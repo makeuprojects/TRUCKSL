@@ -1,0 +1,10 @@
+{
+  "name": "Gestión de Flota",
+  "description": "Sistema PWA y Dashboard para la gestión de flota de camiones, conductores, rutas, gastos y mantenimiento con base de datos en Google Sheets.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
