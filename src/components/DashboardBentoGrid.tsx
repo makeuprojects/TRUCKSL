@@ -32,6 +32,16 @@ import {
 import StatusCard from './StatusCard';
 import { THEME } from '../theme.config';
 
+const safeParse = (val: any): number => {
+  if (val === undefined || val === null) return 0;
+  if (typeof val === 'number') return isNaN(val) ? 0 : val;
+  const str = String(val).trim();
+  if (!str) return 0;
+  const cleaned = str.replace(/[^0-9.-]/g, '');
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
+};
+
 interface DashboardBentoGridProps {
   summary: DashboardSummary | null;
   alerts: ServiceAlert[];
@@ -461,6 +471,34 @@ export default function DashboardBentoGrid({
                     <strong className="text-white font-mono text-xs">{completedTrips.length} Viajes</strong>
                   </div>
                 </div>
+
+                {(() => {
+                  const driverBudget = Number(driver.presupuesto !== undefined && driver.presupuesto !== "" ? driver.presupuesto : 10000);
+                  const driverBalance = Number(driver.saldo_actual !== undefined && driver.saldo_actual !== "" ? driver.saldo_actual : driverBudget);
+                  const totalSpentThisLoad = Math.max(0, driverBudget - driverBalance);
+                  const percentSpent = ((totalSpentThisLoad) / driverBudget) * 100;
+                  
+                  return (
+                    <div className="border-t border-slate-800/60 pt-3 space-y-1.5">
+                      <div className="flex justify-between text-[10px]">
+                        <span className="text-slate-450 uppercase font-semibold text-[8px]">Presupuesto Ejecutado</span>
+                        <span className="font-mono font-bold text-rose-400 text-[10px]">{percentSpent.toFixed(0)}%</span>
+                      </div>
+                      <div className="h-1 w-full bg-slate-900 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-rose-500 rounded-full transition-all duration-300" 
+                          style={{ width: `${Math.min(percentSpent, 100)}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-[10px] items-baseline font-mono">
+                        <span className="text-slate-550 text-[8px] uppercase font-semibold">Monto Gastado</span>
+                        <span className="text-rose-400 font-black text-xs">
+                          BOB {totalSpentThisLoad.toLocaleString('es-BO')}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {inCycleTrip ? (
                   <div className="bg-amber-500/15 border border-amber-500/25 text-amber-300 font-black text-[9px] py-1 px-2 rounded-lg flex items-center justify-between">
@@ -993,7 +1031,7 @@ export default function DashboardBentoGrid({
                     totalTonsExtras += extraTons;
                   });
 
-                  const totalGastoGenerado = driverExpenses.reduce((sum, g) => sum + (Number(g.monto) || 0), 0);
+                  const totalGastoGenerado = driverExpenses.reduce((sum, g) => sum + safeParse(g.monto), 0);
 
                   // Extract all Cloudinary URLs from this driver's trips
                   const imageUrls: string[] = [];
@@ -1057,7 +1095,7 @@ export default function DashboardBentoGrid({
                                   <p className="text-slate-450 text-[10px] italic truncate">{expense.descripcion || 'Sin descripción de ruta'}</p>
                                 </div>
                                 <div className="font-extrabold text-rose-400 font-mono shrink-0">
-                                  -{Number(expense.monto).toLocaleString()} BOB
+                                  -{safeParse(expense.monto).toLocaleString()} BOB
                                 </div>
                               </div>
                             ))}

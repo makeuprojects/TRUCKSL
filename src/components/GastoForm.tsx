@@ -41,8 +41,8 @@ export default function GastoForm({
   const [errorLocal, setErrorLocal] = useState('');
 
   // Driver budget computations
-  const limitePermitido = Number(driver?.presupuesto ?? 10000);
-  const balanceActual = Number(driver?.saldo_actual ?? limitePermitido);
+  const limitePermitido = Number(driver?.presupuesto !== undefined && driver?.presupuesto !== "" ? driver?.presupuesto : 10000);
+  const balanceActual = Number(driver?.saldo_actual !== undefined && driver?.saldo_actual !== "" ? driver?.saldo_actual : limitePermitido);
   const gastoHistorico = Math.max(0, limitePermitido - balanceActual);
   
   // Real-time calculation with current user input
@@ -77,36 +77,6 @@ export default function GastoForm({
   const handleRemoveFile = (index: number) => {
     setGastoFiles((prev) => prev.filter((_, i) => i !== index));
     setGastoFilesUrls((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const manejarEnvioGasto = async (formularioData: { descripcion: string; monto: string; tipo: string; urlFoto?: string }) => {
-    // Armando el objeto bajo el nuevo protocolo basado en eventos
-    const registroEvento = {
-      id_evento_uuid: crypto.randomUUID(), // Genera un ID único para evitar que se duplique por mala señal
-      timestamp_registro: new Date().toISOString(), // Guarda el segundo exacto del registro en ruta
-      id_conductor: driver.nombre_completo || "Mauricio", // Mapeo automático que ya entiende Gemini
-      descripcion_gasto: formularioData.descripcion,
-      monto: Number(formularioData.monto),
-      tipo_gasto: formularioData.tipo, // 'Comida', 'Combustible', etc.
-      enlace_comprobante: formularioData.urlFoto || "" 
-    };
-
-    try {
-      const respuesta = await fetch("https://script.google.com/macros/s/AKfycbxkz2knra1-RVlwQnF2GJ0BmTogZ8oa1k-Xs2T5H2Lx3NbfAF9ES_qwcpG2QKmAOhZM/exec", {
-        method: "POST",
-        body: JSON.stringify({
-          action: "Gastos",
-          data: registroEvento
-        })
-      });
-
-      const resultado = await respuesta.json();
-      if (resultado.status === "success") {
-        console.log("¡Gasto registrado en Apps Script con éxito! Don Saúl ya lo puede ver en su panel.");
-      }
-    } catch (error) {
-      console.error("Error al empujar el gasto al flujo:", error);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -167,14 +137,6 @@ export default function GastoForm({
       };
 
       console.log('Enviando a Sheets:', expensePayload);
-
-      // Trigger user's tracking web-hook in background to satisfy protocol directives without blocking UX
-      manejarEnvioGasto({
-        descripcion: expensePayload.descripcion,
-        monto: String(expensePayload.monto),
-        tipo: expensePayload.tipo_gasto,
-        urlFoto: expensePayload.foto_url
-      }).catch(err => console.warn('Apps Script webhook background failure', err));
 
       const res = await fetch('/api/gastos', {
         method: 'POST',

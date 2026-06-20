@@ -653,8 +653,8 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
           {/* Real Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative z-10">
             {choferes.map((driver, index) => {
-              const driverBudget = Number(driver.presupuesto || 10000);
-              const driverBalance = Number(driver.saldo_actual !== undefined ? driver.saldo_actual : driverBudget);
+              const driverBudget = Number(driver.presupuesto !== undefined && driver.presupuesto !== "" ? driver.presupuesto : 10000);
+              const driverBalance = Number(driver.saldo_actual !== undefined && driver.saldo_actual !== "" ? driver.saldo_actual : driverBudget);
               const trips = viajes.filter(v => v.id_chofer === driver.id_chofer);
               const completedCount = trips.filter(v => v.estado_viaje === 'Finalizado').length;
               const hasActiveTrip = trips.some(v => v.estado_viaje === 'En Ciclo');
@@ -709,12 +709,34 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
                         style={{ width: `${Math.max(0, Math.min(100, (driverBalance / driverBudget) * 100))}%` }}
                       ></div>
                     </div>
-                    <div className="flex justify-between items-baseline pt-0.5">
+                    <div className="flex justify-between items-baseline pt-0.5 pb-1">
                       <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider font-sans">Saldo</span>
                       <strong className="text-sm font-black text-slate-200 font-mono">
                         {driverBalance.toLocaleString('es-BO')} / {driverBudget.toLocaleString('es-BO')} BOB
                       </strong>
                     </div>
+
+                    {/* Presupuesto Ejecutado / Total Gastado */}
+                    {(() => {
+                      const totalSpentThisLoad = Math.max(0, driverBudget - driverBalance);
+                      const totalHistoricSpent = (gastos || [])
+                        .filter(g => {
+                          const gChofer = String(g.id_chofer || '').trim().toLowerCase();
+                          const dChofer = String(driver.id_chofer || '').trim().toLowerCase();
+                          const dNombre = String(driver.nombre_completo || '').trim().toLowerCase();
+                          return gChofer === dChofer || gChofer === dNombre;
+                        })
+                        .reduce((sum, g) => sum + safeParse(g.monto), 0);
+                      
+                      return (
+                        <div className="flex justify-between items-center pt-1.5 border-t border-slate-800/40 text-[10.5px]">
+                          <span className="text-slate-450 font-bold uppercase tracking-wider text-[9px]">Gasto acumulado</span>
+                          <span className="font-mono font-black text-rose-400" title={`Histórico total en sábanas: BOB ${totalHistoricSpent.toLocaleString('es-BO')}`}>
+                             BOB {totalSpentThisLoad.toLocaleString('es-BO', { minimumFractionDigits: 1 })}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   <div className="flex justify-between text-[10px] border-t border-slate-800/40 pt-2.5">

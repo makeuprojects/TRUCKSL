@@ -12,11 +12,20 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedGasto, setSelectedGasto] = useState<Gasto | null>(null);
 
-  // Match drivers by ID
+  // Match drivers by ID or name
   const getDriverName = (id_chofer?: string) => {
     if (!id_chofer) return 'Don Saúl (Admin)';
-    const c = choferes.find((driver) => driver.id_chofer === id_chofer);
-    return c ? c.nombre_completo : `Chofer #${id_chofer}`;
+    const trimmedId = String(id_chofer).trim();
+    const c = choferes.find((driver) => 
+      driver.id_chofer === trimmedId || 
+      driver.nombre_completo.toLowerCase() === trimmedId.toLowerCase()
+    );
+    if (c) return c.nombre_completo;
+    // If it's literally a name, return it as capitalized clean name
+    if (/^[A-Za-z\s]+$/.test(trimmedId)) {
+      return trimmedId;
+    }
+    return `Chofer #${trimmedId}`;
   };
 
   // Safe parsing helper

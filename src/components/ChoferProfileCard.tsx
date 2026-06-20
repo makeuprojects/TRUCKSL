@@ -17,6 +17,16 @@ import {
 } from 'lucide-react';
 import { Chofer, Gasto } from '../types';
 
+const safeParse = (val: any): number => {
+  if (val === undefined || val === null) return 0;
+  if (typeof val === 'number') return isNaN(val) ? 0 : val;
+  const str = String(val).trim();
+  if (!str) return 0;
+  const cleaned = str.replace(/[^0-9.-]/g, '');
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
+};
+
 interface ChoferProfileCardProps {
   chofer: Chofer;
   gastos: Gasto[];
@@ -48,8 +58,8 @@ export default function ChoferProfileCard({
     return Array.isArray(arr) ? arr : [];
   }
 
-  const budgetNum = Number(chofer.presupuesto || 10000);
-  const balanceNum = Number(chofer.saldo_actual !== undefined ? chofer.saldo_actual : budgetNum);
+  const budgetNum = Number(chofer.presupuesto !== undefined && chofer.presupuesto !== "" ? chofer.presupuesto : 10000);
+  const balanceNum = Number(chofer.saldo_actual !== undefined && chofer.saldo_actual !== "" ? chofer.saldo_actual : budgetNum);
   const percentSpent = Math.max(0, Math.min(100, ((budgetNum - balanceNum) / budgetNum) * 100));
 
   const handleReset = async () => {
@@ -103,20 +113,20 @@ export default function ChoferProfileCard({
       <div className="flex-1 overflow-y-auto pr-1 py-5 space-y-6 scrollbar-thin scrollbar-thumb-slate-800">
         
         {/* Core Balances Grid */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {/* Presupuesto */}
           <div className="bg-slate-950/60 border border-slate-800 p-4 rounded-2xl">
             <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
               Límite Presupuesto
             </span>
-            <div className="flex items-baseline space-x-1 mt-1.5">
+            <div className="flex items-baseline space-x-1 mt-1.5 font-sans">
               <span className="text-xs text-slate-400 font-mono font-bold">BOB</span>
               <span className="text-xl font-black text-slate-100 font-mono leading-none">
                 {budgetNum.toLocaleString('es-BO', { minimumFractionDigits: 2 })}
               </span>
             </div>
             <p className="text-[10px] text-slate-400 mt-1 leading-normal">
-              Asignado para reposición de caja chica.
+              Asignado para caja chica.
             </p>
           </div>
 
@@ -125,14 +135,30 @@ export default function ChoferProfileCard({
             <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">
               Saldo Restante
             </span>
-            <div className="flex items-baseline space-x-1 mt-1.5">
+            <div className="flex items-baseline space-x-1 mt-1.5 font-sans">
               <span className="text-xs font-mono font-bold text-emerald-500">BOB</span>
               <span className="text-xl font-black text-[#10B981] font-mono leading-none">
                 {balanceNum.toLocaleString('es-BO', { minimumFractionDigits: 2 })}
               </span>
             </div>
             <p className="text-[10px] text-slate-400 mt-1 leading-normal">
-              Disponible para registrar nuevas compras.
+              Disponible para compras.
+            </p>
+          </div>
+
+          {/* Total Ejecutado */}
+          <div className="bg-[#1e1c27]/60 border border-rose-950/30 p-4 rounded-2xl col-span-2 sm:col-span-1">
+            <span className="text-[10px] text-rose-455 font-bold block uppercase tracking-wider">
+              Monto Gastado
+            </span>
+            <div className="flex items-baseline space-x-1 mt-1.5 font-sans">
+              <span className="text-xs font-mono font-bold text-rose-500 font-sans">BOB</span>
+              <span className="text-xl font-black text-rose-400 font-mono leading-none">
+                {Math.max(0, budgetNum - balanceNum).toLocaleString('es-BO', { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+            <p className="text-[10px] text-slate-400 mt-1 leading-normal">
+              Presupuesto ejecutado en ruta.
             </p>
           </div>
         </div>
@@ -228,7 +254,7 @@ export default function ChoferProfileCard({
                       <div className="text-right shrink-0">
                         <span className="text-xs text-slate-500 font-mono block">Monto</span>
                         <span className="text-sm font-black text-rose-400 font-mono">
-                          -{Number(gasto.monto).toLocaleString('es-BO')} BOB
+                          -{safeParse(gasto.monto).toLocaleString('es-BO')} BOB
                         </span>
                       </div>
                     </div>

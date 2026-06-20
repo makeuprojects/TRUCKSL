@@ -24,17 +24,28 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
     const route = rutas.find(r => r.id_ruta === viaje.id_ruta);
     const searchLower = searchTerm.toLowerCase();
 
-    const matchesDriver = drv?.nombre_completo.toLowerCase().includes(searchLower);
-    const matchesRoute = route?.origen.toLowerCase().includes(searchLower) || route?.destino.toLowerCase().includes(searchLower);
-    const matchesId = viaje.id_viaje.toLowerCase().includes(searchLower);
+    const matchesDriver = drv?.nombre_completo ? String(drv.nombre_completo).toLowerCase().includes(searchLower) : false;
+    const matchesRoute = (route?.origen ? String(route.origen).toLowerCase().includes(searchLower) : false) || 
+                         (route?.destino ? String(route.destino).toLowerCase().includes(searchLower) : false);
+    const matchesId = viaje.id_viaje ? String(viaje.id_viaje).toLowerCase().includes(searchLower) : false;
 
     return matchesDriver || matchesRoute || matchesId;
   });
 
+  const safeParse = (val: any): number => {
+    if (val === undefined || val === null) return 0;
+    if (typeof val === 'number') return isNaN(val) ? 0 : val;
+    const str = String(val).trim();
+    if (!str) return 0;
+    const cleaned = str.replace(/[^0-9.-]/g, '');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+  };
+
   const getTripTotalExpenses = (tripId: string) => {
     return gastos
-      .filter(g => g.id_viaje === tripId)
-      .reduce((acc, g) => acc + (parseFloat(g.monto) || 0), 0);
+      .filter(g => g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(tripId).trim().toLowerCase())
+      .reduce((acc, g) => acc + safeParse(g.monto), 0);
   };
 
   const handleExportPDF = (viaje: Viaje, chofer?: Chofer, ruta?: Ruta) => {
@@ -43,7 +54,7 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
     setTimeout(() => {
       try {
         const doc = new jsPDF('p', 'mm', 'a4');
-        const tripExpenses = gastos.filter(g => g.id_viaje === viaje.id_viaje);
+        const tripExpenses = gastos.filter(g => g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(viaje.id_viaje).trim().toLowerCase());
         const totalGastado = getTripTotalExpenses(viaje.id_viaje);
 
         // Título corporativo
@@ -76,7 +87,7 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
           new Date(g.fecha).toLocaleDateString() || '-',
           g.tipo_gasto || 'Otro',
           g.descripcion || '-',
-          `${parseFloat(g.monto).toLocaleString('es-BO', { minimumFractionDigits: 2 })}`
+          `${safeParse(g.monto).toLocaleString('es-BO', { minimumFractionDigits: 2 })}`
         ]);
 
         // Fila final de totales

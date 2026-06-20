@@ -275,6 +275,9 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
     setActiveViaje(null);
     setPin('');
     localStorage.removeItem('driver_session_user');
+    if (onLogout) {
+      onLogout();
+    }
   };
 
   // Start trip operation
@@ -298,7 +301,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
   };
 
   const executeStartTrip = async (ruta: Ruta) => {
-    setModalType(null);
+    if (!ruta || startingRouteId !== null) return;
     setStartingRouteId(ruta.id_ruta);
     setMessage({ text: '', type: 'info' });
 
@@ -310,6 +313,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
     if (isVehicleBusy || isDriverBusy) {
         setMessage({ text: 'Error: Operación rechazada. El camión o chofer ya se encuentran en ruta.', type: 'error' });
         setStartingRouteId(null);
+        setModalType(null);
         return;
     }
 
@@ -334,11 +338,14 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
         setActiveViaje(data.data);
         setMessage({ text: '¡Viaje iniciado con éxito! El camión ya se encuentra en ciclo.', type: 'success' });
         loadDriverData();
+        setModalType(null); // Close on success!
       } else {
         setMessage({ text: data.message || 'No se pudo iniciar el viaje.', type: 'error' });
+        setModalType(null); // Close to show error message
       }
     } catch (err) {
       setMessage({ text: 'Error de red. No se pudo conectar al servidor.', type: 'error' });
+      setModalType(null);
     } finally {
       setStartingRouteId(null);
     }
@@ -376,7 +383,11 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
       return;
     }
 
-    const availableBalance = Number(authenticatedDriver?.saldo_actual ?? authenticatedDriver?.presupuesto ?? 10000);
+    const availableBalance = Number(
+      authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== ""
+        ? authenticatedDriver.saldo_actual
+        : (authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000)
+    );
     if (Number(montoGasto) > availableBalance) {
       setExpenseModalError('Alerta de saldo: El monto excede tu saldo asignado disponible.');
       return;
@@ -1386,13 +1397,24 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               {/* Progress Bar for Expenses */}
               <div className="bg-slate-950/40 border border-slate-855 p-4 rounded-3xl space-y-2">
                 <div className="flex justify-between items-center text-[9px] text-slate-500 font-extrabold uppercase tracking-wider leading-none">
-                  <span>Presupuesto</span>
-                  <span>{(((Number(authenticatedDriver?.presupuesto || 10000) - Number(authenticatedDriver?.saldo_actual || 10000)) / Number(authenticatedDriver?.presupuesto || 10000)) * 100).toFixed(0)}%</span>
+                  <span>Saldo Disponible</span>
+                  {(() => {
+                    const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
+                    const statSaldoActual = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : statPresupuesto);
+                    const remainingPercent = Math.max(0, Math.min(100, (statSaldoActual / statPresupuesto) * 100));
+                    return <span>{remainingPercent.toFixed(0)}%</span>;
+                  })()}
                 </div>
                 <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
-                    style={{ width: `${Math.min(((Number(authenticatedDriver?.presupuesto || 10000) - Number(authenticatedDriver?.saldo_actual || 10000)) / Number(authenticatedDriver?.presupuesto || 10000)) * 100, 100)}%` }}
+                    style={{
+                      width: `${Math.max(0, Math.min(100, (() => {
+                        const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
+                        const statSaldoActual = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : statPresupuesto);
+                        return (statSaldoActual / statPresupuesto) * 100;
+                      })()))}%`
+                    }}
                   />
                 </div>
               </div>
@@ -1542,20 +1564,32 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               <div className="grid grid-cols-2 gap-3 pt-1">
                 <button
                   type="button"
+                  disabled={startingRouteId !== null}
                   onClick={() => {
                     setModalType(null);
                     setSelectedRutaToStart(null);
                   }}
-                  className="bg-slate-950 border border-slate-800 text-slate-300 hover:bg-slate-900 font-bold py-3 px-4 rounded-xl text-xs transition uppercase cursor-pointer"
+                  className="bg-slate-950 border border-slate-800 text-slate-300 hover:bg-slate-900 font-bold py-3 px-4 rounded-xl text-xs transition uppercase cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancelar
                 </button>
                 <button
                   type="button"
+                  disabled={startingRouteId !== null}
                   onClick={() => executeStartTrip(selectedRutaToStart)}
-                  className="bg-emerald-500 text-slate-950 font-black hover:bg-emerald-400 py-3 px-4 rounded-xl text-xs transition cursor-pointer shadow uppercase"
+                  className="bg-emerald-500 text-slate-950 font-black hover:bg-emerald-400 py-3 px-4 rounded-xl text-xs transition cursor-pointer shadow uppercase flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Confirmar
+                  {startingRouteId !== null ? (
+                    <>
+                      <svg className="animate-spin h-3.5 w-3.5 text-slate-950" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Iniciando...
+                    </>
+                  ) : (
+                    'Confirmar'
+                  )}
                 </button>
               </div>
             </motion.div>

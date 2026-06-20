@@ -68,7 +68,7 @@ export default function RouteDetailDrawer({
   const currentTruck = camiones.find((t) => t.id_camion === viaje.id_camion);
 
   const routeExpenses = gastos
-    .filter((g) => g.id_viaje === viaje.id_viaje)
+    .filter((g) => g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(viaje.id_viaje).trim().toLowerCase())
     .map(g => ({
       ...g,
       normalizedCat: normalizeCategory(g.tipo_gasto)

@@ -114,9 +114,11 @@ apiRouter.post('/auth/login', async (req, res) => {
 
     const trimmedNameInput = normalizedName.toLowerCase().trim();
     let match = choferes.find(
-      c => c.nombre_completo.toLowerCase().trim() === trimmedNameInput &&
-           String(c.pin_acceso) === String(pin) &&
-           c.estado === 'Activo'
+      c => c.nombre_completo &&
+           typeof c.nombre_completo === 'string' &&
+           c.nombre_completo.toLowerCase().trim() === trimmedNameInput &&
+           String(c.pin_acceso || '') === String(pin) &&
+           String(c.estado || '').toLowerCase() === 'activo'
     );
 
     // Fallback: PIN 1234
@@ -156,7 +158,7 @@ apiRouter.post('/choferes/login', async (req, res) => {
     }
 
     const choferes = await getCachedSheetRows<any>(authHeader, 'Choferes');
-    let match = choferes.find(c => String(c.pin_acceso) === String(pin) && c.estado === 'Activo');
+    let match = choferes.find(c => String(c.pin_acceso || '') === String(pin) && String(c.estado || '').toLowerCase() === 'activo');
 
     if (!match && String(pin) === '1234') {
       match = {
@@ -270,13 +272,31 @@ apiRouter.post('/choferes', async (req, res) => {
     
     const payload = {
       id_chofer: body.id_chofer || '',
-      nombre_completo: body.nombre_completo || '',
+      nombre_completo: (body.nombre_completo || '').trim(),
       telefono: body.telefono || '',
       pin_acceso: body.pin_acceso || '0000',
       estado: body.estado || 'Activo',
       presupuesto: body.presupuesto || '10000',
       saldo_actual: body.saldo_actual || body.presupuesto || '10000'
     };
+
+    if (!payload.id_chofer || !payload.nombre_completo) {
+      return res.status(400).json({ success: false, message: 'Se requiere ID de chofer y Nombre Completo.' });
+    }
+
+    const choferes = await getCachedSheetRows<any>(authHeader, 'Choferes');
+    const normalizedNewName = normalizeName(payload.nombre_completo).toLowerCase().trim();
+
+    // Check if duplicate ID or same name exists
+    const existing = choferes.find(
+      c => (c.id_chofer && String(c.id_chofer).toLowerCase().trim() === String(payload.id_chofer).toLowerCase().trim()) ||
+           (c.nombre_completo && normalizeName(c.nombre_completo).toLowerCase().trim() === normalizedNewName)
+    );
+
+    if (existing) {
+      console.log(`[API Create Chofer] Duplicate driver detected for name "${payload.nombre_completo}" or ID "${payload.id_chofer}". Returning existing driver to avoid clones.`);
+      return res.json({ success: true, data: existing, message: 'El conductor ya existe.' });
+    }
 
     const result = await sheetsQueue.enqueue(async () => {
       const data = await appendSheetRow(authHeader, 'Choferes', payload, 'id_chofer');
@@ -478,6 +498,29 @@ apiRouter.post('/viajes/:id/finalizar', async (req, res) => {
       const valueExtraTotal = extTons * pricePerTon;
       const driverBonus = valueExtraTotal * 0.40;
       const adminBonus = valueExtraTotal * 0.60;
+
+      // 1. Maintain driver balance for next trips (DO NOT mix trip salary payouts with the monthly active cash advance wallet)
+      console.log(`[Balance Control] Driver ${viaje.id_chofer} maintains their balance intact for next trips without mixing with salary payout.`);
+
+      // 2. Append Gasto entry representing the payout of this trip for administrative logging
+      try {
+        const payoutExpensePayload = {
+          id_viaje: id_viaje,
+          id_camion: viaje.id_camion,
+          id_chofer: viaje.id_chofer,
+          tipo_gasto: 'Pago Chofer',
+          monto: String((tarifaBase + driverBonus).toFixed(2)),
+          fecha: new Date().toISOString().split('T')[0],
+          descripcion: `Pago de tarifa base (${tarifaBase} BOB) + bono extra (${driverBonus.toFixed(2)} BOB) al finalizar viaje.`,
+          foto_url: foto_pesaje_url || '',
+          id_evento_uuid: req.body.id_evento_uuid ? `payout-${req.body.id_evento_uuid}` : `payout-${id_viaje}-${Date.now()}`,
+          timestamp_registro: new Date().toISOString()
+        };
+        await appendSheetRow(authHeader, 'Gastos', payoutExpensePayload, 'id_gasto');
+        invalidateSheetCache('Gastos');
+      } catch (err) {
+        console.warn('[Finalize Trip] Non-blocking warn: Could not record payout in Gastos:', err);
+      }
 
       // Invalidate related cache cells
       invalidateSheetCache('Rutas');

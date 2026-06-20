@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast, Toaster } from 'sonner';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
@@ -81,6 +81,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   const [trucksListRef] = useAutoAnimate();
   const [activeRoutesListRef] = useAutoAnimate();
   const [sparePartsTableRef] = useAutoAnimate();
+  const seenEventsRef = useRef<Set<string>>(new Set());
 
   // Core Data Lists
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -189,6 +190,21 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
       if (resSummary.success) {
         setSummary(resSummary.summary);
         setAlerts(resSummary.alertas_servicio || []);
+        
+        // Trigger live notifications for any new dynamic events matching drivers
+        if (Array.isArray(resSummary.novedades_tiempo_real)) {
+          resSummary.novedades_tiempo_real.forEach((event: any) => {
+            const eventKey = event.uuid || `${event.tipo_evento}-${event.timestamp_registro}-${event.id_referencia}`;
+            if (eventKey && !seenEventsRef.current.has(eventKey)) {
+              seenEventsRef.current.add(eventKey);
+              toast.info(`${event.tipo_evento}`, {
+                description: `${event.descripcion} (hace ${event.hace})`,
+                duration: 6000,
+                icon: '🚚'
+              });
+            }
+          });
+        }
       }
       if (resCamiones.success) setCamiones(resCamiones.data);
       if (resRutas.success) setRutas(resRutas.data);
@@ -198,7 +214,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
       if (resChoferes.success) setChoferes(resChoferes.data);
 
       const now = new Date();
-      setLastSyncText(`Sincronizado hoy a las ${now.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`);
+      setLastSyncText(`Monitoreo en vivo • Sync: ${now.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`);
       setInitialLoaded(true);
     } catch (error: any) {
       console.error(error);
@@ -210,7 +226,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
   useEffect(() => {
     syncDatabase();
-    const interval = setInterval(syncDatabase, 30000); // 30 seconds polling
+    // Fast 5-second polling coordinates immediate synchronization 24/7 without delays!
+    const interval = setInterval(syncDatabase, 5000);
     return () => clearInterval(interval);
   }, [token]);
 
@@ -550,10 +567,13 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   };
 
   // Filters for Bento Grid Lists
-  const filteredDrivers = choferes.filter((d) => 
-    d.nombre_completo.toLowerCase().includes(driverSearchQuery.toLowerCase()) ||
-    d.id_chofer.toLowerCase().includes(driverSearchQuery.toLowerCase())
-  );
+  const filteredDrivers = choferes.filter((d) => {
+    if (!d) return false;
+    const name = String(d.nombre_completo || '').toLowerCase();
+    const id = String(d.id_chofer || '').toLowerCase();
+    const query = String(driverSearchQuery || '').toLowerCase();
+    return name.includes(query) || id.includes(query);
+  });
 
   const filteredTrucks = camiones.filter((t) => {
     if (truckFilterActive === 'todos') return true;

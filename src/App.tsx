@@ -156,13 +156,14 @@ export default function App() {
               googleToken ? (
                 <AdminConsoleLayout
                   token={googleToken}
-                  userEmail={currentUser?.email}
+                  userEmail={currentUser?.email || 'Don Saúl (Sheets Público 24/7)'}
                   onSignOut={handleGoogleSignOut}
                 />
               ) : (
                 <AdminGoogleLoginGate
                   isLoggingIn={isLoggingIn}
                   onLogin={() => handleGoogleLogin()}
+                  onBypass={() => setGoogleToken('anonymous-public-sheets-session')}
                 />
               )
             }
@@ -341,18 +342,33 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
         if (data.success && data.data) {
           // Keep only active drivers
           const actives = data.data.filter((c: any) => c.estado === 'Activo');
-          setChoferList(actives);
+          
+          // Deduplicate based on id_chofer or name to avoid listing cloned entries in the select
+          const uniqueActives: any[] = [];
+          const seen = new Set<string>();
+          for (const item of actives) {
+            const key = String(item.id_chofer || item.nombre_completo).toLowerCase().trim();
+            if (!seen.has(key)) {
+              seen.add(key);
+              uniqueActives.push(item);
+            }
+          }
+          
+          setChoferList(uniqueActives);
           try {
-            localStorage.setItem('fallback_choferes_cache', JSON.stringify(actives));
+            localStorage.setItem('fallback_choferes_cache', JSON.stringify(uniqueActives));
           } catch (storageErr) {
             console.warn('Could not save choferes to local cache:', storageErr);
           }
         }
       } catch (err) {
-        console.error('Cannot load drivers lists for helper select', err);
+        console.warn('Cannot load drivers lists for helper select - using local fallback lists storage:', err);
       }
     };
     fetchDrivers();
+    // Re-attempt after 4 seconds if fallback is in place to ensure smooth loading
+    const timer = setTimeout(fetchDrivers, 4000);
+    return () => clearTimeout(timer);
   }, [googleToken]);
 
   const handleLocalSubmit = async (e: React.FormEvent) => {
@@ -515,63 +531,82 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
 interface AdminGoogleLoginGateProps {
   isLoggingIn: boolean;
   onLogin: () => void;
+  onBypass: () => void;
 }
 
-function AdminGoogleLoginGate({ isLoggingIn, onLogin }: AdminGoogleLoginGateProps) {
+function AdminGoogleLoginGate({ isLoggingIn, onLogin, onBypass }: AdminGoogleLoginGateProps) {
   const navigate = useNavigate();
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleAdminAccess = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (password === 'SL1234') {
+      onBypass();
+    } else {
+      setError(true);
+      setTimeout(() => setError(false), 2000);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#070a13] flex items-center justify-center p-4">
       <div className="max-w-md w-full backdrop-blur-[12px] bg-[#0d1324]/80 border border-[#1e2943]/50 rounded-[24px] p-8 space-y-6 shadow-2xl relative text-center">
         
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-t-[24px]"></div>
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-indigo-600 rounded-t-[24px]"></div>
 
-        <div className="mx-auto w-16 h-16 bg-indigo-500/10 text-indigo-400 rounded-full border border-indigo-500/20 flex items-center justify-center shadow-lg">
-          <Key className="w-8 h-8" />
+        <div className="mx-auto w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 flex items-center justify-center shadow-lg">
+          <Layout className="w-8 h-8" />
         </div>
 
         <div className="space-y-1.5">
-          <h2 className="text-xl font-bold text-white tracking-tight">Acceso Privado Admin</h2>
-          <p className="text-[10px] text-slate-300 uppercase tracking-widest font-semibold">
-            Consola Principal Don Saúl
+          <h2 className="text-xl font-bold text-white tracking-tight">Consola de Don Saúl</h2>
+          <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-semibold font-mono">
+            Acceso Restringido
           </p>
         </div>
 
-        <p className="text-xs text-slate-300 leading-relaxed max-w-sm px-2">
-          Para acceder a la bitácora financiera consolidada, agregar camiones y modificar rutas de reparto se requiere conectar una cuenta autorizada de administrador de Google Sheets.
+        <p className="text-xs text-slate-300 leading-relaxed max-w-sm px-2 mx-auto">
+          Ingrese la contraseña de administrador para acceder a la consola centralizada de la flota.
         </p>
 
-        <div className="space-y-3 pt-2">
-          <button
-            onClick={onLogin}
-            disabled={isLoggingIn}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-750 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-xl flex items-center justify-center gap-2 transition cursor-pointer transform active:scale-98"
-          >
-            {isLoggingIn ? (
-              <>
-                <Sparkles className="w-4 h-4 animate-spin" />
-                <span>Vinculando Google...</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
-                  <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18c-3.86 0-7-3.14-7-7s3.14-7 7-7c1.71 0 3.28.62 4.49 1.64l2.463-2.463C17.38 1.63 14.97 1 12.24 1 6.723 1 2.24 5.48 2.24 11s4.483 10 10 10c5.772 0 10-4.06 10-10 0-.614-.057-1.2-.164-1.715H12.24z" />
-                </svg>
-                <span>Conectar con Google</span>
-              </>
+        <form onSubmit={handleAdminAccess} className="space-y-3 pt-1">
+          <div>
+            <input
+              type="password"
+              placeholder="Contraseña de acceso"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (error) setError(false);
+              }}
+              className={`w-full bg-[#151d2f]/80 border ${error ? 'border-red-500/50 text-red-100 placeholder-red-500/50' : 'border-indigo-500/30 text-emerald-100'} rounded-xl py-3.5 px-4 text-center focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition`}
+            />
+            {error && (
+              <p className="text-[10px] text-red-400 mt-2 font-mono">Contraseña incorrecta</p>
             )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 active:scale-[0.98] text-slate-950 font-extrabold py-3.5 px-4 rounded-xl shadow-xl flex items-center justify-center gap-2 transition cursor-pointer transform font-sans text-xs tracking-wider uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!password.trim()}
+          >
+            <span>INGRESAR COMO DON SAÚL</span>
+            <ChevronRight className="w-4 h-4 text-slate-950" />
           </button>
 
           <button
+            type="button"
             onClick={() => navigate('/')}
-            className="w-full bg-[#0d1324] border border-[#1e2943]/60 hover:bg-[#16223f] text-slate-300 font-extrabold py-2.5 px-4 rounded-xl transition text-xs uppercase"
+            className="w-full bg-transparent hover:bg-slate-950 text-slate-400 font-bold py-2 px-4 rounded-xl transition text-[10px] uppercase tracking-wider mt-2"
           >
-            VOLVER AL SELECTOR
+            VOLVER AL PORTAL
           </button>
-        </div>
+        </form>
 
-        <div className="pt-2 text-[10px] text-slate-300 font-mono">
-          Tu sesión administrativa habilitará el proxy del servidor.
+        <div className="pt-2 text-[9px] text-slate-400 font-mono leading-relaxed">
+          Google Sheets ID: <span className="text-indigo-400 block break-all">1ZNuFluKQi3lFP5qF-eQtfvDCcIDotu4v8jV89GwRgsQ</span>
         </div>
       </div>
     </div>

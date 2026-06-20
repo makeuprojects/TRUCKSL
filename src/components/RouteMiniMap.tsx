@@ -23,9 +23,9 @@ const BOLIVIA_CITIES: CityNode[] = [
 ];
 
 // Helper to find matching node by string
-const findCityNode = (cityName: string): CityNode | null => {
+const findCityNode = (cityName: string | undefined): CityNode | null => {
   if (!cityName) return null;
-  const cleanName = cityName.toLowerCase().trim();
+  const cleanName = String(cityName).toLowerCase().trim();
   return BOLIVIA_CITIES.find(city => 
     city.matchKeys.some(key => cleanName.includes(key)) ||
     cleanName.includes(city.id)
@@ -33,9 +33,9 @@ const findCityNode = (cityName: string): CityNode | null => {
 };
 
 // Route information helper
-const getRouteMetadata = (orig: string, dest: string) => {
-  const o = orig.toLowerCase();
-  const d = dest.toLowerCase();
+const getRouteMetadata = (orig: string | undefined, dest: string | undefined) => {
+  const o = String(orig || '').toLowerCase();
+  const d = String(dest || '').toLowerCase();
 
   if (o.includes('la paz') && d.includes('oruro') || o.includes('oruro') && d.includes('la paz')) {
     return { dist: '~230 km', msg: 'Tránsito por Doble Vía LP-OR' };
