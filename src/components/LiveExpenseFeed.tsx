@@ -48,21 +48,21 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
 
   return (
     <div id="live-expense-feed" className="bg-[#1E293B]/40 hover:bg-[#1E293B]/50 backdrop-blur-md border border-white/[0.05] rounded-2xl p-6 transition duration-300 flex flex-col h-[400px]">
-      <div className="flex items-center justify-between border-b border-slate-800/80 pb-3.5 mb-4 shrink-0">
+      <div className="flex items-center justify-between border-b border-[#112240]/80 pb-3.5 mb-4 shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></div>
-          <h3 className="font-extrabold text-white text-sm uppercase tracking-wider font-sans">
+          <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider font-sans">
             Módulo de Rendición en Vivo • Liqui-Feed
           </h3>
         </div>
-        <span className="text-[10px] text-slate-400 font-mono bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+        <span className="text-[10px] text-slate-300 font-mono bg-[#0A192F] px-2 py-0.5 rounded border border-[#112240]">
           {sortedGastos.length} reportes
         </span>
       </div>
 
       {sortedGastos.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-slate-500 font-sans space-y-2">
-          <CreditCard className="w-10 h-10 stroke-[1.2] text-slate-600" />
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-slate-600 font-sans space-y-2">
+          <CreditCard className="w-10 h-10 stroke-[1.2] text-slate-700" />
           <p className="text-xs">No hay liquidaciones reportadas aún.</p>
         </div>
       ) : (
@@ -78,7 +78,7 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: Math.min(idx * 0.05, 0.4) }}
-                className="group flex items-start justify-between p-3.5 rounded-xl bg-slate-930/60 hover:bg-slate-900/80 border border-white/[0.02] hover:border-white/[0.06] transition"
+                className="group flex items-start justify-between p-3.5 rounded-xl bg-slate-930/60 hover:bg-[#0A192F]/80 border border-white/[0.02] hover:border-white/[0.06] transition"
               >
                 <div className="flex items-start gap-3 min-w-0">
                   {/* Category icon or thumbnail */}
@@ -88,7 +88,7 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
                         setSelectedImage(rawPhotos[0]);
                         setSelectedGasto(g);
                       }}
-                      className="w-12 h-12 rounded-lg bg-slate-950 border border-slate-800 overflow-hidden relative cursor-zoom-in shrink-0 group/thumb"
+                      className="w-12 h-12 rounded-lg bg-slate-950 border border-[#112240] overflow-hidden relative cursor-zoom-in shrink-0 group/thumb"
                     >
                       <img
                         src={rawPhotos[0]}
@@ -98,11 +98,11 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition">
-                        <Maximize2 className="w-3 h-3 text-white" />
+                        <Maximize2 className="w-3 h-3 text-slate-900" />
                       </div>
                     </div>
                   ) : (
-                    <div className="w-12 h-12 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-indigo-400 shrink-0 font-bold text-xs uppercase">
+                    <div className="w-12 h-12 rounded-lg bg-[#0A192F] border border-[#112240] flex items-center justify-center text-[#1E3A8A] shrink-0 font-bold text-xs uppercase">
                       {g.tipo_gasto ? g.tipo_gasto.substring(0, 3) : 'GST'}
                     </div>
                   )}
@@ -110,14 +110,14 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
                   {/* Driver & details */}
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-extrabold text-white text-xs group-hover:text-amber-400 transition truncate max-w-[140px]">
+                      <span className="font-extrabold text-slate-900 text-xs group-hover:text-orange-400 transition truncate max-w-[140px]">
                         {driverName}
                       </span>
-                      <span className="bg-slate-900 text-slate-350 border border-slate-800 text-[8.5px] uppercase font-bold px-1.5 py-0.5 rounded">
+                      <span className="bg-[#0A192F] text-slate-350 border border-[#112240] text-[8.5px] uppercase font-bold px-1.5 py-0.5 rounded">
                         {g.tipo_gasto || 'General'}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-350 font-normal leading-relaxed text-slate-300 mt-1 max-w-[240px] truncate" title={g.descripcion}>
+                    <p className="text-[11px] text-slate-350 font-normal leading-relaxed text-slate-700 mt-1 max-w-[240px] truncate" title={g.descripcion}>
                       {g.descripcion || 'Sin descripción'}
                     </p>
                     <div className="flex items-center gap-2 mt-1.5 text-[9px] text-slate-450 font-mono">
@@ -133,7 +133,7 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
 
                 {/* Amount in Geist Mono */}
                 <div className="text-right shrink-0">
-                  <span className="text-[10px] text-slate-400 font-mono mr-1">BOB</span>
+                  <span className="text-[10px] text-slate-300 font-mono mr-1">BOB</span>
                   <span className="text-sm font-black text-rose-450 font-mono tracking-tight group-hover:text-rose-400 transition">
                     -{montoNum.toLocaleString('es-BO', { minimumFractionDigits: 1 })}
                   </span>
@@ -155,13 +155,13 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
               transition={{ type: 'spring', damping: 25 }}
               className="relative max-w-xl w-full bg-[#1E293B]/90 border border-white/[0.08] rounded-3xl p-4 overflow-hidden shadow-2xl flex flex-col"
             >
-              <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+              <div className="flex justify-between items-center pb-3 border-b border-[#112240]">
                 <div>
-                  <h4 className="font-extrabold text-white text-xs uppercase tracking-wide">
+                  <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wide">
                     Auditoría de Comprobante Digital
                   </h4>
                   {selectedGasto && (
-                    <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                    <p className="text-[10px] text-slate-300 font-mono mt-0.5">
                       Rendición por {getDriverName(selectedGasto.id_chofer)}
                     </p>
                   )}
@@ -171,14 +171,14 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
                     setSelectedImage(null);
                     setSelectedGasto(null);
                   }}
-                  className="text-slate-400 hover:text-white p-1.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-lg cursor-pointer transition"
+                  className="text-slate-300 hover:text-slate-900 p-1.5 bg-slate-950 hover:bg-[#0A192F] border border-[#112240] rounded-lg cursor-pointer transition"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Box Containing High Res Image */}
-              <div className="h-[400px] w-full my-3 bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center relative border border-slate-800">
+              <div className="h-[400px] w-full my-3 bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center relative border border-[#112240]">
                 <img
                   src={selectedImage}
                   alt="High Resolution Bill"
@@ -196,8 +196,8 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
                         key={i}
                         type="button"
                         onClick={() => setSelectedImage(url)}
-                        className={`w-12 h-12 rounded-lg border border-slate-800 overflow-hidden bg-slate-950 cursor-pointer shrink-0 transition-all ${
-                          selectedImage === url ? 'ring-2 ring-indigo-400 border-transparent scale-105 shadow-md shadow-indigo-400/20' : 'opacity-70 hover:opacity-100'
+                        className={`w-12 h-12 rounded-lg border border-[#112240] overflow-hidden bg-slate-950 cursor-pointer shrink-0 transition-all ${
+                          selectedImage === url ? 'ring-2 ring-blue-400 border-transparent scale-105 shadow-md shadow-blue-400/20' : 'opacity-70 hover:opacity-100'
                         }`}
                       >
                         <img src={url} alt={`Comprobante Thumbnail ${i + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -208,17 +208,17 @@ export default function LiveExpenseFeed({ gastos, choferes }: LiveExpenseFeedPro
               })()}
 
               {selectedGasto && (
-                <div className="bg-slate-950/50 rounded-xl p-3 border border-slate-800/60 flex items-center justify-between text-left shrink-0">
+                <div className="bg-slate-950/50 rounded-xl p-3 border border-[#112240]/60 flex items-center justify-between text-left shrink-0">
                   <div>
-                    <span className="text-[9px] text-indigo-400 font-mono uppercase font-bold tracking-wide">
+                    <span className="text-[9px] text-[#1E3A8A] font-mono uppercase font-bold tracking-wide">
                       Detalle de Liquidación
                     </span>
-                    <p className="text-xs text-slate-300 font-medium leading-relaxed max-w-[360px] truncate">
+                    <p className="text-xs text-slate-700 font-medium leading-relaxed max-w-[360px] truncate">
                       {selectedGasto.descripcion || 'Sin descripción'}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-[9px] text-slate-500 font-mono block">Monto Facturado</span>
+                    <span className="text-[9px] text-slate-600 font-mono block">Monto Facturado</span>
                     <span className="text-sm font-black text-rose-400 font-mono">
                       BOB {safeParse(selectedGasto.monto).toLocaleString('es-BO', { minimumFractionDigits: 1 })}
                     </span>

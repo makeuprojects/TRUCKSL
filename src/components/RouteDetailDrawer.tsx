@@ -36,8 +36,8 @@ const normalizeCategory = (tipo: string | undefined): ExpenseCategory => {
 const getCategoryIcon = (category: ExpenseCategory) => {
   switch (category) {
     case 'DIESEL': return <Fuel className="w-3.5 h-3.5 text-emerald-400" />;
-    case 'PEAJES': return <Ticket className="w-3.5 h-3.5 text-amber-400" />;
-    default: return <MoreHorizontal className="w-3.5 h-3.5 text-indigo-400" />;
+    case 'PEAJES': return <Ticket className="w-3.5 h-3.5 text-orange-400" />;
+    default: return <MoreHorizontal className="w-3.5 h-3.5 text-[#1E3A8A]" />;
   }
 };
 
@@ -105,15 +105,15 @@ export default function RouteDetailDrawer({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-full max-w-[480px] bg-[#0d1324] border-l border-[#1e2943]/80 shadow-2xl z-55 flex flex-col overflow-hidden"
+              className="fixed top-0 right-0 h-full w-full max-w-[480px] bg-white border-l border-slate-200/80 shadow-2xl z-55 flex flex-col overflow-hidden"
             >
-              <div className="p-6 border-b border-[#1e2943]/80 bg-[#0d1324]/90 backdrop-blur-md flex items-center justify-between">
+              <div className="p-6 border-b border-slate-200/80 bg-white/90 backdrop-blur-md flex items-center justify-between">
                 <div className="space-y-1">
                   <span className="text-emerald-400 font-mono text-[9px] font-black uppercase tracking-wider rounded-md">
                     Auditoría en Ruta
                   </span>
-                  <h2 className="text-lg font-black text-white tracking-tight">
-                    Viaje: <span className="font-mono text-indigo-400">{viaje.id_viaje}</span>
+                  <h2 className="text-lg font-black text-slate-900 tracking-tight">
+                    Viaje: <span className="font-mono text-[#1E3A8A]">{viaje.id_viaje}</span>
                   </h2>
                 </div>
                 <div className="flex items-center gap-2">
@@ -129,25 +129,25 @@ export default function RouteDetailDrawer({
                       Cancelar Viaje
                     </button>
                   )}
-                  <button onClick={onClose} className="p-1.5 rounded-lg bg-[#1e2943]/50 hover:bg-[#1e2943] text-slate-400 transition">
+                  <button onClick={onClose} className="p-1.5 rounded-lg bg-[#1e2943]/50 hover:bg-[#1e2943] text-slate-300 transition">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                <div className="grid grid-cols-2 gap-4 bg-[#070a13]/50 border border-[#1e2943] p-4 rounded-xl">
-                  <div className="space-y-0.5"><span className="text-[9px] text-slate-500 uppercase font-bold">Chofer</span><span className="text-xs font-black text-white flex items-center gap-1.5"><User className="w-3.5 h-3.5 text-indigo-400" />{currentDriver?.nombre_completo || 'N/A'}</span></div>
-                  <div className="space-y-0.5"><span className="text-[9px] text-slate-500 uppercase font-bold">Camión</span><span className="text-xs font-black text-white flex items-center gap-1.5"><Truck className="w-3.5 h-3.5 text-indigo-400" />{currentTruck?.modelo || 'N/A'}</span></div>
+                <div className="grid grid-cols-2 gap-4 bg-slate-50/50 border border-slate-200 p-4 rounded-xl">
+                  <div className="space-y-0.5"><span className="text-[9px] text-slate-600 uppercase font-bold">Chofer</span><span className="text-xs font-black text-slate-900 flex items-center gap-1.5"><User className="w-3.5 h-3.5 text-[#1E3A8A]" />{currentDriver?.nombre_completo || 'N/A'}</span></div>
+                  <div className="space-y-0.5"><span className="text-[9px] text-slate-600 uppercase font-bold">Camión</span><span className="text-xs font-black text-slate-900 flex items-center gap-1.5"><Truck className="w-3.5 h-3.5 text-[#1E3A8A]" />{currentTruck?.modelo || 'N/A'}</span></div>
                 </div>
 
                 {/* Weigh Scale Ticket & Load Photos Section */}
                 {viaje.foto_pesaje_url && viaje.foto_pesaje_url.trim().length > 6 && (
-                  <div className="space-y-2 bg-[#070a13]/70 border border-[#1e2943] p-4 rounded-xl">
+                  <div className="space-y-2 bg-slate-50/70 border border-slate-200 p-4 rounded-xl">
                     <span className="text-[10px] text-indigo-300 font-extrabold uppercase tracking-wide flex items-center gap-1.5">
                       🎫 Certificación de Pesaje y Carga
                     </span>
-                    <p className="text-[9.5px] text-slate-400">
+                    <p className="text-[9.5px] text-slate-300">
                       Fotografías o tickets del pesaje y boletas oficiales reguladoras asociadas a este viaje:
                     </p>
                     <div className="flex flex-wrap gap-2 pt-1">
@@ -158,7 +158,7 @@ export default function RouteDetailDrawer({
                             setSelectedPhoto(imgUrl);
                             setZoomScale(1);
                           }}
-                          className="relative w-16 h-16 rounded-xl overflow-hidden border border-[#1e2943]/60 bg-slate-950 cursor-pointer group shrink-0"
+                          className="relative w-16 h-16 rounded-xl overflow-hidden border border-slate-200/60 bg-slate-950 cursor-pointer group shrink-0"
                           title="Click para ver certificación de carga"
                         >
                           <img 
@@ -168,7 +168,7 @@ export default function RouteDetailDrawer({
                             referrerPolicy="no-referrer"
                           />
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                            <ZoomIn className="w-4 h-4 text-white" />
+                            <ZoomIn className="w-4 h-4 text-slate-900" />
                           </div>
                         </div>
                       ))}
@@ -178,42 +178,42 @@ export default function RouteDetailDrawer({
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Resumen Gastos</span>
-                    <span className="text-white text-xs font-black font-mono">Bs. {totalRouteSpent.toFixed(2)}</span>
+                    <span className="text-[10px] text-slate-300 font-black uppercase tracking-wider">Resumen Gastos</span>
+                    <span className="text-slate-900 text-xs font-black font-mono">Bs. {totalRouteSpent.toFixed(2)}</span>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-[#0f172a] p-3 rounded-lg border border-[#1e2943] text-center"><span className="text-[9px] text-slate-500 uppercase block">Diésel</span><span className="text-xs font-bold font-mono text-emerald-400 block">{totalFuelExp.toFixed(2)}</span></div>
-                    <div className="bg-[#0f172a] p-3 rounded-lg border border-[#1e2943] text-center"><span className="text-[9px] text-slate-500 uppercase block">Peaje</span><span className="text-xs font-bold font-mono text-amber-400 block">{totalTollsExp.toFixed(2)}</span></div>
-                    <div className="bg-[#0f172a] p-3 rounded-lg border border-[#1e2943] text-center"><span className="text-[9px] text-slate-550 uppercase block">Otros</span><span className="text-xs font-bold font-mono text-indigo-400 block">{totalOtherExp.toFixed(2)}</span></div>
+                    <div className="bg-[#0f172a] p-3 rounded-lg border border-slate-200 text-center"><span className="text-[9px] text-slate-600 uppercase block">Diésel</span><span className="text-xs font-bold font-mono text-emerald-400 block">{totalFuelExp.toFixed(2)}</span></div>
+                    <div className="bg-[#0f172a] p-3 rounded-lg border border-slate-200 text-center"><span className="text-[9px] text-slate-600 uppercase block">Peaje</span><span className="text-xs font-bold font-mono text-orange-400 block">{totalTollsExp.toFixed(2)}</span></div>
+                    <div className="bg-[#0f172a] p-3 rounded-lg border border-slate-200 text-center"><span className="text-[9px] text-slate-550 uppercase block">Otros</span><span className="text-xs font-bold font-mono text-[#1E3A8A] block">{totalOtherExp.toFixed(2)}</span></div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider">Historial de Declaraciones</span>
+                  <span className="text-[10px] text-slate-300 font-black uppercase tracking-wider">Historial de Declaraciones</span>
                   {routeExpenses.length === 0 ? (
-                    <div className="p-8 text-center bg-[#070a13]/20 border border-[#1e2943]/80 rounded-xl text-xs text-slate-500 italic">
+                    <div className="p-8 text-center bg-slate-50/20 border border-slate-200/80 rounded-xl text-xs text-slate-600 italic">
                       Esperando registros del conductor en tiempo real...
                     </div>
                   ) : (
-                    <div className="relative border-l border-[#1e2943] pl-4 ml-2.5 space-y-6">
+                    <div className="relative border-l border-slate-200 pl-4 ml-2.5 space-y-6">
                       {routeExpenses.map((gasto, index) => {
                         const rawPhotos = gasto.foto_url ? gasto.foto_url.split(',').map((u) => u.trim()).filter(Boolean) : [];
                         return (
                           <div key={`${gasto.id_gasto}-${index}`} className="relative group/timeline-item">
-                            <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 bg-[#090D16] border-2 border-indigo-400 rounded-full" />
+                            <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 bg-[#090D16] border-2 border-blue-400 rounded-full" />
                             <div className="space-y-1.5">
                               <div className="flex items-center justify-between">
-                                <span className="flex items-center gap-1.5 bg-[#1e2943]/70 text-slate-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
+                                <span className="flex items-center gap-1.5 bg-[#1e2943]/70 text-slate-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
                                   {getCategoryIcon(gasto.normalizedCat)}
                                   {gasto.normalizedCat}
                                 </span>
                                 <span className="font-mono text-sm font-black text-rose-400">Bs. {safeParseNum(gasto.monto).toFixed(2)}</span>
                               </div>
-                              <p className="text-[11px] text-slate-400 leading-relaxed">{gasto.descripcion || 'Sin descripción'}</p>
+                              <p className="text-[11px] text-slate-300 leading-relaxed">{gasto.descripcion || 'Sin descripción'}</p>
                               
                               {rawPhotos.length > 0 && (
                                 <div className="mt-2 space-y-1">
-                                  <span className="text-[9px] text-slate-500 uppercase font-black tracking-wider block">Estampas de Comprobante:</span>
+                                  <span className="text-[9px] text-slate-600 uppercase font-black tracking-wider block">Estampas de Comprobante:</span>
                                   <div className="flex flex-wrap gap-2">
                                     {rawPhotos.map((imgUrl, i) => (
                                       <div 
@@ -222,7 +222,7 @@ export default function RouteDetailDrawer({
                                           setSelectedPhoto(imgUrl);
                                           setZoomScale(1);
                                         }}
-                                        className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#1e2943]/70 bg-slate-950 cursor-pointer group/item scale-100 hover:scale-105 transition duration-150"
+                                        className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200/70 bg-slate-950 cursor-pointer group/item scale-100 hover:scale-105 transition duration-150"
                                       >
                                         <img 
                                           src={imgUrl} 
@@ -231,7 +231,7 @@ export default function RouteDetailDrawer({
                                           referrerPolicy="no-referrer"
                                         />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/item:opacity-100 flex items-center justify-center transition">
-                                          <ZoomIn className="w-3.5 h-3.5 text-white" />
+                                          <ZoomIn className="w-3.5 h-3.5 text-slate-900" />
                                         </div>
                                       </div>
                                     ))}
@@ -259,11 +259,11 @@ export default function RouteDetailDrawer({
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-60 bg-slate-950/95 backdrop-blur-xl flex flex-col justify-center items-center p-8"
           >
-            <button onClick={() => setSelectedPhoto(null)} className="absolute top-5 right-5 p-2 bg-slate-800 rounded-lg text-white"><X /></button>
+            <button onClick={() => setSelectedPhoto(null)} className="absolute top-5 right-5 p-2 bg-[#112240] rounded-lg text-slate-900"><X /></button>
             <img src={selectedPhoto} alt="Comprobante" style={{ transform: `scale(${zoomScale})` }} className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl" />
             <div className="mt-4 flex gap-2">
-              <button onClick={() => setZoomScale(Math.max(0.5, zoomScale - 0.25))} className="p-2 bg-slate-800 text-white rounded"><ZoomOut /></button>
-              <button onClick={() => setZoomScale(Math.min(3.0, zoomScale + 0.25))} className="p-2 bg-slate-800 text-white rounded"><ZoomIn /></button>
+              <button onClick={() => setZoomScale(Math.max(0.5, zoomScale - 0.25))} className="p-2 bg-[#112240] text-slate-900 rounded"><ZoomOut /></button>
+              <button onClick={() => setZoomScale(Math.min(3.0, zoomScale + 0.25))} className="p-2 bg-[#112240] text-slate-900 rounded"><ZoomIn /></button>
             </div>
           </motion.div>
         )}

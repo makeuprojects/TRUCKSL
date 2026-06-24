@@ -128,22 +128,22 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
   };
 
   return (
-    <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 mt-6 shadow-xl animate-fade-in">
+    <div className="bg-[#0A192F]/50 backdrop-blur-sm border border-[#112240] rounded-2xl p-6 mt-6 shadow-xl animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pt-2">
         <div className="space-y-1">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Package className="w-5 h-5 text-emerald-400" />
             La Bóveda de Viajes
           </h2>
-          <p className="text-sm text-slate-400">Historial y liquidaciones de ruteo completado</p>
+          <p className="text-sm text-slate-300">Historial y liquidaciones de ruteo completado</p>
         </div>
         
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
           <input 
             type="text" 
             placeholder="Buscar chofer, ruta, o ID..." 
-            className="w-full bg-slate-950 border border-slate-800 text-slate-300 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl pl-9 pr-4 py-2 text-sm outline-none transition"
+            className="w-full bg-slate-950 border border-[#112240] text-slate-700 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl pl-9 pr-4 py-2 text-sm outline-none transition"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -151,7 +151,7 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
       </div>
 
       {filteredTrips.length === 0 ? (
-        <div className="text-center py-10 text-slate-500 border border-dashed border-slate-800 rounded-xl">
+        <div className="text-center py-10 text-slate-600 border border-dashed border-[#112240] rounded-xl">
           <p className="text-sm">No se encontraron viajes finalizados.</p>
         </div>
       ) : (
@@ -163,50 +163,50 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
               const totalGastado = getTripTotalExpenses(viaje.id_viaje);
               
               return (
-                <div key={`${viaje.id_viaje}-${idx}`} className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between hover:border-slate-700 transition group">
+                <div key={`${viaje.id_viaje}-${idx}`} className="bg-slate-950/80 border border-[#112240]/80 rounded-xl p-4 flex items-center justify-between hover:border-[#233554] transition group">
                   <div className="grid grid-cols-4 gap-4 flex-1 items-center">
                     {/* Fecha y Estado */}
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-slate-900 rounded-lg shrink-0 group-hover:bg-emerald-950/30 transition">
-                        <Calendar className="w-4 h-4 text-slate-400 group-hover:text-emerald-400" />
+                      <div className="p-2 bg-[#0A192F] rounded-lg shrink-0 group-hover:bg-emerald-950/30 transition">
+                        <Calendar className="w-4 h-4 text-slate-300 group-hover:text-emerald-400" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-xs font-medium text-slate-200">{viaje.fecha_fin || 'Sin Fecha'}</span>
+                        <span className="text-xs font-medium text-slate-800">{viaje.fecha_fin || 'Sin Fecha'}</span>
                         <span className="text-[10px] text-emerald-500 font-mono">ID: {viaje.id_viaje}</span>
                       </div>
                     </div>
                     
                     {/* Chofer */}
                     <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-slate-500" />
-                      <span className="text-xs font-semibold text-slate-300">{drv?.nombre_completo || 'Sin Chofer'}</span>
+                      <User className="w-4 h-4 text-slate-600" />
+                      <span className="text-xs font-semibold text-slate-700">{drv?.nombre_completo || 'Sin Chofer'}</span>
                     </div>
 
                     {/* Ruta */}
                     <div className="flex items-center gap-2">
-                      <Navigation className="w-4 h-4 text-indigo-400" />
+                      <Navigation className="w-4 h-4 text-[#1E3A8A]" />
                       <span className="text-xs text-indigo-200">{route?.origen || '?'} ➔ {route?.destino || '?'}</span>
                     </div>
 
                     {/* Gastos Totales */}
                     <div className="flex flex-col items-end pr-8">
-                      <span className="text-[10px] text-slate-500 uppercase tracking-wider">Total Gastado</span>
+                      <span className="text-[10px] text-slate-600 uppercase tracking-wider">Total Gastado</span>
                       <span className="font-mono text-sm text-emerald-400 font-bold tracking-tight">Bs. {totalGastado.toFixed(2)}</span>
                     </div>
                   </div>
 
                   {/* Acciones */}
-                  <div className="flex items-center gap-2 border-l border-slate-800 pl-4 shrink-0">
+                  <div className="flex items-center gap-2 border-l border-[#112240] pl-4 shrink-0">
                     <button 
                       onClick={() => onOpenDetails(viaje)}
-                      className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition"
+                      className="p-2 text-slate-300 hover:text-slate-900 hover:bg-[#112240] rounded-lg transition"
                       title="Ver Detalles del Viaje"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => handleExportPDF(viaje, drv, route)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-700 hover:bg-slate-800 hover:border-slate-600 text-slate-300 text-xs font-medium rounded-lg transition"
+                      className="flex items-center gap-1.5 px-3 py-1.5 border border-[#233554] hover:bg-[#112240] hover:border-slate-600 text-slate-700 text-xs font-medium rounded-lg transition"
                     >
                       <FileDown className="w-3.5 h-3.5" />
                       Exportar PDF

@@ -54,7 +54,7 @@ export default function GastoForm({
   // Conditional color gradient for the bar according to the percentage
   let barColorClass = "bg-gradient-to-r from-emerald-500 to-teal-400";
   if (porcentaje >= 50 && porcentaje <= 85) {
-    barColorClass = "bg-gradient-to-r from-amber-500 to-orange-400";
+    barColorClass = "bg-gradient-to-r from-orange-500 to-orange-400";
   } else if (porcentaje > 85) {
     barColorClass = "bg-gradient-to-r from-rose-500 to-red-600";
   }
@@ -163,11 +163,11 @@ export default function GastoForm({
   };
 
   return (
-    <div className="w-full max-w-md bg-[#1E293B] border border-slate-700/60 rounded-3xl p-6 space-y-5 shadow-2xl relative text-slate-100" id="gasto-form-component">
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-t-3xl"></div>
+    <div className="w-full max-w-md bg-[#1E293B] border border-[#233554]/60 rounded-3xl shadow-2xl relative text-slate-100 flex flex-col max-h-[90vh]" id="gasto-form-component">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-t-3xl z-10"></div>
       
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Header (Fixed) */}
+      <div className="flex items-center justify-between p-5 sm:px-6 pt-6 sm:pt-7 pb-4 border-b border-[#233554]/40 shrink-0">
         <h3 className="text-white font-extrabold text-sm uppercase tracking-wide flex items-center gap-2">
           <span className="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-xl">
             <DollarSign className="w-4 h-4" />
@@ -177,39 +177,41 @@ export default function GastoForm({
         <button
           type="button"
           onClick={onClose}
-          className="text-slate-400 hover:text-white p-1.5 bg-slate-900/50 border border-slate-800 rounded-xl transition"
+          className="text-slate-200 hover:text-white p-1.5 bg-[#0A192F]/50 border border-[#112240] hover:bg-rose-500/20 hover:text-rose-400 hover:border-rose-500/50 rounded-xl transition-all"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
+      <div className="p-5 sm:p-6 overflow-y-auto overflow-x-hidden flex-1 space-y-5 rounded-b-3xl scrollbar-thin scrollbar-thumb-[#233554] scrollbar-track-transparent">
+
       {/* Driver metadata panel */}
-      <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850 flex items-center justify-between">
+      <div className="bg-[#0A192F]/80 p-4 rounded-2xl border border-[#233554]/60 flex items-center justify-between shadow-inner">
         <div className="text-left space-y-0.5">
-          <span className="text-[9px] text-[#10B981] font-mono font-bold block uppercase tracking-wider">Caja Chica Disponible</span>
-          <span className="text-lg font-black text-emerald-400 font-mono tracking-tight leading-none block">
+          <span className="text-[9px] text-emerald-400 font-mono font-bold block uppercase tracking-wider">Caja Chica Disponible</span>
+          <span className="text-lg font-black text-[#00ff9d] font-mono tracking-tight leading-none block drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">
             {balanceActual.toLocaleString('es-BO', { minimumFractionDigits: 2 })} BOB
           </span>
         </div>
         <div className="text-right shrink-0">
-          <span className="text-[9px] text-slate-550 font-bold block uppercase tracking-wider">Límite Permitido</span>
-          <span className="text-xs font-black text-slate-300 font-mono">
+          <span className="text-[9px] text-slate-400 font-bold block uppercase tracking-wider">Límite Permitido</span>
+          <span className="text-xs font-black text-slate-200 font-mono mt-0.5 block">
             {limitePermitido.toLocaleString('es-BO')} BOB
           </span>
         </div>
       </div>
 
       {/* Framer-Motion Animated Progress Bar */}
-      <div className="bg-[#0F172A]/50 border border-slate-850 p-4 rounded-2xl space-y-2.5">
+      <div className="bg-[#0A192F]/50 border border-[#233554]/40 p-4 rounded-2xl space-y-2.5">
         <div className="flex justify-between items-center text-[10px] font-mono font-bold">
-          <span className="text-slate-450 uppercase tracking-widest">Consumo Acumulado</span>
-          <span className={porcentaje > 85 ? 'text-rose-500 font-black' : 'text-slate-350'}>
+          <span className="text-slate-400 uppercase tracking-widest">Consumo Acumulado</span>
+          <span className={porcentaje > 85 ? 'text-rose-500 font-black' : 'text-slate-300'}>
             {(gastoHistorico + montoActual).toLocaleString('es-BO')} BOB ({porcentaje.toFixed(1)}%)
           </span>
         </div>
         
         {/* Animated Bar using motion */}
-        <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden relative">
+        <div className="h-2 w-full bg-[#0A192F] rounded-full overflow-hidden relative">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(porcentaje, 100)}%` }}
@@ -230,11 +232,11 @@ export default function GastoForm({
         
         {/* Tipo de Gasto - Standardized select dropdown */}
         <div className="space-y-1">
-          <label className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Tipo de Gasto</label>
+          <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Tipo de Gasto</label>
           <select
             value={tipoGasto}
             onChange={(e) => setTipoGasto(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 p-3.5 rounded-2xl focus:ring-1 focus:ring-emerald-500 text-sm font-semibold text-white outline-none"
+            className="w-full bg-slate-950 border border-[#112240] p-3.5 rounded-2xl focus:ring-1 focus:ring-emerald-500 text-sm font-semibold text-white outline-none"
           >
             <option value="Alimentación 🍲">Alimentación 🍲</option>
             <option value="Combustible ⛽">Combustible ⛽</option>
@@ -248,7 +250,7 @@ export default function GastoForm({
 
         {/* Amount in BOB */}
         <div className="space-y-1">
-          <label className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Monto total (BOB)</label>
+          <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Monto total (BOB)</label>
           <input
             type="number"
             required
@@ -256,45 +258,53 @@ export default function GastoForm({
             value={montoGasto}
             onChange={(e) => setMontoGasto(e.target.value)}
             placeholder="Ingrese saldo gastado..."
-            className="w-full bg-slate-950 border border-slate-800 p-3.5 rounded-2xl text-white outline-none font-bold text-lg focus:border-emerald-500 font-mono"
+            className="w-full bg-slate-950 border border-[#112240] p-3.5 rounded-2xl text-white outline-none font-bold text-lg focus:border-emerald-500 font-mono"
             id="gasto-monto-input"
           />
         </div>
 
         {/* Short Justification */}
         <div className="space-y-1">
-          <label className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Justificación / Detalle</label>
+          <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Justificación / Detalle</label>
           <input
             type="text"
             value={descGasto}
             onChange={(e) => setDescGasto(e.target.value)}
             placeholder="Detalle de la compra o comprobante..."
-            className="w-full bg-slate-950 border border-slate-800 p-3.5 rounded-2xl text-white outline-none font-medium text-sm focus:border-emerald-500"
+            className="w-full bg-slate-950 border border-[#112240] p-3.5 rounded-2xl text-white outline-none font-medium text-sm focus:border-emerald-500"
           />
         </div>
 
         {/* Multi receipt uploader */}
-        <div className="space-y-1.5 text-left bg-slate-950/40 p-3.5 rounded-2xl border border-slate-850">
-          <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Adjuntar Facturas / Recibos (Múltiple)</label>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleFileChange}
-            className="block w-full text-xs text-slate-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-extrabold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700 cursor-pointer"
-          />
+        <div className="space-y-2 text-left">
+          <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Adjuntar Facturas / Recibos</label>
+          <div className="relative border-2 border-dashed border-[#233554] bg-[#0A192F]/50 rounded-2xl p-6 hover:bg-[#112240] hover:border-[#38BDF8] transition-colors cursor-pointer text-center group flex flex-col items-center justify-center min-h-[120px]">
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            />
+            <div className="bg-[#112240] p-3 rounded-full mb-3 group-hover:bg-[#1E293B] transition-colors shadow-inner">
+              <Image className="w-6 h-6 text-slate-400 group-hover:text-[#38BDF8] transition-colors" />
+            </div>
+            <p className="text-xs text-slate-300 font-medium group-hover:text-white transition-colors">Toca para abrir cámara o galería</p>
+            <p className="text-[10px] text-slate-500 mt-1 font-mono">JPG, PNG, WEBP</p>
+          </div>
           
           {gastoFilesUrls.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2.5">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 pt-3">
               {gastoFilesUrls.map((url, i) => (
-                <div key={i} className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-800 group bg-slate-950">
-                  <img src={url} alt="Receipt preview" className="w-full h-full object-cover" />
+                <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-[#233554] shadow-md group bg-slate-900">
+                  <img src={url} alt={`Comprobante ${i+1}`} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => handleRemoveFile(i)}
-                    className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-black transition-opacity"
+                    className="absolute top-1.5 right-1.5 bg-rose-500/90 backdrop-blur-sm hover:bg-rose-500 text-white p-1.5 rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all flex items-center justify-center shadow-lg transform hover:scale-110 z-20"
                   >
-                    ✕
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ))}
@@ -311,7 +321,7 @@ export default function GastoForm({
         )}
 
         {isUploading && (
-          <div className="text-[10px] text-center text-slate-400 font-bold animate-pulse uppercase tracking-wider flex items-center justify-center gap-1.5">
+          <div className="text-[10px] text-center text-slate-200 font-bold animate-pulse uppercase tracking-wider flex items-center justify-center gap-1.5">
             <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" />
             <span>Subiendo comprobantes y registrando en Google Sheets...</span>
           </div>
@@ -324,7 +334,7 @@ export default function GastoForm({
           disabled={isExceeded || isBudgetAgotado || isUploading}
           className={`w-full font-black py-4 px-4 rounded-2xl text-xs sm:text-sm tracking-wide transition cursor-pointer shadow-lg uppercase ${
             isExceeded || isBudgetAgotado
-              ? 'bg-slate-800 text-slate-500 border border-slate-700/60 cursor-not-allowed shadow-none'
+              ? 'bg-[#112240] text-slate-400 border border-[#233554]/60 cursor-not-allowed shadow-none'
               : 'bg-emerald-500 text-slate-950 hover:bg-emerald-450 shadow-emerald-500/10'
           }`}
           id="gasto-submit-btn"
@@ -344,6 +354,7 @@ export default function GastoForm({
           </p>
         )}
       </form>
+      </div>
     </div>
   );
 }

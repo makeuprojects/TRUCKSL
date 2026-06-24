@@ -192,50 +192,50 @@ function PortalSelector({ currentUser, googleToken, onSignOut, localDriver }: Po
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-[#0A192F] flex flex-col items-center justify-center p-4 relative">
       {/* Visual background ambient glow elements */}
-      <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-fuchsia-500/10 rounded-full blur-[80px] pointer-events-none"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-indigo-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+      <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-blue-900/20 rounded-full blur-[80px] pointer-events-none"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none"></div>
 
-      <div className="max-w-2xl w-full backdrop-blur-[12px] bg-[#0d1324]/80 border border-[#1e2943]/50 rounded-[32px] p-8 md:p-12 space-y-8 text-center relative shadow-2xl">
+      <div className="max-w-2xl w-full backdrop-blur-[12px] bg-[#112240]/80 border border-[#233554]/50 rounded-[32px] p-8 md:p-12 space-y-8 text-center relative shadow-2xl">
         {/* Colorful top border highlight */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-indigo-500 to-rose-500 rounded-t-[32px]"></div>
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 via-blue-500 to-orange-500 rounded-t-[32px]"></div>
 
-        <div className="flex items-center justify-between border-b border-[#1e2943]/50 pb-4">
+        <div className="flex items-center justify-between border-b border-[#233554]/50 pb-4">
           <div className="flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-[10px] font-mono font-bold tracking-widest text-slate-300 uppercase">
-              Operación Activa
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+            <span className="text-[10px] font-mono font-bold tracking-widest text-slate-100 uppercase">
+              Plataforma de Logística
             </span>
           </div>
           {googleToken ? (
             <div className="flex items-center gap-3">
-              <span className="text-[10px] font-mono text-indigo-400 bg-indigo-950/40 border border-indigo-900/40 px-2 py-0.5 rounded-md">
+              <span className="text-[10px] font-mono text-blue-400 bg-blue-950/40 border border-blue-900/40 px-2 py-0.5 rounded-md">
                 Admin: {currentUser?.email?.split('@')[0]}
               </span>
               <button
                 onClick={onSignOut}
-                className="text-slate-300 hover:text-rose-400 text-[11px] font-medium flex items-center gap-1 transition"
+                className="text-slate-100 hover:text-red-400 text-[11px] font-medium flex items-center gap-1 transition"
               >
                 <LogOut className="w-3 h-3" />
                 Desconectar
               </button>
             </div>
           ) : (
-            <span className="text-[10px] font-mono text-slate-300">
+            <span className="text-[10px] font-mono text-slate-100">
               Modo Cloud sin vincular
             </span>
           )}
         </div>
 
         <div className="space-y-3">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-tr from-emerald-500/20 to-indigo-500/20 text-indigo-400 rounded-full border border-[#1e2943]/50 flex items-center justify-center shadow-lg">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-tr from-blue-900/20 to-blue-500/20 text-blue-400 rounded-full border border-[#233554]/50 flex items-center justify-center shadow-lg">
             <Truck className="w-8 h-8" />
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white font-sans">
-            Gestión de Flota <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Enterprise</span>
+            SL ROAD <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-300">TRUCKING</span>
           </h1>
-          <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
+          <p className="text-xs text-slate-100 max-w-md mx-auto leading-relaxed">
             Consola centralizada para el pesaje, bitácora de choferes, consumos de combustible y mantenimiento preventivo.
           </p>
         </div>
@@ -244,19 +244,19 @@ function PortalSelector({ currentUser, googleToken, onSignOut, localDriver }: Po
           {/* DRIVERS ENTRY PANEL */}
           <button
             onClick={() => navigate(localDriver ? '/chofer' : '/chofer-login')}
-            className="group backdrop-blur-[6px] bg-[#0d1324]/60 hover:bg-[#0d1324]/90 border border-[#1e2943]/50 hover:border-emerald-500/30 rounded-2xl p-6 space-y-4 transition-all duration-300 transform hover:-translate-y-1 shadow-lg text-left cursor-pointer focus:ring-2 focus:ring-emerald-500"
+            className="group backdrop-blur-[6px] bg-[#0A192F]/60 hover:bg-[#0A192F]/90 border border-[#233554]/50 hover:border-orange-500/30 rounded-2xl p-6 space-y-4 transition-all duration-300 transform hover:-translate-y-1 shadow-lg text-left cursor-pointer focus:ring-2 focus:ring-orange-500"
           >
-            <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20 inline-block">
+            <div className="p-3 bg-orange-500/10 text-orange-500 rounded-xl border border-orange-500/20 inline-block">
               <Smartphone className="w-6 h-6" />
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-base text-white group-hover:text-emerald-400 transition">
+                <h3 className="font-bold text-base text-white group-hover:text-orange-500 transition">
                   {localDriver ? `Volver como ${localDriver.nombre_completo}` : 'Portal Choferes'}
                 </h3>
-                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-emerald-400 transition transform group-hover:translate-x-1" />
+                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-orange-500 transition transform group-hover:translate-x-1" />
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-200 leading-relaxed">
                 Ingreso rápido para conductores usando Nombre y PIN de 4 dígitos. Reportes de combustible, pesaje y alertas sin conexión.
               </p>
             </div>
@@ -265,26 +265,26 @@ function PortalSelector({ currentUser, googleToken, onSignOut, localDriver }: Po
           {/* ADMIN ENTRY PANEL */}
           <button
             onClick={() => navigate('/admin')}
-            className="group backdrop-blur-[6px] bg-[#0d1324]/60 hover:bg-[#0d1324]/90 border border-[#1e2943]/50 hover:border-indigo-500/30 rounded-2xl p-6 space-y-4 transition-all duration-300 transform hover:-translate-y-1 shadow-lg text-left cursor-pointer focus:ring-2 focus:ring-indigo-500"
+            className="group backdrop-blur-[6px] bg-[#0A192F]/60 hover:bg-[#0A192F]/90 border border-[#233554]/50 hover:border-blue-500/30 rounded-2xl p-6 space-y-4 transition-all duration-300 transform hover:-translate-y-1 shadow-lg text-left cursor-pointer focus:ring-2 focus:ring-blue-500"
           >
-            <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-xl border border-indigo-500/20 inline-block">
+            <div className="p-3 bg-blue-900/20 text-blue-500 rounded-xl border border-blue-900/30 inline-block">
               <Layout className="w-6 h-6" />
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-base text-white group-hover:text-indigo-400 transition">
-                  Consola Don Saúl
+                <h3 className="font-bold text-base text-white group-hover:text-blue-400 transition">
+                  Administración
                 </h3>
-                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-indigo-400 transition transform group-hover:translate-x-1" />
+                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-blue-400 transition transform group-hover:translate-x-1" />
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-slate-200 leading-relaxed">
                 Tablero analítico financiero, aprobaciones, control de inventario de repuestos y cambio de aceite de los vehículos.
               </p>
             </div>
           </button>
         </div>
 
-        <div className="pt-2 flex flex-col items-center justify-center space-y-1 text-slate-300 text-[10px] font-mono">
+        <div className="pt-2 flex flex-col items-center justify-center space-y-1 text-slate-100 text-[10px] font-mono">
           <div className="flex items-center gap-1.5">
             <Database className="w-3 h-3 text-emerald-500" />
             <span>Proxy de Caching con Node-Cache & Colas Síncronos</span>
@@ -413,15 +413,15 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
   };
 
   return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
-      <div className="max-w-md w-full backdrop-blur-[12px] bg-[#0d1324]/80 border border-[#1e2943]/50 rounded-[24px] p-8 space-y-6 shadow-2xl relative">
+    <div className="min-h-screen bg-[#0A192F] flex items-center justify-center p-4">
+      <div className="max-w-md w-full backdrop-blur-[12px] bg-[#112240]/80 border border-[#233554]/50 rounded-[24px] p-8 space-y-6 shadow-2xl relative">
         
         <div className="flex flex-col items-center text-center space-y-2">
-          <div className="p-3.5 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 shadow-md">
+          <div className="p-3.5 bg-orange-500/10 text-orange-500 rounded-full border border-orange-500/20 shadow-md">
             <Smartphone className="w-8 h-8" />
           </div>
           <h2 className="text-xl font-bold text-white tracking-tight">Acceso Conductor</h2>
-          <p className="text-[10px] text-slate-300 uppercase tracking-widest font-semibold">
+          <p className="text-[10px] text-slate-200 uppercase tracking-widest font-semibold">
             Inicia sesión con tu Nombre y tu PIN de Ruta
           </p>
         </div>
@@ -436,11 +436,11 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
         <form onSubmit={handleLocalSubmit} className="space-y-4">
           {/* CHOFER DIRECT SELECT OR WRITE INPUT */}
           <div className="space-y-1.5">
-            <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+            <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
               Selecciona tu Nombre
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-300">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-200">
                 <UserIcon className="w-4.5 h-4.5" />
               </span>
               
@@ -448,7 +448,7 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
                 <select
                   value={selectedDriverName}
                   onChange={(e) => setSelectedDriverName(e.target.value)}
-                  className="w-full bg-[#070a13] border border-[#1e2943]/60 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer appearance-none"
+                  className="w-full bg-[#0A192F] border border-[#233554] rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 cursor-pointer appearance-none"
                 >
                   <option value="">-- Elige tu Nombre de la Lista --</option>
                   {choferList
@@ -466,7 +466,7 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
                   placeholder="Escribe tu Nombre Completo..."
                   value={selectedDriverName}
                   onChange={(e) => setSelectedDriverName(e.target.value)}
-                  className="w-full bg-[#070a13] border border-[#1e2943]/60 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#0A192F] border border-[#233554] rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                 />
               )}
             </div>
@@ -474,11 +474,11 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
 
           {/* PIN keypad entry */}
           <div className="space-y-1.5">
-            <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+            <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
               PIN Secreto de Acceso (4 dígitos)
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-300">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-200">
                 <Lock className="w-4.5 h-4.5" />
               </span>
               <input
@@ -489,7 +489,7 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
                 placeholder="••••"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                className="w-full bg-[#070a13] border border-[#1e2943]/60 rounded-xl pl-10 pr-4 py-3 text-sm text-center text-slate-200 font-mono tracking-[0.5em] text-lg focus:outline-none focus:border-emerald-500"
+                className="w-full bg-[#0A192F] border border-[#233554] rounded-xl pl-10 pr-4 py-3 text-sm text-center text-slate-100 font-mono tracking-[0.5em] text-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
             </div>
           </div>
@@ -498,14 +498,14 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex-1 bg-[#0d1324] border border-[#1e2943]/60 hover:bg-[#16223f] text-slate-300 font-extrabold text-xs py-3 rounded-xl transition cursor-pointer"
+              className="flex-1 bg-[#112240] border border-[#233554] hover:bg-[#233554] text-slate-100 font-extrabold text-xs py-3 rounded-xl transition cursor-pointer"
             >
               VOLVER
             </button>
             <button
               type="submit"
               disabled={isLogging}
-              className="flex-1 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-slate-950 font-extrabold text-xs py-3 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5"
+              className="flex-1 bg-orange-500 hover:bg-orange-600 active:bg-amber-700 text-slate-950 font-extrabold text-xs py-3 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
               {isLogging ? (
                 <>
@@ -519,7 +519,7 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
           </div>
         </form>
 
-        <div className="text-center text-[10px] text-slate-300 font-mono leading-normal">
+        <div className="text-center text-[10px] text-slate-100 font-mono leading-normal">
           ¿No apareces en la lista? Ingresa tu nombre manualmente o usa tu PIN asignado por Don Saúl (PIN por defecto: 1234).
         </div>
       </div>
@@ -550,23 +550,23 @@ function AdminGoogleLoginGate({ isLoggingIn, onLogin, onBypass }: AdminGoogleLog
   };
 
   return (
-    <div className="min-h-screen bg-[#070a13] flex items-center justify-center p-4">
-      <div className="max-w-md w-full backdrop-blur-[12px] bg-[#0d1324]/80 border border-[#1e2943]/50 rounded-[24px] p-8 space-y-6 shadow-2xl relative text-center">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white border border-slate-200 rounded-[24px] p-8 space-y-6 shadow-xl relative text-center">
         
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-indigo-600 rounded-t-[24px]"></div>
+        <div className="absolute top-0 left-0 right-0 h-1 bg-blue-900 rounded-t-[24px]"></div>
 
-        <div className="mx-auto w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 flex items-center justify-center shadow-lg">
+        <div className="mx-auto w-16 h-16 bg-blue-900/10 text-blue-900 rounded-full border border-blue-900/20 flex items-center justify-center shadow-sm">
           <Layout className="w-8 h-8" />
         </div>
 
         <div className="space-y-1.5">
-          <h2 className="text-xl font-bold text-white tracking-tight">Consola de Don Saúl</h2>
-          <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-semibold font-mono">
+          <h2 className="text-xl font-bold text-slate-800 tracking-tight">Consola Administrativa</h2>
+          <p className="text-[10px] text-blue-900 uppercase tracking-widest font-semibold font-mono">
             Acceso Restringido
           </p>
         </div>
 
-        <p className="text-xs text-slate-300 leading-relaxed max-w-sm px-2 mx-auto">
+        <p className="text-xs text-slate-400 leading-relaxed max-w-sm px-2 mx-auto">
           Ingrese la contraseña de administrador para acceder a la consola centralizada de la flota.
         </p>
 
@@ -580,33 +580,33 @@ function AdminGoogleLoginGate({ isLoggingIn, onLogin, onBypass }: AdminGoogleLog
                 setPassword(e.target.value);
                 if (error) setError(false);
               }}
-              className={`w-full bg-[#151d2f]/80 border ${error ? 'border-red-500/50 text-red-100 placeholder-red-500/50' : 'border-indigo-500/30 text-emerald-100'} rounded-xl py-3.5 px-4 text-center focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition`}
+              className={`w-full bg-slate-50 border ${error ? 'border-red-500 text-red-600 placeholder-red-400' : 'border-slate-300 text-slate-800 placeholder-slate-400'} rounded-xl py-3.5 px-4 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
             />
             {error && (
-              <p className="text-[10px] text-red-400 mt-2 font-mono">Contraseña incorrecta</p>
+              <p className="text-[10px] text-red-500 mt-2 font-mono">Contraseña incorrecta</p>
             )}
           </div>
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 active:scale-[0.98] text-slate-950 font-extrabold py-3.5 px-4 rounded-xl shadow-xl flex items-center justify-center gap-2 transition cursor-pointer transform font-sans text-xs tracking-wider uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white font-extrabold py-3.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition cursor-pointer transform font-sans text-xs tracking-wider uppercase disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!password.trim()}
           >
-            <span>INGRESAR COMO DON SAÚL</span>
-            <ChevronRight className="w-4 h-4 text-slate-950" />
+            <span>INGRESAR ADMINISTRACIÓN</span>
+            <ChevronRight className="w-4 h-4 text-white" />
           </button>
 
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="w-full bg-transparent hover:bg-slate-950 text-slate-400 font-bold py-2 px-4 rounded-xl transition text-[10px] uppercase tracking-wider mt-2"
+            className="w-full bg-transparent hover:bg-slate-100 text-slate-400 font-bold py-2 px-4 rounded-xl transition text-[10px] uppercase tracking-wider mt-2 cursor-pointer"
           >
             VOLVER AL PORTAL
           </button>
         </form>
 
-        <div className="pt-2 text-[9px] text-slate-400 font-mono leading-relaxed">
-          Google Sheets ID: <span className="text-indigo-400 block break-all">1ZNuFluKQi3lFP5qF-eQtfvDCcIDotu4v8jV89GwRgsQ</span>
+        <div className="pt-2 text-[9px] text-slate-200 font-mono leading-relaxed">
+          Google Sheets ID: <span className="text-blue-500 block break-all">1ZNuFluKQi3lFP5qF-eQtfvDCcIDotu4v8jV89GwRgsQ</span>
         </div>
       </div>
     </div>
@@ -632,7 +632,7 @@ function AdminConsoleLayout({ token, userEmail, onSignOut }: AdminConsoleLayoutP
             <Layout className="w-5 h-5" />
           </div>
           <div>
-            <span className="font-extrabold text-white text-sm tracking-wide">Flotas Don Saúl</span>
+            <span className="font-extrabold text-white text-sm tracking-wide">SL ROAD TRUCKING</span>
             <span className="text-[9px] bg-fuchsia-950 text-fuchsia-400 border border-fuchsia-900/60 ml-2 px-1.5 py-0.5 rounded uppercase font-bold font-mono tracking-widest">
               Admin Consola
             </span>
@@ -640,18 +640,18 @@ function AdminConsoleLayout({ token, userEmail, onSignOut }: AdminConsoleLayoutP
         </div>
         
         <div className="flex items-center space-x-4">
-          <span className="text-slate-300 text-xs hidden sm:inline-block font-medium">
+          <span className="text-slate-100 text-xs hidden sm:inline-block font-medium">
             Admin: {userEmail || 'Conectado'}
           </span>
           <button
             onClick={() => navigate('/')}
-            className="text-xs text-slate-300 hover:text-white font-bold transition py-1 px-2.5 rounded-lg border border-fuchsia-900/80 bg-[#0d1324]/80 cursor-pointer"
+            className="text-xs text-slate-100 hover:text-white font-bold transition py-1 px-2.5 rounded-lg border border-fuchsia-900/80 bg-[#0d1324]/80 cursor-pointer"
           >
             Selector General
           </button>
           <button
             onClick={onSignOut}
-            className="text-xs bg-[#0d1324]/90 hover:bg-rose-950 hover:text-rose-450 text-slate-200 border border-[#1e2943]/60 transition font-extrabold px-3 py-1.5 rounded-lg cursor-pointer"
+            className="text-xs bg-[#0d1324]/90 hover:bg-rose-950 hover:text-rose-450 text-slate-100 border border-[#1e2943]/60 transition font-extrabold px-3 py-1.5 rounded-lg cursor-pointer"
           >
             Cerrar Sesión
           </button>

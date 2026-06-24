@@ -66,7 +66,7 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
   const isRouteConnected = originNode && destNode;
 
   return (
-    <div id={`minimap-${idViaje || 'demo'}`} className="bg-[#0d1324]/90 backdrop-blur-md border border-[#1e2943]/60 rounded-xl overflow-hidden relative h-[120px] transition duration-300 w-full select-none group-hover:border-[#00ff9d]/30 shadow-md">
+    <div id={`minimap-${idViaje || 'demo'}`} className="bg-[#0B1329] border border-[#1E293B] rounded-xl overflow-hidden relative h-[120px] transition duration-300 w-full select-none shadow-inner">
       {/* SVG Vector Drawing */}
       <svg
         viewBox="0 0 400 120"
@@ -224,7 +224,7 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
             transform: 'translate(10px, -15px)' 
           }}
         >
-          <div className="bg-slate-900/80 backdrop-blur-md border border-slate-700/50 text-slate-300 text-[10px] px-2 py-1 rounded-md flex items-center gap-1 shadow-xl w-max">
+          <div className="bg-[#1E293B]/80 backdrop-blur-md border border-[#233554]/50 text-slate-300 text-[10px] px-2 py-1 rounded-md flex items-center gap-1 shadow-xl w-max">
             {destNode.label === 'Oruro' || destNode.label === 'Potosí' ? '❄️ Nieve/Hielo' 
               : destNode.label === 'Santa Cruz' ? '☀️ Despejado'
               : '🌧️ Lluvia Fuerte'}
@@ -234,18 +234,18 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
 
       {/* Top Left Floating Indicator Overlay */}
       <div className="absolute top-2 left-2 flex flex-col gap-0.5">
-        <span className="backdrop-blur-md bg-[#070a13]/85 text-[#00ff9d] text-[8.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-[#00ff9d]/30 shadow-lg leading-none">
+        <span className="backdrop-blur-md bg-[#1E293B]/80 text-[#00ff9d] text-[8.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-[#00ff9d]/30 shadow-lg leading-none">
           GPS LOCK • {metadata.dist}
         </span>
-        <span className="text-[7.5px] text-slate-300 font-mono pl-1 leading-none">
+        <span className="text-[7.5px] text-slate-400 font-mono pl-1 leading-none mt-0.5">
           {metadata.msg}
         </span>
       </div>
 
       {/* Connection verification status in right corner */}
-      <div className="absolute bottom-2 right-2 flex items-center gap-1 backdrop-blur-sm bg-[#070a13]/60 px-1.5 py-0.5 rounded border border-[#1e2943]/50">
-        <span className={`w-1.5 h-1.5 rounded-full ${isRouteConnected ? 'bg-[#00ff9d]' : 'bg-amber-500 animate-pulse'}`}></span>
-        <span className="text-[7.5px] font-mono text-slate-200 uppercase">
+      <div className="absolute bottom-2 right-2 flex items-center gap-1 backdrop-blur-sm bg-[#1E293B]/60 px-1.5 py-0.5 rounded border border-[#233554]/50">
+        <span className={`w-1.5 h-1.5 rounded-full ${isRouteConnected ? 'bg-[#00ff9d]' : 'bg-orange-500 animate-pulse'}`}></span>
+        <span className="text-[7.5px] font-mono text-slate-300 uppercase">
           {isRouteConnected ? 'COORD_LOCKED' : 'SYS_GEOPATH_DEFAULT'}
         </span>
       </div>

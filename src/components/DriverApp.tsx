@@ -173,20 +173,18 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
   // Trigger loading when driver changes or lists reload
   useEffect(() => {
-    if (authenticatedDriver) {
-      loadDriverData();
+    if (authenticatedDriver && !camiones.length) {
+      loadDriverData(true);
     }
   }, [authenticatedDriver]);
 
   // Load state from localStorage on load if offline
   useEffect(() => {
-    if (initialDriver) {
+    const savedDriver = localStorage.getItem('driver_session_user');
+    if (savedDriver) {
+      setAuthenticatedDriver(JSON.parse(savedDriver));
+    } else if (initialDriver) {
       setAuthenticatedDriver(initialDriver);
-    } else {
-      const savedDriver = localStorage.getItem('driver_session_user');
-      if (savedDriver) {
-        setAuthenticatedDriver(JSON.parse(savedDriver));
-      }
     }
 
     const savedPending = localStorage.getItem('pending_sync_actions');
@@ -337,7 +335,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
       if (data.success) {
         setActiveViaje(data.data);
         setMessage({ text: '¡Viaje iniciado con éxito! El camión ya se encuentra en ciclo.', type: 'success' });
-        loadDriverData();
+        loadDriverData(true);
         setModalType(null); // Close on success!
       } else {
         setMessage({ text: data.message || 'No se pudo iniciar el viaje.', type: 'error' });
@@ -466,7 +464,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
         setDescGasto('');
         setGastoFiles([]);
         setGastoFilesUrls([]);
-        loadDriverData();
+        loadDriverData(true);
       } else {
         setMessage({ text: resJson.message || 'Error al guardar compra.', type: 'error' });
       }
@@ -618,7 +616,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           setMessage({ text: '¡Sincronización Completa! Tu Gasto Offline ha sido guardado.', type: 'success' });
           localStorage.removeItem('pending_sync_actions');
           setOfflineAction(null);
-          loadDriverData();
+          loadDriverData(true);
         } else {
           setMessage({ text: 'No se pudo sincronizar el gasto: ' + resJson.message, type: 'error' });
         }
@@ -637,7 +635,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           setMessage({ text: '¡Sincronización exitosa! Tu reporte de pesaje y viaje offline fue guardado en la nube.', type: 'success' });
           localStorage.removeItem('pending_sync_actions');
           setOfflineAction(null);
-          loadDriverData();
+          loadDriverData(true);
         } else {
           setMessage({ text: 'No se pudo sincronizar el viaje: ' + resJson.message, type: 'error' });
         }
@@ -652,22 +650,22 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
   // Auth Screen if not logged in using PIN
   if (!authenticatedDriver) {
     return (
-      <div className="max-w-md w-full bg-slate-800 rounded-3xl border border-slate-700 p-8 space-y-6 mx-auto animate-fade-in shadow-2xl">
+      <div className="max-w-md w-full bg-[#112240] rounded-3xl border border-[#233554] p-8 space-y-6 mx-auto animate-fade-in shadow-2xl">
         <div className="flex flex-col items-center justify-center space-y-3">
-          <div className="p-4 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 shadow-md">
+          <div className="p-4 bg-orange-500/10 text-emerald-400 rounded-full border border-emerald-500/20 shadow-md">
             <Truck className="w-12 h-12" />
           </div>
           <h1 className="text-2xl font-bold text-white text-center">Choferes de Ruta</h1>
-          <p className="text-xs text-slate-400 text-center uppercase tracking-wider font-semibold">Sistema de Gestión de Flota</p>
+          <p className="text-xs text-slate-200 text-center uppercase tracking-wider font-semibold">SL ROAD TRUCKING</p>
         </div>
 
         {/* Network Stager warning */}
-        <div className="flex items-center justify-between bg-slate-900 px-4 py-2.5 rounded-xl border border-slate-700/60 text-xs">
+        <div className="flex items-center justify-between bg-[#0A192F] px-4 py-2.5 rounded-xl border border-[#233554]/60 text-xs">
           <div className="flex items-center space-x-2">
             {currentNetworkActive ? (
               <>
                 <Wifi className="w-4 h-4 text-emerald-400" />
-                <span className="text-slate-300 font-medium">Bases Disponibles en Línea</span>
+                <span className="text-slate-100 font-medium">Bases Disponibles en Línea</span>
               </>
             ) : (
               <>
@@ -681,8 +679,8 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             onClick={() => setSimulateOffline(!simulateOffline)}
             className={`px-2 py-0.5 rounded text-[10px] font-mono leading-none border transition-colors ${
               simulateOffline 
-                ? 'bg-amber-950/40 text-amber-400 border-amber-800' 
-                : 'bg-slate-750 text-slate-400 border-slate-700 hover:bg-slate-700'
+                ? 'bg-orange-950/40 text-orange-400 border-amber-800' 
+                : 'bg-slate-750 text-slate-200 border-[#233554] hover:bg-[#233554]'
             }`}
           >
             {simulateOffline ? 'SIM: OFFLINE' : 'PROBAR OFFLINE'}
@@ -691,9 +689,9 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
         <form onSubmit={handlePinSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs text-slate-400 font-semibold uppercase tracking-wider">PIN de Conductor</label>
+            <label className="text-xs text-slate-200 font-semibold uppercase tracking-wider">PIN de Conductor</label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                 <KeyRound className="w-5 h-5" />
               </span>
               <input
@@ -704,10 +702,10 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 placeholder="••••"
-                className="w-full bg-slate-950 border border-slate-700 text-white font-mono text-center tracking-widest text-2xl py-3 pl-10 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
+                className="w-full bg-slate-950 border border-[#233554] text-white font-mono text-center tracking-widest text-2xl py-3 pl-10 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
               />
             </div>
-            <p className="text-[10px] text-slate-400 text-center mt-1">
+            <p className="text-[10px] text-slate-200 text-center mt-1">
               Ingresa tu código PIN de 4 dígitos. Para pruebas usa: <strong className="text-emerald-400">1234</strong>
             </p>
           </div>
@@ -722,13 +720,13 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-slate-950 font-bold py-3.5 px-4 rounded-2xl shadow-lg transform active:scale-98 transition cursor-pointer"
+            className="w-full bg-orange-500 hover:bg-emerald-600 active:bg-emerald-700 text-slate-950 font-bold py-3.5 px-4 rounded-2xl shadow-lg transform active:scale-98 transition cursor-pointer"
           >
             {isLoading ? 'Comprobando acceso...' : 'INGRESAR'}
           </button>
         </form>
 
-        <p className="text-center text-xs text-slate-500">
+        <p className="text-center text-xs text-slate-400">
           ¿No tienes PIN? Solicítalo a <strong>Don Saúl</strong>.
         </p>
       </div>
@@ -756,16 +754,16 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
   return (
     <div className="min-h-screen bg-transparent text-slate-100 flex flex-col font-sans">
       {/* 1. Header (Mobile Visible, Desktop Hidden) */}
-      <header className="lg:hidden bg-[#0d1324]/80 backdrop-blur-md border-b border-fuchsia-900/50 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+      <header className="lg:hidden bg-[#0A192F]/80 backdrop-blur-md border-b border-[#112240]/50 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setIsMobileSidebarOpen(true)}
-            className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition cursor-pointer font-bold uppercase text-[10px]"
+            className="p-1.5 hover:bg-[#112240] rounded-lg text-slate-200 hover:text-white transition cursor-pointer font-bold uppercase text-[10px]"
           >
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center space-x-1">
-            <span className="p-1 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
+            <span className="p-1 bg-orange-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
               <Truck className="w-4 h-4" />
             </span>
             <span className="font-extrabold text-sm text-white">Flota Choferes</span>
@@ -791,35 +789,35 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
       <div className="flex flex-1 relative overflow-x-hidden">
         
         {/* Desktop Sidebar (Docked) */}
-        <aside className="hidden lg:flex flex-col w-80 shrink-0 border-r border-fuchsia-900/50 bg-[#0d1324]/60 backdrop-blur-md p-6 h-[calc(100vh-0px)] sticky top-0 justify-between">
+        <aside className="hidden lg:flex flex-col w-80 shrink-0 border-r border-[#112240]/50 bg-[#0A192F]/60 backdrop-blur-md p-6 h-[calc(100vh-0px)] sticky top-0 justify-between">
           <div className="space-y-6">
-            <div className="flex items-center space-x-2.5 pb-2 border-b border-fuchsia-900/50">
-              <span className="p-2 bg-emerald-500/10 text-emerald-400 rounded-2xl border border-emerald-500/20 shadow-inner">
+            <div className="flex items-center space-x-2.5 pb-2 border-b border-[#112240]/50">
+              <span className="p-2 bg-orange-500/10 text-emerald-400 rounded-2xl border border-emerald-500/20 shadow-inner">
                 <Truck className="w-6 h-6" />
               </span>
               <div>
                 <h1 className="font-black text-base text-white tracking-tight leading-tight">Flota Choferes</h1>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Módulo Conductor</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Módulo Conductor</p>
               </div>
             </div>
 
             {/* Profile Summary */}
             <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-3xl space-y-3">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-extrabold shadow-inner shrink-0 leading-none">
+                <div className="w-10 h-10 rounded-full bg-orange-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-extrabold shadow-inner shrink-0 leading-none">
                   {authenticatedDriver.nombre_completo.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-[9px] text-slate-500 font-bold uppercase block tracking-wider leading-none">CONDUCTOR</span>
+                  <span className="text-[9px] text-slate-400 font-bold uppercase block tracking-wider leading-none">CONDUCTOR</span>
                   <div className="text-white font-bold text-sm truncate leading-tight mt-0.5">{authenticatedDriver.nombre_completo}</div>
                 </div>
               </div>
 
               {/* Vehicle selector */}
               <div className="space-y-1.5 pt-2">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Vehículo Activo</label>
+                <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">Vehículo Activo</label>
                 {activeViaje ? (
-                  <div className="bg-slate-900 border border-slate-800 p-2 py-2.5 rounded-xl text-xs text-white font-bold truncate flex items-center gap-2">
+                  <div className="bg-[#0A192F] border border-[#112240] p-2 py-2.5 rounded-xl text-xs text-white font-bold truncate flex items-center gap-2">
                     <Truck className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
                     {camiones.find(c => c.id_camion === selectedCamionId)?.modelo || 'Camión Asignado'}
                   </div>
@@ -827,7 +825,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   <select
                     value={selectedCamionId}
                     onChange={(e) => setSelectedCamionId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl focus:ring-1 focus:ring-emerald-500 text-xs outline-none text-white font-medium cursor-pointer"
+                    className="w-full bg-slate-950 border border-[#112240] p-2.5 rounded-xl focus:ring-1 focus:ring-emerald-500 text-xs outline-none text-white font-medium cursor-pointer"
                   >
                     <option value="">Selecciona un camión...</option>
                     {camiones.map((c, idx) => (
@@ -843,7 +841,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             {/* Offline simulator */}
             <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-3xl space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">Conexión</span>
+                <span className="text-slate-200 font-semibold uppercase tracking-wider text-[10px]">Conexión</span>
                 {currentNetworkActive ? (
                   <span className="text-emerald-400 font-bold flex items-center gap-1">
                     <Wifi className="w-3.5 h-3.5" /> En Línea
@@ -859,7 +857,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 <button
                   onClick={handleSyncOfflineActions}
                   disabled={isLoading || !currentNetworkActive}
-                  className="w-full bg-indigo-600 hover:bg-indigo-505 disabled:opacity-40 text-white text-xs py-2 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow"
+                  className="w-full bg-blue-600 hover:bg-indigo-505 disabled:opacity-40 text-white text-xs py-2 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow"
                 >
                   <RotateCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
                   Sincronizar Pendientes
@@ -870,8 +868,8 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 onClick={() => setSimulateOffline(!simulateOffline)}
                 className={`w-full py-2 border rounded-xl text-xs font-bold leading-none transition duration-200 cursor-pointer ${
                   simulateOffline 
-                    ? 'bg-amber-950/40 text-amber-400 border-amber-800' 
-                    : 'bg-slate-800 border-slate-700 hover:bg-slate-750 text-slate-300'
+                    ? 'bg-orange-950/40 text-orange-400 border-amber-800' 
+                    : 'bg-[#112240] border-[#233554] hover:bg-slate-750 text-slate-100'
                 }`}
               >
                 {simulateOffline ? 'DESACTIVAR SIMULADOR' : 'PROBAR MODO OFFLINE'}
@@ -882,7 +880,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           <div className="space-y-3 pt-6 border-t border-slate-850">
             <button
               onClick={onLogout}
-              className="w-full border border-slate-800 hover:bg-slate-850 text-slate-300 hover:text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full border border-[#112240] hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
             >
               ← Volver al Portal
             </button>
@@ -914,19 +912,19 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                className="fixed inset-y-0 left-0 z-50 w-80 bg-slate-900 border-r border-slate-800 p-6 flex flex-col justify-between shadow-2xl lg:hidden"
+                className="fixed inset-y-0 left-0 z-50 w-80 bg-[#0A192F] border-r border-[#112240] p-6 flex flex-col justify-between shadow-2xl lg:hidden"
               >
                 <div className="space-y-6">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-850">
                     <div className="flex items-center space-x-2">
-                      <span className="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20 shadow-inner">
+                      <span className="p-1.5 bg-orange-500/10 text-emerald-400 rounded-xl border border-emerald-500/20 shadow-inner">
                         <Truck className="w-5 h-5" />
                       </span>
                       <span className="font-extrabold text-sm text-white">Menú Conductor</span>
                     </div>
                     <button
                       onClick={() => setIsMobileSidebarOpen(false)}
-                      className="p-1 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
+                      className="p-1 hover:bg-[#112240] rounded-lg text-slate-200 hover:text-white transition cursor-pointer"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -935,19 +933,19 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   {/* Profile section */}
                   <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-2xl space-y-3">
                     <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-orange-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold shrink-0">
                         {authenticatedDriver.nombre_completo.charAt(0)}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <span className="text-[8px] text-slate-500 font-bold uppercase tracking-wider block leading-none">CONDUCTOR</span>
+                        <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider block leading-none">CONDUCTOR</span>
                         <div className="text-white font-extrabold text-xs truncate mt-0.5">{authenticatedDriver.nombre_completo}</div>
                       </div>
                     </div>
 
                     <div className="space-y-1.5 pt-2">
-                      <label className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Vehículo Activo</label>
+                      <label className="text-[9px] text-slate-200 font-bold uppercase tracking-wider block">Vehículo Activo</label>
                       {activeViaje ? (
-                        <div className="bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs text-white font-bold truncate flex items-center gap-2">
+                        <div className="bg-[#0A192F] border border-[#112240] p-2 rounded-xl text-xs text-white font-bold truncate flex items-center gap-2">
                           <Truck className="w-3.5 h-3.5 text-emerald-400" />
                           {camiones.find(c => c.id_camion === selectedCamionId)?.modelo || 'Camión Asignado'}
                         </div>
@@ -955,7 +953,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                         <select
                           value={selectedCamionId}
                           onChange={(e) => setSelectedCamionId(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl focus:ring-1 focus:ring-emerald-500 text-xs outline-none text-white font-medium"
+                          className="w-full bg-slate-950 border border-[#112240] p-2.5 rounded-xl focus:ring-1 focus:ring-emerald-500 text-xs outline-none text-white font-medium"
                         >
                           <option value="">Selecciona un camión...</option>
                           {camiones.map((c, index) => (
@@ -971,7 +969,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   {/* Offline helper */}
                   <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-2xl space-y-3">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400 font-semibold uppercase tracking-wider text-[9px]">Sincronización</span>
+                      <span className="text-slate-200 font-semibold uppercase tracking-wider text-[9px]">Sincronización</span>
                       {currentNetworkActive ? (
                         <span className="text-emerald-400 font-bold flex items-center gap-1">
                           <Wifi className="w-3.5 h-3.5" /> En Línea
@@ -990,7 +988,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                           handleSyncOfflineActions();
                         }}
                         disabled={isLoading || !currentNetworkActive}
-                        className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-xs py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                        className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-xs py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
                       >
                         <RotateCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
                         Sincronizar Pendientes
@@ -1001,8 +999,8 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                       onClick={() => setSimulateOffline(!simulateOffline)}
                       className={`w-full py-2 border rounded-lg text-xs font-bold transition duration-200 cursor-pointer ${
                         simulateOffline 
-                          ? 'bg-amber-950/40 text-amber-400 border-amber-800' 
-                          : 'bg-slate-800 border-slate-705 hover:bg-slate-750 text-slate-300'
+                          ? 'bg-orange-950/40 text-orange-400 border-amber-800' 
+                          : 'bg-[#112240] border-slate-705 hover:bg-slate-750 text-slate-100'
                       }`}
                     >
                       {simulateOffline ? 'DESACTIVAR SIMULADOR' : 'PROBAR MODO OFFLINE'}
@@ -1013,7 +1011,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 <div className="space-y-3 pt-4 border-t border-slate-850">
                   <button
                     onClick={onLogout}
-                    className="w-full border border-slate-800 hover:bg-slate-850 text-slate-300 hover:text-white font-bold py-2 px-4 rounded-lg text-xs transition"
+                    className="w-full border border-[#112240] hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2 px-4 rounded-lg text-xs transition"
                   >
                     ← Volver al Portal
                   </button>
@@ -1077,12 +1075,12 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 className="space-y-6"
               >
                 {/* Odometer selector visible only on mobile layout */}
-                <div className="lg:hidden bg-slate-900 border border-slate-800 p-4 rounded-3xl space-y-2.5">
+                <div className="lg:hidden bg-[#0A192F] border border-[#112240] p-4 rounded-3xl space-y-2.5">
                   <span className="text-[10px] text-slate-505 font-extrabold uppercase tracking-wider block">Camión de la Flota</span>
                   <select
                     value={selectedCamionId}
                     onChange={(e) => setSelectedCamionId(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 p-3.5 rounded-2xl focus:ring-1 focus:ring-emerald-500 text-sm outline-none text-white font-bold cursor-pointer"
+                    className="w-full bg-slate-950 border border-[#112240] p-3.5 rounded-2xl focus:ring-1 focus:ring-emerald-500 text-sm outline-none text-white font-bold cursor-pointer"
                   >
                     <option value="">Selecciona tu camión asignado...</option>
                     {camiones.map((c, idx) => (
@@ -1096,15 +1094,15 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Rutas de Transporte</h2>
-                    <p className="text-xs text-slate-400 mt-0.5">Selecciona tu destino para iniciar el ciclo comercial.</p>
+                    <p className="text-xs text-slate-200 mt-0.5">Selecciona tu destino para iniciar el ciclo comercial.</p>
                   </div>
                   <button
                     onClick={async () => {
                       if (isLoading) return;
-                      await loadDriverData();
+                      await loadDriverData(true);
                       setMessage({ text: 'Rutas actualizadas correctamente.', type: 'success' });
                     }}
-                    className="p-2 sm:p-3 bg-slate-900 border border-slate-800 hover:bg-slate-850 active:bg-slate-850 text-slate-400 hover:text-emerald-400 hover:border-slate-700/60 rounded-2xl transition cursor-pointer flex items-center justify-center shadow"
+                    className="p-2 sm:p-3 bg-[#0A192F] border border-[#112240] hover:bg-slate-850 active:bg-slate-850 text-slate-200 hover:text-emerald-400 hover:border-[#233554]/60 rounded-2xl transition cursor-pointer flex items-center justify-center shadow"
                     title="Actualizar Rutas"
                     disabled={isLoading}
                   >
@@ -1113,7 +1111,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 </div>
 
                 {rutas.filter(r => r.estado === 'Disponible' && !viajes.some(v => v.id_ruta === r.id_ruta && v.estado_viaje === 'En Ciclo')).length === 0 ? (
-                  <div className="p-12 text-center bg-slate-905/30 border border-slate-850 rounded-3xl text-slate-500 flex flex-col items-center justify-center space-y-2">
+                  <div className="p-12 text-center bg-slate-905/30 border border-slate-850 rounded-3xl text-slate-400 flex flex-col items-center justify-center space-y-2">
                     <AlertTriangle className="w-8 h-8 text-slate-600 animate-bounce" />
                     <span className="font-semibold text-sm">No hay rutas asignadas disponibles.</span>
                     <span className="text-xs text-slate-600 max-w-xs">Pídele a Don Saúl o administración que asigne rutas con estado "Disponible" en Google Sheets.</span>
@@ -1130,7 +1128,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                         return (
                           <div key={`${ruta.id_ruta}-${index}`} className="flex flex-col gap-2">
                             {isBlocked && (
-                              <div className="bg-amber-500/10 border border-amber-500/20 p-2 rounded-xl text-[10px] text-amber-500 font-bold text-center flex items-center gap-1">
+                              <div className="bg-orange-500/10 border border-orange-500/20 p-2 rounded-xl text-[10px] text-orange-500 font-bold text-center flex items-center gap-1">
                                 <AlertTriangle className="w-3 h-3" />
                                 Bloqueo de Seguridad: Conductor/Vehículo Ocupado
                               </div>
@@ -1159,35 +1157,35 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 transition={{ duration: 0.25 }}
                 className="space-y-6"
               >
-                <div className="bg-slate-900 border border-emerald-500/20 rounded-3xl p-6 sm:p-8 text-center space-y-6 animate-pulse-border shadow-2xl relative overflow-hidden">
+                <div className="bg-[#0A192F] border border-emerald-500/20 rounded-3xl p-6 sm:p-8 text-center space-y-6 animate-pulse-border shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
 
-                  <div className="inline-flex p-4 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 shadow-inner">
+                  <div className="inline-flex p-4 bg-orange-500/10 text-emerald-400 rounded-full border border-emerald-500/20 shadow-inner">
                     <Navigation className="w-8 h-8 animate-bounce text-emerald-400" />
                   </div>
                   
                   <div className="space-y-1.5">
                     <h4 className="text-white text-lg sm:text-xl font-black tracking-tight uppercase">Viaje Registrado en Ciclo</h4>
-                    <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                    <p className="text-xs text-slate-200 max-w-md mx-auto leading-relaxed">
                       Llevando cargamento de <strong className="text-emerald-400">45 Toneladas Base</strong>. Rutas secundarias bloqueadas hasta completar el pesaje.
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2">
                     <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850">
-                      <span className="text-[9px] text-slate-500 font-bold block uppercase leading-none pb-1.5 tracking-wider">Origen del Viaje</span>
+                      <span className="text-[9px] text-slate-400 font-bold block uppercase leading-none pb-1.5 tracking-wider">Origen del Viaje</span>
                       <span className="text-white font-extrabold text-sm sm:text-base">
                         {rutas.find(r => r.id_ruta === activeViaje?.id_ruta)?.origen || 'Consultando...'}
                       </span>
                     </div>
                     <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850">
-                      <span className="text-[9px] text-slate-500 font-bold block uppercase leading-none pb-1.5 tracking-wider">Destino del Viaje</span>
+                      <span className="text-[9px] text-slate-400 font-bold block uppercase leading-none pb-1.5 tracking-wider">Destino del Viaje</span>
                       <span className="text-white font-extrabold text-sm sm:text-base">
                         {rutas.find(r => r.id_ruta === activeViaje?.id_ruta)?.destino || 'Consultando...'}
                       </span>
                     </div>
                     <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850">
-                      <span className="text-[9px] text-slate-500 font-bold block uppercase leading-none pb-1.5 tracking-wider">Vehículo Utilizado</span>
+                      <span className="text-[9px] text-slate-400 font-bold block uppercase leading-none pb-1.5 tracking-wider">Vehículo Utilizado</span>
                       <span className="text-white font-extrabold text-sm truncate block">
                         {camiones.find(c => c.id_camion === activeViaje?.id_camion)?.modelo || 'Camión'}
                       </span>
@@ -1226,22 +1224,22 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 transition={{ duration: 0.25 }}
                 className="space-y-6"
               >
-                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
+                <div className="bg-[#0A192F] border border-[#112240] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
                   <div className="space-y-1">
                     <h3 className="text-white font-black text-lg sm:text-xl tracking-tight uppercase">Confirmar Cierre de Viaje</h3>
-                    <p className="text-xs text-slate-400">Registra el ticket oficial de pesaje y odómetro del vehículo.</p>
+                    <p className="text-xs text-slate-200">Registra el ticket oficial de pesaje y odómetro del vehículo.</p>
                   </div>
 
                   <div className="space-y-4 pt-2">
                     {/* Odometer Field */}
                     <div className="space-y-1.5">
-                      <label className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Kilometraje Final (Odometer)</label>
+                      <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Kilometraje Final (Odometer)</label>
                       <input
                         type="number"
                         value={kmFinal}
                         onChange={(e) => setKmFinal(e.target.value)}
                         placeholder="Ingresa kilometraje actual del camión..."
-                        className="w-full bg-slate-950 border border-slate-800 p-4 rounded-2xl text-white font-extrabold outline-none text-sm focus:border-emerald-500"
+                        className="w-full bg-slate-950 border border-[#112240] p-4 rounded-2xl text-white font-extrabold outline-none text-sm focus:border-emerald-500"
                       />
                     </div>
 
@@ -1255,34 +1253,34 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                     {/* Stepper +/- selector for Extra Tons */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Sueldo / Toneladas Extra (Tons)</label>
-                        <span className="text-[10px] text-slate-500 font-semibold uppercase">Base obligatoria: 45 Tons</span>
+                        <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Sueldo / Toneladas Extra (Tons)</label>
+                        <span className="text-[10px] text-slate-400 font-semibold uppercase">Base obligatoria: 45 Tons</span>
                       </div>
-                      <div className="flex items-center justify-between bg-slate-950 border border-slate-800 p-3 rounded-2xl">
+                      <div className="flex items-center justify-between bg-slate-950 border border-[#112240] p-3 rounded-2xl">
                         <motion.button
                           whileTap={{ scale: 0.90 }}
                           type="button"
                           onClick={() => setToneladasExtras(Math.max(0, toneladasExtras - 1))}
-                          className="w-12 h-12 bg-slate-900 border border-slate-705 rounded-xl text-slate-305 font-bold hover:bg-slate-850 flex items-center justify-center transition cursor-pointer shadow"
+                          className="w-12 h-12 bg-[#0A192F] border border-slate-705 rounded-xl text-slate-305 font-bold hover:bg-slate-850 flex items-center justify-center transition cursor-pointer shadow"
                         >
                           <Minus className="w-5 h-5" />
                         </motion.button>
                         <div className="text-center">
-                          <span className="text-[10px] block text-slate-500 font-bold leading-none uppercase tracking-wide">Adicional</span>
+                          <span className="text-[10px] block text-slate-400 font-bold leading-none uppercase tracking-wide">Adicional</span>
                           <span className="text-lg sm:text-xl font-black text-white font-mono mt-1 block">{toneladasExtras} Tons</span>
                         </div>
                         <motion.button
                           whileTap={{ scale: 0.90 }}
                           type="button"
                           onClick={() => setToneladasExtras(toneladasExtras + 1)}
-                          className="w-12 h-12 bg-slate-900 border border-slate-705 rounded-xl text-slate-305 font-bold hover:bg-slate-850 flex items-center justify-center transition cursor-pointer shadow"
+                          className="w-12 h-12 bg-[#0A192F] border border-slate-705 rounded-xl text-slate-305 font-bold hover:bg-slate-850 flex items-center justify-center transition cursor-pointer shadow"
                         >
                           <Plus className="w-5 h-5" />
                         </motion.button>
                       </div>
 
                       {toneladasExtras > 0 && (
-                        <div className="p-3 bg-indigo-950/30 text-indigo-400 border border-indigo-900/40 rounded-xl text-xs leading-relaxed font-semibold">
+                        <div className="p-3 bg-indigo-950/30 text-blue-400 border border-indigo-900/40 rounded-xl text-xs leading-relaxed font-semibold">
                           <strong>Ganancia Estimada Extras (40% Chofer):</strong> Un estimado de <strong>{((toneladasExtras * (500 / 45)) * 0.40).toFixed(1)} BOB</strong> se acumulará como bono personal.
                         </div>
                       )}
@@ -1290,8 +1288,8 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
                     {/* Camera Capture */}
                     <div className="space-y-2">
-                      <label className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Fotografía del Ticket de Pesaje (Múltiple)</label>
-                      <div className="flex flex-col border border-dashed border-slate-800 rounded-3xl p-5 bg-slate-950 text-center gap-4">
+                      <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Fotografía del Ticket de Pesaje (Múltiple)</label>
+                      <div className="flex flex-col border border-dashed border-[#112240] rounded-3xl p-5 bg-slate-950 text-center gap-4">
                         
                         {fotosPesaje.length > 0 && (
                           <div className="space-y-3 w-full">
@@ -1307,7 +1305,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                                     animate={{ scale: 1, opacity: 1 }}
                                     exit={{ scale: 0.4, opacity: 0 }}
                                     transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-                                    className="relative group border border-slate-800 rounded-xl overflow-hidden bg-slate-900 aspect-video h-16"
+                                    className="relative group border border-[#112240] rounded-xl overflow-hidden bg-[#0A192F] aspect-video h-16"
                                   >
                                     <img
                                       src={foto}
@@ -1330,10 +1328,10 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                         )}
 
                         <div className="flex flex-col items-center justify-center gap-2 py-2">
-                          <Camera className="w-8 h-8 text-indigo-400 animate-pulse shrink-0" />
+                          <Camera className="w-8 h-8 text-blue-400 animate-pulse shrink-0" />
                           <div className="space-y-1">
-                            <span className="text-xs text-slate-300 font-extrabold block">Toma fotos con la cámara</span>
-                            <p className="text-[9px] text-slate-500 leading-none">Puedes seleccionar múltiples fotos como comprobantes del pesaje.</p>
+                            <span className="text-xs text-slate-100 font-extrabold block">Toma fotos con la cámara</span>
+                            <p className="text-[9px] text-slate-400 leading-none">Puedes seleccionar múltiples fotos como comprobantes del pesaje.</p>
                           </div>
                           
                           <input
@@ -1348,7 +1346,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                           <motion.label
                             whileTap={{ scale: 0.95 }}
                             htmlFor="weigh-photo-capture"
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-[11px] px-4 py-2 rounded-xl transition cursor-pointer shadow mt-1 inline-block"
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-[11px] px-4 py-2 rounded-xl transition cursor-pointer shadow mt-1 inline-block"
                           >
                             {fotosPesaje.length > 0 ? 'AÑADIR MÁS COMPROS' : 'ACTIVAR CÁMARA'}
                           </motion.label>
@@ -1363,14 +1361,14 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setIsFinalizing(false)}
-                      className="bg-slate-950 border border-slate-800 text-slate-300 hover:bg-slate-900 font-bold py-3.5 px-4 rounded-2xl text-xs transition uppercase cursor-pointer"
+                      className="bg-slate-950 border border-[#112240] text-slate-100 hover:bg-[#0A192F] font-bold py-3.5 px-4 rounded-2xl text-xs transition uppercase cursor-pointer"
                     >
                       VOLVER ATRÁS
                     </motion.button>
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={handleFinalizeTripSubmit}
-                      className="bg-emerald-500 text-slate-950 font-black hover:bg-emerald-400 py-3.5 px-4 rounded-2xl text-xs transition cursor-pointer shadow uppercase"
+                      className="bg-orange-500 text-slate-950 font-black hover:bg-emerald-400 py-3.5 px-4 rounded-2xl text-xs transition cursor-pointer shadow uppercase"
                     >
                       ENTREGAR VIAJE
                     </motion.button>
@@ -1382,32 +1380,47 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
         </main>
 
         {/* 3-Column Layout: Column 3 (Alerts & KPIs Panel, docked on Desktop, hidden on Mobile) */}
-        <aside className="hidden lg:flex flex-col w-80 shrink-0 border-l border-slate-800 bg-slate-900/80 backdrop-blur-md p-6 h-[calc(100vh-0px)] sticky top-0 justify-between">
+        <aside className="hidden lg:flex flex-col w-80 shrink-0 border-l border-[#112240] bg-[#0A192F]/80 backdrop-blur-md p-6 h-[calc(100vh-0px)] sticky top-0 justify-between">
           <div className="space-y-6">
             <div className="pb-2 border-b border-slate-850">
               <h3 className="font-extrabold text-sm text-white tracking-tight flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-emerald-400" />
                 Estadísticas del Chofer
               </h3>
-              <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase mt-0.5">Control de Rendimiento</p>
+              <p className="text-[10px] text-slate-400 font-bold tracking-wider uppercase mt-0.5">Control de Rendimiento</p>
             </div>
 
             {/* KPIs statistics */}
             <div className="grid grid-cols-1 gap-3">
               {/* Progress Bar for Expenses */}
-              <div className="bg-slate-950/40 border border-slate-855 p-4 rounded-3xl space-y-2">
-                <div className="flex justify-between items-center text-[9px] text-slate-500 font-extrabold uppercase tracking-wider leading-none">
-                  <span>Saldo Disponible</span>
+              <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl space-y-2">
+                <div className="flex justify-between items-end">
+                  <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none mb-1">
+                    Saldo Mensual Disponible
+                  </span>
+                  {(() => {
+                    const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
+                    const statSaldoActual = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : statPresupuesto);
+                    return (
+                      <div className="text-right">
+                        <span className="text-xl font-black text-white font-mono">{statSaldoActual.toLocaleString('es-BO')}</span>
+                        <span className="text-xs text-slate-500 font-mono"> / {statPresupuesto.toLocaleString('es-BO')} BOB</span>
+                      </div>
+                    );
+                  })()}
+                </div>
+                <div className="flex justify-between items-center text-[9px] text-slate-400 font-extrabold uppercase tracking-wider leading-none mt-1">
+                  <span>Consumo de Caja Chica</span>
                   {(() => {
                     const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
                     const statSaldoActual = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : statPresupuesto);
                     const remainingPercent = Math.max(0, Math.min(100, (statSaldoActual / statPresupuesto) * 100));
-                    return <span>{remainingPercent.toFixed(0)}%</span>;
+                    return <span>{remainingPercent.toFixed(0)}% Restante</span>;
                   })()}
                 </div>
-                <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-[#0A192F] rounded-full overflow-hidden mt-2">
                   <div 
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
+                    className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full"
                     style={{
                       width: `${Math.max(0, Math.min(100, (() => {
                         const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
@@ -1420,16 +1433,16 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               </div>
 
               <div className="bg-slate-950/40 border border-slate-855 p-4 rounded-3xl space-y-1">
-                <span className="text-[9px] text-slate-500 font-extrabold uppercase block tracking-wider leading-none">VIAJES COMPLETADOS</span>
+                <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none">VIAJES COMPLETADOS</span>
                 <div className="text-xl font-black text-white font-mono mt-1">{completedTrips.length} Viajes</div>
               </div>
 
               <div className="bg-slate-950/40 border border-slate-855 p-4 rounded-3xl space-y-1">
-                <span className="text-[9px] text-slate-500 font-extrabold uppercase block tracking-wider leading-none">TONELADAS RECIENTES</span>
+                <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none">TONELADAS RECIENTES</span>
                 <div className="text-xl font-black text-white font-mono mt-1">{totalTons.toFixed(0)} Tons</div>
               </div>
 
-              <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-3xl space-y-1 text-emerald-400">
+              <div className="bg-orange-500/5 border border-emerald-500/10 p-4 rounded-3xl space-y-1 text-emerald-400">
                 <span className="text-[9px] text-emerald-500 font-extrabold uppercase block tracking-wider leading-none">BONOS DE EXTRAS (40%)</span>
                 <div className="text-xl font-black text-emerald-400 font-mono mt-1">{totalBonus.toFixed(1)} BOB</div>
               </div>
@@ -1445,7 +1458,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                       + Añadir
                     </button>
                   </div>
-                  <div className="text-[10px] text-slate-400 leading-relaxed font-semibold">
+                  <div className="text-[10px] text-slate-200 leading-relaxed font-semibold">
                     Puedes registrar consumos de combustible, peajes o talleres en cualquier momento presionando el botón "Registrar Gasto Rápido".
                   </div>
                 </div>
@@ -1454,8 +1467,8 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
             {/* Daily warnings checklist */}
             <div className="bg-slate-950/40 border border-slate-855 p-4 rounded-3xl space-y-3">
-              <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">RECOMENDACIONES DIARIAS</span>
-              <ul className="text-[10px] text-slate-400 space-y-2 leading-tight">
+              <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">RECOMENDACIONES DIARIAS</span>
+              <ul className="text-[10px] text-slate-200 space-y-2 leading-tight">
                 <li className="flex items-start gap-1.5">
                   <span className="text-emerald-400 select-none">✓</span>
                   <span>Verificar la presión de llantas antes de cada viaje.</span>
@@ -1485,7 +1498,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsGastoModalOpen(true)}
-            className="w-14 h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center shadow-2xl border border-blue-500/40 cursor-pointer shadow-blue-500/20"
+            className="w-14 h-14 bg-orange-500 hover:bg-orange-400 text-white rounded-full flex items-center justify-center shadow-2xl border border-orange-500/40 cursor-pointer shadow-orange-500/20"
             title="Registrar Gasto"
           >
             <DollarSign className="w-6 h-6" />
@@ -1494,7 +1507,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsFinalizing(true)}
-            className="w-14 h-14 bg-rose-500 hover:bg-rose-450 text-white rounded-full flex items-center justify-center shadow-2xl border border-rose-500/40 cursor-pointer shadow-rose-500/20"
+            className="w-14 h-14 bg-orange-500 hover:bg-orange-400 text-white rounded-full flex items-center justify-center shadow-2xl border border-orange-500/40 cursor-pointer shadow-orange-500/20"
             title="Finalizar Viaje"
           >
             <CheckCircle className="w-6 h-6" />
@@ -1512,13 +1525,15 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             token={token}
             onSuccess={(amount: number) => {
               if (authenticatedDriver) {
-                setAuthenticatedDriver({
+                const updatedDriver = {
                   ...authenticatedDriver,
                   saldo_actual: (Number(authenticatedDriver.saldo_actual || 10000) - amount).toString()
-                });
+                };
+                setAuthenticatedDriver(updatedDriver);
+                localStorage.setItem('driver_session_user', JSON.stringify(updatedDriver));
               }
               setMessage({ text: `Gasto de ${amount} BOB registrado con éxito.`, type: 'success' });
-              loadDriverData();
+              loadDriverData(true);
             }}
             onClose={() => setIsGastoModalOpen(false)}
           />
@@ -1534,30 +1549,30 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl"
+              className="w-full max-w-sm bg-[#0A192F] border border-[#112240] rounded-3xl p-6 space-y-5 shadow-2xl"
             >
               <div className="space-y-2 text-center">
-                <div className="mx-auto w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 shadow-md">
-                  <Play className="w-5 h-5 text-emerald-400" />
+                <div className="mx-auto w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center border border-orange-500/20 shadow-md">
+                  <Play className="w-5 h-5 text-orange-500" />
                 </div>
                 <h3 className="text-white font-extrabold text-base tracking-tight uppercase">¿Iniciar Viaje?</h3>
-                <p className="text-xs text-slate-400 leading-normal">
+                <p className="text-xs text-slate-200 leading-normal">
                   ¿Confirmas iniciar este viaje con destino a <strong className="text-white">"{selectedRutaToStart.destino}"</strong>?
                 </p>
               </div>
 
               <div className="bg-slate-950 border border-slate-850 p-4 rounded-2xl space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-slate-500">ORIGEN:</span>
+                  <span className="text-slate-400">ORIGEN:</span>
                   <span className="text-white">{selectedRutaToStart.origen}</span>
                 </div>
                 <div className="flex justify-between text-xs font-semibold">
-                  <span className="text-slate-500">DESTINO:</span>
+                  <span className="text-slate-400">DESTINO:</span>
                   <span className="text-white">{selectedRutaToStart.destino}</span>
                 </div>
                 <div className="flex justify-between text-xs font-semibold border-t border-slate-850 pt-2">
-                  <span className="text-emerald-500">TARIFA BASE:</span>
-                  <span className="text-emerald-400 font-bold font-mono">{selectedRutaToStart.tarifa_base} BOB</span>
+                  <span className="text-orange-500">TARIFA BASE:</span>
+                  <span className="text-orange-400 font-bold font-mono">{selectedRutaToStart.tarifa_base} BOB</span>
                 </div>
               </div>
 
@@ -1569,7 +1584,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                     setModalType(null);
                     setSelectedRutaToStart(null);
                   }}
-                  className="bg-slate-950 border border-slate-800 text-slate-300 hover:bg-slate-900 font-bold py-3 px-4 rounded-xl text-xs transition uppercase cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-slate-950 border border-[#112240] text-slate-100 hover:bg-[#0A192F] font-bold py-3 px-4 rounded-xl text-xs transition uppercase cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancelar
                 </button>
@@ -1577,7 +1592,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   type="button"
                   disabled={startingRouteId !== null}
                   onClick={() => executeStartTrip(selectedRutaToStart)}
-                  className="bg-emerald-500 text-slate-950 font-black hover:bg-emerald-400 py-3 px-4 rounded-xl text-xs transition cursor-pointer shadow uppercase flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-orange-500 text-slate-950 font-black hover:bg-orange-400 py-3 px-4 rounded-xl text-xs transition cursor-pointer shadow uppercase flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {startingRouteId !== null ? (
                     <>
@@ -1603,14 +1618,14 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-5 shadow-2xl"
+              className="w-full max-w-sm bg-[#0A192F] border border-[#112240] rounded-3xl p-6 space-y-5 shadow-2xl"
             >
               <div className="space-y-2 text-center">
-                <div className="mx-auto w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 shadow-md">
-                  <AlertTriangle className="w-5 h-5 animate-bounce text-amber-400" />
+                <div className="mx-auto w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-400 flex items-center justify-center border border-orange-500/20 shadow-md">
+                  <AlertTriangle className="w-5 h-5 animate-bounce text-orange-400" />
                 </div>
                 <h3 className="text-white font-extrabold text-base tracking-tight uppercase">¿Sin Foto del Ticket?</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-200 leading-relaxed">
                   ¿Deseas finalizar sin adjuntar foto del ticket de pesaje? Se recomienda encarecidamente sacarle una fotografía para respaldo.
                 </p>
               </div>
@@ -1619,14 +1634,14 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 <button
                   type="button"
                   onClick={() => setModalType(null)}
-                  className="bg-slate-950 border border-slate-800 text-slate-300 hover:bg-slate-900 font-bold py-3 px-4 rounded-xl text-xs transition uppercase cursor-pointer"
+                  className="bg-slate-950 border border-[#112240] text-slate-100 hover:bg-[#0A192F] font-bold py-3 px-4 rounded-xl text-xs transition uppercase cursor-pointer"
                 >
                   Tomar Foto
                 </button>
                 <button
                   type="button"
                   onClick={() => executeFinalizeTripSubmit()}
-                  className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 px-4 rounded-xl text-xs transition cursor-pointer shadow uppercase"
+                  className="bg-orange-500 hover:bg-orange-400 text-slate-950 font-black py-3 px-4 rounded-xl text-xs transition cursor-pointer shadow uppercase"
                 >
                   Ignorar y Cerrar
                 </button>
@@ -1642,21 +1657,21 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl"
+              className="w-full max-w-md bg-[#0A192F] border border-[#112240] rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl"
             >
               <div className="space-y-2 text-center">
-                <div className="mx-auto w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 shadow-md">
+                <div className="mx-auto w-12 h-12 rounded-2xl bg-orange-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 shadow-md">
                   <Award className="w-6 h-6 text-emerald-400" />
                 </div>
                 <h3 className="text-white font-extrabold text-lg tracking-tight uppercase">¡Viaje Finalizado Con Éxito!</h3>
-                <p className="text-xs text-slate-400 leading-normal text-center">
+                <p className="text-xs text-slate-200 leading-normal text-center">
                   El viaje ha concluido formalmente. Se ha realizado el cálculo de toneladas extras para el balance general:
                 </p>
               </div>
 
               <div className="bg-slate-950 border border-slate-850 p-5 rounded-2xl space-y-3.5 shadow-inner">
                 <div className="flex justify-between items-center text-xs font-semibold border-b border-slate-850/50 pb-2.5">
-                  <span className="text-slate-400 uppercase">Total Pago Extra:</span>
+                  <span className="text-slate-200 uppercase">Total Pago Extra:</span>
                   <span className="text-white font-extrabold text-base font-mono">
                     {tripSummaryData.valor_extra_total.toFixed(2)} BOB
                   </span>
@@ -1665,7 +1680,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 <div className="space-y-2 pt-1">
                   <div className="flex justify-between items-center text-xs">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
                       <span className="text-emerald-400 font-bold uppercase tracking-wide text-[10px]">Tu Comisión (40% Chofer):</span>
                     </div>
                     <span className="text-white font-extrabold font-mono text-sm">
@@ -1675,10 +1690,10 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   
                   <div className="flex justify-between items-center text-xs font-semibold">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                      <span className="text-indigo-400 font-bold uppercase tracking-wide text-[10px]">Don Saúl (60% Admin):</span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                      <span className="text-blue-400 font-bold uppercase tracking-wide text-[10px]">Don Saúl (60% Admin):</span>
                     </div>
-                    <span className="text-slate-300 font-extrabold font-mono text-xs">
+                    <span className="text-slate-100 font-extrabold font-mono text-xs">
                       {tripSummaryData.bono_administrador.toFixed(2)} BOB
                     </span>
                   </div>
@@ -1693,7 +1708,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                     setTripSummaryData(null);
                     setActiveViaje(null);
                   }}
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3.5 px-4 rounded-xl text-xs sm:text-sm tracking-wide transition cursor-pointer shadow-lg shadow-emerald-500/10 uppercase"
+                  className="w-full bg-orange-500 hover:bg-emerald-400 text-slate-950 font-black py-3.5 px-4 rounded-xl text-xs sm:text-sm tracking-wide transition cursor-pointer shadow-lg shadow-emerald-500/10 uppercase"
                 >
                   Entendido / Continuar
                 </button>

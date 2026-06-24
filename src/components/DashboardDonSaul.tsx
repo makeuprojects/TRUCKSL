@@ -141,45 +141,47 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
     try {
       const authHeader = `Bearer ${token}`;
 
+      const tb = `?t=${Date.now()}`;
+      
       // Fetch summary and list assets in parallel
       const [resSummary, resCamiones, resRutas, resViajes, resGastos, resRepuestos, resChoferes] = await Promise.all([
-        fetch('/api/dashboard-summary', { headers: { Authorization: authHeader } })
+        fetch(`/api/dashboard-summary${tb}`, { headers: { Authorization: authHeader } })
           .then((r) => r.json())
           .catch(err => {
             console.warn('[Resilience] Failed to fetch dashboard-summary:', err);
             return { success: false, summary: {}, alertas_servicio: [] };
           }),
-        fetch('/api/camiones', { headers: { Authorization: authHeader } })
+        fetch(`/api/camiones${tb}`, { headers: { Authorization: authHeader } })
           .then((r) => r.json())
           .catch(err => {
             console.warn('[Resilience] Failed to fetch camiones:', err);
             return { success: false, data: [] };
           }),
-        fetch('/api/rutas', { headers: { Authorization: authHeader } })
+        fetch(`/api/rutas${tb}`, { headers: { Authorization: authHeader } })
           .then((r) => r.json())
           .catch(err => {
             console.warn('[Resilience] Failed to fetch rutas:', err);
             return { success: false, data: [] };
           }),
-        fetch('/api/viajes', { headers: { Authorization: authHeader } })
+        fetch(`/api/viajes${tb}`, { headers: { Authorization: authHeader } })
           .then((r) => r.json())
           .catch(err => {
             console.warn('[Resilience] Failed to fetch viajes:', err);
             return { success: false, data: [] };
           }),
-        fetch('/api/gastos', { headers: { Authorization: authHeader } })
+        fetch(`/api/gastos${tb}`, { headers: { Authorization: authHeader } })
           .then((r) => r.json())
           .catch(err => {
             console.warn('[Resilience] Failed to fetch gastos:', err);
             return { success: false, data: [] };
           }),
-        fetch('/api/control-repuestos', { headers: { Authorization: authHeader } })
+        fetch(`/api/control-repuestos${tb}`, { headers: { Authorization: authHeader } })
           .then((r) => r.json())
           .catch(err => {
             console.warn('[Resilience] Failed to fetch control-repuestos:', err);
             return { success: false, data: [] };
           }),
-        fetch('/api/choferes', { headers: { Authorization: authHeader } })
+        fetch(`/api/choferes${tb}`, { headers: { Authorization: authHeader } })
           .then((r) => r.json())
           .catch(err => {
             console.warn('[Resilience] Failed to fetch choferes:', err);
@@ -588,7 +590,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
       {/* Industrial background gradient grids */}
       <div className="absolute top-0 left-0 w-full h-[550px] bg-gradient-to-b from-fuchsia-600/10 to-transparent pointer-events-none" />
       <div className="absolute top-1/3 left-1/12 w-[550px] h-[550px] bg-fuchsia-500/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/3 right-1/12 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/12 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* NOCTURNAL MAP IN THE BACKGROUND WITH EM SECTIONS (z-index: -1, sutil opacity) */}
       <div 
@@ -598,13 +600,13 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
       >
         <svg
           viewBox="0 0 1600 1100"
-          className="w-full h-full text-indigo-500"
+          className="w-full h-full text-blue-500"
           fill="none"
           stroke="currentColor"
           strokeWidth="0.8"
         >
           {/* Grid visual lines */}
-          <g className="text-slate-800" strokeWidth="0.3">
+          <g className="text-slate-900" strokeWidth="0.3">
             <line x1="0" y1="200" x2="1600" y2="200" strokeDasharray="3,3" />
             <line x1="0" y1="400" x2="1600" y2="400" strokeDasharray="3,3" />
             <line x1="0" y1="600" x2="1600" y2="600" strokeDasharray="3,3" />
@@ -616,7 +618,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
           </g>
 
           {/* Connected routes representation */}
-          <g className="text-indigo-400" strokeWidth="1.2" strokeOpacity="0.4" strokeDasharray="8,6">
+          <g className="text-[#1E3A8A]" strokeWidth="1.2" strokeOpacity="0.4" strokeDasharray="8,6">
             <path d="M410 230 L550 420" id="route-lp-or" />
             <path d="M550 420 L820 480" id="route-or-co" />
             <path d="M820 480 L1210 520" id="route-co-sc" />
@@ -634,21 +636,21 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
           {/* Base Oruro */}
           <g transform="translate(550, 420)">
-            <circle cx="0" cy="0" r="14" className="animate-ping text-indigo-400 fill-indigo-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="14" className="animate-ping text-[#1E3A8A] fill-blue-500/10" strokeWidth="1" />
             <circle cx="0" cy="0" r="5.5" fill="#6366F1" />
             <text x="16" y="4" fill="#94A3B8" fontSize="11" fontWeight="bold" fontFamily="monospace">Oruro (Taller Base)</text>
           </g>
 
           {/* Base Cochabamba */}
           <g transform="translate(820, 480)">
-            <circle cx="0" cy="0" r="14" className="animate-ping text-indigo-400 fill-indigo-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="14" className="animate-ping text-[#1E3A8A] fill-blue-500/10" strokeWidth="1" />
             <circle cx="0" cy="0" r="5.5" fill="#6366F1" />
             <text x="16" y="4" fill="#94A3B8" fontSize="11" fontWeight="bold" fontFamily="monospace">Cochabamba</text>
           </g>
 
           {/* Base Santa Cruz */}
           <g transform="translate(1210, 520)">
-            <circle cx="0" cy="0" r="15" className="animate-ping text-amber-450 fill-amber-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="15" className="animate-ping text-amber-450 fill-orange-500/10" strokeWidth="1" />
             <circle cx="0" cy="0" r="5.5" fill="#F59E0B" />
             <text x="16" y="4" fill="#94A3B8" fontSize="11" fontWeight="bold" fontFamily="monospace">Santa Cruz (Distribución)</text>
           </g>
@@ -668,18 +670,18 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.04] backdrop-blur-md">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-mono text-[9px] font-black uppercase tracking-widest rounded-md leading-none">
-                Enterprise Console v4.2
+              <span className="px-2 py-0.5 bg-blue-500/10 border border-blue-300/30 text-[#1E3A8A] font-mono text-[9px] font-black uppercase tracking-widest rounded-md leading-none">
+                SL ROAD TRUCKING Console
               </span>
               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black font-sans text-white tracking-tight flex items-center gap-3">
-              <span className="bg-gradient-to-br from-indigo-500 to-indigo-700 text-slate-950 w-8.5 h-8.5 rounded-xl flex items-center justify-center shadow-lg font-black text-sm">
+            <h1 className="text-2xl sm:text-3xl font-black font-sans text-slate-900 tracking-tight flex items-center gap-3">
+              <span className="bg-gradient-to-br from-blue-500 to-indigo-700 text-slate-950 w-8.5 h-8.5 rounded-xl flex items-center justify-center shadow-lg font-black text-sm">
                 🛰
               </span>
-              Platform Don Saúl
+              Bienvenido Saul
             </h1>
-            <p className="text-xs text-slate-300 font-sans leading-relaxed">
+            <p className="text-xs text-slate-700 font-sans leading-relaxed">
               Consola del Administrador para la sincronización, auditorías y monitoreo en vivo de flotas bolivianas.
             </p>
           </div>
@@ -689,7 +691,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             <button
               onClick={handleManualSync}
               disabled={isSyncing}
-              className="relative group bg-[#0d1324] hover:bg-[#131b31] active:bg-[#070a13] border border-[#1e2943]/60 hover:border-[#00ff9d]/30 text-indigo-300 rounded-xl px-4 py-2.5 font-black text-xs uppercase flex items-center gap-2 cursor-pointer transition shadow-xl"
+              className="relative group bg-white hover:bg-[#131b31] active:bg-slate-50 border border-slate-200/60 hover:border-[#00ff9d]/30 text-indigo-300 rounded-xl px-4 py-2.5 font-black text-xs uppercase flex items-center gap-2 cursor-pointer transition shadow-xl"
             >
               <RotateCcw className={`w-3.5 h-3.5 text-[#00ff9d] ${isSyncing ? 'animate-spin' : 'group-hover:rotate-45 transition'}`} />
               <span>{isSyncing ? 'Sincronizando...' : 'Sincronizar Sheets'}</span>
@@ -709,11 +711,11 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
         <div id="analytics-hud" className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           
           {/* Ingresos Brutos */}
-          <div className="relative group overflow-hidden bg-[#0d1324]/80 hover:bg-[#131b31] backdrop-blur-md border border-[#1e2943]/50 p-5 rounded-2xl shadow-xl transition duration-300">
-            <div className="absolute top-0 right-0 p-3 text-slate-600/40 group-hover:text-amber-500/20 transition duration-300">
+          <div className="relative group overflow-hidden bg-white/80 hover:bg-[#131b31] backdrop-blur-md border border-slate-200/50 p-5 rounded-2xl shadow-xl transition duration-300">
+            <div className="absolute top-0 right-0 p-3 text-slate-700/40 group-hover:text-orange-500/20 transition duration-300">
               <TrendingUp className="w-12 h-12 stroke-[1.2]" />
             </div>
-            <span className="text-[10px] text-slate-300 font-black block uppercase tracking-wider">
+            <span className="text-[10px] text-slate-700 font-black block uppercase tracking-wider">
               Ingresos Brutos Fletados
             </span>
             {!initialLoaded ? (
@@ -721,7 +723,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             ) : (
               <div className="mt-2 text-left">
                 <div className="flex items-baseline space-x-1">
-                  <span className="text-xs font-mono font-bold text-slate-300">BOB</span>
+                  <span className="text-xs font-mono font-bold text-slate-700">BOB</span>
                   <span className="text-2xl font-black font-mono tracking-tight text-[#00ff9d]">
                     {ingresosValue.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -734,11 +736,11 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
           </div>
 
           {/* Gastos Totales */}
-          <div className="relative group overflow-hidden bg-[#0d1324]/80 hover:bg-[#131b31] backdrop-blur-md border border-[#1e2943]/50 p-5 rounded-2xl shadow-xl transition duration-300">
-            <div className="absolute top-0 right-0 p-3 text-slate-600/40 group-hover:text-rose-500/20 transition duration-300">
+          <div className="relative group overflow-hidden bg-white/80 hover:bg-[#131b31] backdrop-blur-md border border-slate-200/50 p-5 rounded-2xl shadow-xl transition duration-300">
+            <div className="absolute top-0 right-0 p-3 text-slate-700/40 group-hover:text-rose-500/20 transition duration-300">
               <DollarSign className="w-12 h-12 stroke-[1.2]" />
             </div>
-            <span className="text-[10px] text-slate-300 font-black block uppercase tracking-wider">
+            <span className="text-[10px] text-slate-700 font-black block uppercase tracking-wider">
               Gastos de Ruta Operativos
             </span>
             {!initialLoaded ? (
@@ -759,11 +761,11 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
           </div>
 
           {/* Margen */}
-          <div className="relative group overflow-hidden bg-[#0d1324]/80 hover:bg-[#131b31] backdrop-blur-md border border-[#1e2943]/50 p-5 rounded-2xl shadow-xl transition duration-300">
-            <div className="absolute top-0 right-0 p-3 text-slate-600/40 group-hover:text-emerald-500/20 transition duration-300">
+          <div className="relative group overflow-hidden bg-white/80 hover:bg-[#131b31] backdrop-blur-md border border-slate-200/50 p-5 rounded-2xl shadow-xl transition duration-300">
+            <div className="absolute top-0 right-0 p-3 text-slate-700/40 group-hover:text-emerald-500/20 transition duration-300">
               <Layers className="w-12 h-12 stroke-[1.2]" />
             </div>
-            <span className="text-[10px] text-slate-300 font-black block uppercase tracking-wider">
+            <span className="text-[10px] text-slate-700 font-black block uppercase tracking-wider">
               Margen de Utilidad Bruta
             </span>
             {!initialLoaded ? (
@@ -771,7 +773,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             ) : (
               <div className="mt-2 text-left">
                 <div className="flex items-baseline space-x-1">
-                  <span className="text-xs font-mono font-bold text-indigo-400">BOB</span>
+                  <span className="text-xs font-mono font-bold text-[#1E3A8A]">BOB</span>
                   <span className={`text-2xl font-black font-mono tracking-tight ${isMargenNegative ? 'text-rose-500' : 'text-[#00ff9d]'}`}>
                     {margenValue.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -786,13 +788,13 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
         </div>
 
         {/* TOP COMMAND NAVIGATION */}
-        <div className="flex bg-[#0d1324]/90 backdrop-blur-lg border-b border-[#1e2943] mb-6 rounded-2xl overflow-hidden mt-6 shadow-xl">
+        <div className="flex bg-white/90 backdrop-blur-lg border-b border-slate-200 mb-6 rounded-2xl overflow-hidden mt-6 shadow-xl">
           <button
             onClick={() => setActiveTab('monitoreo')}
             className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold uppercase transition-all duration-300 border-b-2 focus:outline-none ${
               activeTab === 'monitoreo'
-                ? 'text-emerald-400 border-emerald-400 bg-emerald-400/5'
-                : 'text-slate-500 border-transparent hover:text-slate-300 hover:bg-[#1e2943]/30'
+                ? 'text-emerald-600 border-emerald-500 bg-emerald-50'
+                : 'text-slate-600 border-transparent hover:text-slate-900 hover:bg-slate-50'
             }`}
           >
             <Activity className="w-5 h-5" />
@@ -802,8 +804,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             onClick={() => setActiveTab('historial')}
             className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold uppercase transition-all duration-300 border-b-2 focus:outline-none ${
               activeTab === 'historial'
-                ? 'text-emerald-400 border-emerald-400 bg-emerald-400/5'
-                : 'text-slate-500 border-transparent hover:text-slate-300 hover:bg-[#1e2943]/30'
+                ? 'text-emerald-600 border-emerald-500 bg-emerald-50'
+                : 'text-slate-600 border-transparent hover:text-slate-900 hover:bg-slate-50'
             }`}
           >
             <Archive className="w-5 h-5" />
@@ -813,8 +815,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             onClick={() => setActiveTab('personal')}
             className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold uppercase transition-all duration-300 border-b-2 focus:outline-none ${
               activeTab === 'personal'
-                ? 'text-emerald-400 border-emerald-400 bg-emerald-400/5'
-                : 'text-slate-500 border-transparent hover:text-slate-300 hover:bg-[#1e2943]/30'
+                ? 'text-emerald-600 border-emerald-500 bg-emerald-50'
+                : 'text-slate-600 border-transparent hover:text-slate-900 hover:bg-slate-50'
             }`}
           >
             <Users className="w-5 h-5" />
@@ -827,14 +829,14 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
           {activeTab === 'monitoreo' && (
             <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
               {/* MONITOREO DE RUTAS EN TIEMPO REAL */}
-            <div id="live-route-container" className="bg-[#0d1324]/80 backdrop-blur-md border border-[#1e2943]/50 p-6 rounded-2xl space-y-5 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-[#1e2943]/80 pb-3">
+            <div id="live-route-container" className="bg-white/80 backdrop-blur-md border border-slate-200/50 p-6 rounded-2xl space-y-5 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="relative flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                   </span>
-                  <h3 className="font-extrabold text-white text-sm uppercase tracking-wider">
+                  <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider">
                     Estado de Rutas Activas
                   </h3>
                 </div>
@@ -845,10 +847,10 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
               <div ref={activeRoutesListRef} className="space-y-3.5">
                 {activeViajes.length === 0 ? (
-                  <div className="p-8 text-center bg-[#0d1324]/80 border border-[#1e2943]/50 rounded-xl space-y-2">
-                    <MapPin className="w-10 h-10 text-slate-600 mx-auto stroke-[1]" />
-                    <p className="text-xs text-slate-300 font-bold">Sin viajes activos de carretera en el ciclo</p>
-                    <p className="text-[10px] text-slate-300 max-w-sm mx-auto leading-relaxed">
+                  <div className="p-8 text-center bg-white/80 border border-slate-200/50 rounded-xl space-y-2">
+                    <MapPin className="w-10 h-10 text-slate-700 mx-auto stroke-[1]" />
+                    <p className="text-xs text-slate-700 font-bold">Sin viajes activos de carretera en el ciclo</p>
+                    <p className="text-[10px] text-slate-700 max-w-sm mx-auto leading-relaxed">
                       Cuando un conductor inicie su viaje con el PIN en la app móvil, su estatus aparecerá listado dinámicamente aquí.
                     </p>
                   </div>
@@ -865,43 +867,43 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                           setSelectedRouteViaje(viaje);
                           setIsRouteDetailOpen(true);
                         }}
-                        className="relative overflow-hidden group p-4 bg-[#0d1324]/85 backdrop-blur-md hover:bg-[#131b31] border border-[#1e2943]/60 hover:border-[#00ff9d]/40 rounded-xl flex flex-col gap-4 transition duration-300 animate-fade-in cursor-pointer hover:scale-[1.02] active:scale-[0.99] shadow-lg hover:shadow-emerald-950/10 animate-pulse-subtle"
+                        className="relative overflow-hidden group p-4 bg-white/85 backdrop-blur-md hover:bg-[#131b31] border border-slate-200/60 hover:border-[#00ff9d]/40 rounded-xl flex flex-col gap-4 transition duration-300 animate-fade-in cursor-pointer hover:scale-[1.02] active:scale-[0.99] shadow-lg hover:shadow-emerald-950/10 animate-pulse-subtle"
                         title="Haga clic para auditar la ruta y los comprobantes en detalle"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="w-1.5 h-1.5 rounded-full bg-[#00ff9d] group-hover:scale-125 transition-all duration-300 animate-pulse"></span>
-                              <span className="text-[10px] font-black font-mono text-indigo-400 uppercase">
+                              <span className="text-[10px] font-black font-mono text-[#1E3A8A] group-hover:text-[#38BDF8] uppercase transition-colors">
                                 ID {viaje.id_viaje}
                               </span>
                               <span className="bg-emerald-500/10 text-[#00ff9d] border border-emerald-500/30 text-[8px] font-black px-1.5 py-0.5 rounded">
                                 EN MONITOREO
                               </span>
                             </div>
-                            <h4 className="text-white font-black text-sm tracking-tight flex items-center gap-1.5 group-hover:text-[#00ff9d] transition-colors duration-300">
+                            <h4 className="text-slate-900 font-black text-sm tracking-tight flex items-center gap-1.5 group-hover:text-white transition-colors duration-300">
                               📍 En Ruta: {route?.origen || 'La Paz'} ➔ {route?.destino || 'Oruro'}
                             </h4>
-                            <p className="text-[10px] text-slate-300">
+                            <p className="text-[10px] text-slate-600 group-hover:text-slate-400 transition-colors">
                               Zarpó el {viaje.fecha_inicio || 'Hoy'}
                             </p>
-                            <div className="flex gap-4">
-                              <span className="text-[10px] text-white font-mono bg-slate-900/50 px-2 py-0.5 rounded">
+                            <div className="flex gap-4 mt-1">
+                              <span className="text-[10px] font-mono font-bold bg-slate-100 group-hover:bg-[#0A192F]/80 text-slate-700 group-hover:text-slate-300 px-2.5 py-1 rounded-md transition-colors">
                                 Pesaje: {Number(viaje.toneladas_base) + Number(viaje.toneladas_extras)} t
                               </span>
-                              <span className="text-[10px] text-white font-mono bg-slate-900/50 px-2 py-0.5 rounded">
+                              <span className="text-[10px] font-mono font-bold bg-slate-100 group-hover:bg-[#0A192F]/80 text-slate-700 group-hover:text-[#00ff9d] px-2.5 py-1 rounded-md transition-colors">
                                 Status: {viaje.estado_viaje}
                               </span>
                             </div>
                           </div>
 
                           {/* Right dynamic Badge */}
-                          <div className="bg-[#070a13] border border-[#1e2943]/60 rounded-xl px-4 py-2 flex flex-col justify-center text-left shrink-0 sm:min-w-48 shadow-inner group-hover:border-[#00ff9d]/20 transition-all">
-                            <span className="text-[8px] text-slate-450 uppercase font-black tracking-wider">Chofer y Camión</span>
-                            <span className="text-xs font-black text-slate-205 mt-0.5 truncate max-w-[130px]" title={drv?.nombre_completo}>
+                          <div className="bg-slate-50 group-hover:bg-[#1E293B] border border-slate-200/60 group-hover:border-[#00ff9d]/20 rounded-xl px-4 py-2 flex flex-col justify-center text-left shrink-0 sm:min-w-48 shadow-inner transition-colors duration-300">
+                            <span className="text-[8px] text-slate-500 group-hover:text-slate-400 uppercase font-black tracking-wider transition-colors">Chofer y Camión</span>
+                            <span className="text-xs font-black text-slate-800 group-hover:text-slate-200 mt-0.5 truncate max-w-[130px] transition-colors" title={drv?.nombre_completo}>
                               👤 {drv?.nombre_completo || 'Sin chofer'}
                             </span>
-                            <span className="text-[10.5px] font-mono text-indigo-300 mt-0.5" title={truck?.modelo}>
+                            <span className="text-[10.5px] font-mono text-indigo-600 group-hover:text-indigo-400 mt-0.5 transition-colors" title={truck?.modelo}>
                               🚛 {truck?.modelo || 'Sin camión'}
                             </span>
                           </div>
@@ -938,34 +940,34 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             <LiveExpenseFeed gastos={gastos} choferes={choferes} />
 
             {/* CONTROL DE REPUESTOS Y DICTAMEN DIARIO */}
-            <div className="bg-[#0d1324]/80 backdrop-blur-md border border-[#1e2943]/50 p-6 rounded-2xl space-y-4 shadow-2xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1e2943]/80 pb-3">
+            <div className="bg-white/80 backdrop-blur-md border border-slate-200/50 p-6 rounded-2xl space-y-4 shadow-2xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-3">
                 <div className="space-y-0.5">
-                  <h3 className="font-extrabold text-white text-sm uppercase tracking-wider flex items-center gap-2">
-                    <Wrench className="w-5 h-5 text-indigo-400" />
+                  <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider flex items-center gap-2">
+                    <Wrench className="w-5 h-5 text-[#1E3A8A]" />
                     Destino y Reciclaje de Piezas Extraídas
                   </h3>
-                  <p className="text-xs text-slate-300">
+                  <p className="text-xs text-slate-700">
                     Evita fugas de stock. Determina si los repuestos usados van a desecho, reutilización o rectificación.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={executeAutoSeedDemoRepuesto}
-                  className="border border-[#1e2943] text-indigo-300 bg-[#0d1324] hover:bg-[#131b31] hover:border-emerald-500/40 font-black text-[9px] uppercase px-3 py-1.5 rounded-lg transition shrink-0 cursor-pointer shadow-md shadow-emerald-950/10"
+                  className="border border-slate-200 text-indigo-300 bg-white hover:bg-[#131b31] hover:border-emerald-500/40 font-black text-[9px] uppercase px-3 py-1.5 rounded-lg transition shrink-0 cursor-pointer shadow-md shadow-emerald-950/10"
                 >
                   Simular Pieza Extraída
                 </button>
               </div>
 
               {repuestos.length === 0 ? (
-                <div className="p-8 text-center bg-[#0d1324]/80 border border-[#1e2943]/50 rounded-xl text-xs text-slate-300">
+                <div className="p-8 text-center bg-white/80 border border-slate-200/50 rounded-xl text-xs text-slate-700">
                   No hay activos reciclados por Taller actualmente. Se crean automáticamente cuando un conductor reporta gasto de repuestos.
                 </div>
               ) : (
-                <div className="overflow-x-auto border border-[#1e2943]/50 rounded-xl bg-[#0d1324]/60">
+                <div className="overflow-x-auto border border-slate-200/50 rounded-xl bg-white/60">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-[#070a13] text-slate-300 font-bold uppercase text-[9px] tracking-wider border-b border-[#1e2943]/50">
+                    <thead className="bg-slate-50 text-slate-700 font-bold uppercase text-[9px] tracking-wider border-b border-slate-200/50">
                       <tr>
                         <th className="p-3">Refacción Cambiada</th>
                         <th className="p-3">ID Recibo</th>
@@ -974,9 +976,9 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                     </thead>
                     <tbody ref={sparePartsTableRef} className="divide-y divide-slate-900">
                       {repuestos.map((row, index) => (
-                        <tr key={`${row.id_repuesto_historial}-${row.id_gasto}-${index}`} className="hover:bg-[#131b31]/50 text-slate-200 transition duration-150">
-                          <td className="p-3 font-extrabold text-slate-200">{row.pieza_cambiada}</td>
-                          <td className="p-3 font-mono text-indigo-400 uppercase">{row.id_gasto}</td>
+                        <tr key={`${row.id_repuesto_historial}-${row.id_gasto}-${index}`} className="hover:bg-[#131b31]/50 text-slate-800 transition duration-150">
+                          <td className="p-3 font-extrabold text-slate-800">{row.pieza_cambiada}</td>
+                          <td className="p-3 font-mono text-[#1E3A8A] uppercase">{row.id_gasto}</td>
                           <td className="p-3 flex items-center justify-center gap-1.5">
                             {(['Desecho', 'Reutilizar', 'Reparar'] as const).map((option) => (
                               <button
@@ -985,11 +987,11 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                                 className={`px-2 py-1 text-[9px] uppercase font-black tracking-wider rounded-md transition-all cursor-pointer ${
                                   row.destino_pieza_vieja === option
                                     ? option === 'Reparar'
-                                      ? 'bg-amber-500 text-slate-950 font-extrabold'
+                                      ? 'bg-orange-500 text-slate-950 font-extrabold'
                                       : option === 'Reutilizar'
                                         ? 'bg-emerald-500 text-slate-950 font-extrabold'
-                                        : 'bg-slate-600 text-white'
-                                    : 'bg-[#070a13] border border-[#1e2943]/80 text-slate-550 hover:text-slate-300'
+                                        : 'bg-slate-600 text-slate-900'
+                                    : 'bg-slate-50 border border-slate-200/80 text-slate-550 hover:text-slate-700'
                                 }`}
                               >
                                 {option}
@@ -1010,19 +1012,19 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-start animate-fade-in">
               <div className="space-y-8">
                 {/* DRIVERS / CHOFERES BOARD */}
-                <div className="bg-[#0d1324]/80 backdrop-blur-md border border-[#1e2943]/50 p-6 rounded-2xl space-y-4 shadow-2xl relative">
-              <div className="flex items-center justify-between border-b border-[#1e2943]/80 pb-3">
+                <div className="bg-white/80 backdrop-blur-md border border-slate-200/50 p-6 rounded-2xl space-y-4 shadow-2xl relative">
+              <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
                 <div className="space-y-0.5">
-                  <h3 className="font-extrabold text-white text-sm uppercase tracking-wider flex items-center gap-2">
-                    <User className="w-4 h-4 text-indigo-400" />
+                  <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider flex items-center gap-2">
+                    <User className="w-4 h-4 text-[#1E3A8A]" />
                     Plantilla de Choferes
                   </h3>
-                  <p className="text-[10px] text-slate-300 font-normal">Don Saúl e inspectores autorizados.</p>
+                  <p className="text-[10px] text-slate-700 font-normal">Don Saúl e inspectores autorizados.</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsAddDriverOpen(true)}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-[10px] uppercase px-3 py-1.5 rounded-lg flex items-center gap-1 transition cursor-pointer shadow-md shadow-emerald-950/20"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-emerald-500 hover:to-teal-500 text-slate-900 font-black text-[10px] uppercase px-3 py-1.5 rounded-lg flex items-center gap-1 transition cursor-pointer shadow-md shadow-emerald-950/20"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Agregar Chofer
@@ -1031,7 +1033,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
               {/* Filtering & Searching */}
               <div className="relative shrink-0">
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-300">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-700">
                   <Search className="w-3.5 h-3.5" />
                 </span>
                 <input
@@ -1039,7 +1041,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                   placeholder="Buscar chofer por nombre o ID..."
                   value={driverSearchQuery}
                   onChange={(e) => setDriverSearchQuery(e.target.value)}
-                  className="w-full bg-[#070a13] border border-[#1e2943]/50 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 border border-slate-200/50 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-800 placeholder-slate-600 focus:outline-none focus:border-blue-300"
                 />
               </div>
 
@@ -1050,18 +1052,18 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                   return (
                     <div
                       key={`${driver.id_chofer}-${driver.nombre_completo}-${index}`}
-                      className="group/card flex items-center justify-between p-3 rounded-xl bg-[#0d1324]/80 hover:bg-[#070a13] border border-[#1e2943]/30 hover:border-indigo-500/20 transition duration-300"
+                      className="group/card flex items-center justify-between p-3 rounded-xl bg-white/80 hover:bg-slate-50 border border-slate-200/30 hover:border-blue-300/20 transition duration-300"
                     >
                       <div
                         onClick={() => setSelectedDriver(driver)}
                         className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-300/20 text-[#1E3A8A] flex items-center justify-center shrink-0">
                           <User className="w-4.5 h-4.5" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <h4 className="font-extrabold text-white text-xs group-hover/card:text-indigo-455 transition truncate max-w-[124px]">
+                            <h4 className="font-extrabold text-slate-900 text-xs group-hover/card:text-indigo-455 transition truncate max-w-[124px]">
                               {driver.nombre_completo}
                             </h4>
                             {isAdmin && (
@@ -1070,8 +1072,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] text-slate-300 flex items-center gap-1 mt-0.5">
-                            <Phone className="w-3 h-3 text-slate-300" />
+                          <span className="text-[10px] text-slate-700 flex items-center gap-1 mt-0.5">
+                            <Phone className="w-3 h-3 text-slate-700" />
                             {driver.telefono || 'Sin celular'}
                           </span>
                         </div>
@@ -1080,7 +1082,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                       {/* Discret Pencil Edit Button */}
                       <button
                         onClick={() => openEditDriver(driver)}
-                        className="p-2 hover:bg-[#0d1324] border border-transparent hover:border-[#1e2943]/60 rounded-lg text-slate-300 hover:text-indigo-400 transition cursor-pointer ml-1"
+                        className="p-2 hover:bg-white border border-transparent hover:border-slate-200/60 rounded-lg text-slate-700 hover:text-[#1E3A8A] transition cursor-pointer ml-1"
                         title="Ficha y Caja Chica"
                       >
                         <Edit className="w-3.5 h-3.5 stroke-[1.2]" />
@@ -1092,30 +1094,30 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             </div>
 
             {/* ESTADO DE CAMIONES FLEET CARD */}
-            <div className="bg-[#0d1324]/80 backdrop-blur-md border border-[#1e2943]/50 p-6 rounded-2xl space-y-4 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-[#1e2943]/80 pb-3">
+            <div className="bg-white/80 backdrop-blur-md border border-slate-200/50 p-6 rounded-2xl space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
                 <div className="space-y-0.5">
-                  <h3 className="font-extrabold text-white text-sm uppercase tracking-wider flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-indigo-400" />
+                  <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-[#1E3A8A]" />
                     Fichas Físicas de Camiones
                   </h3>
-                  <p className="text-[10px] text-slate-300">Kilometrajes y Alertas de Taller.</p>
+                  <p className="text-[10px] text-slate-700">Kilometrajes y Alertas de Taller.</p>
                 </div>
-                <span className="text-[9.5px] text-slate-300 font-mono bg-[#070a13] border border-[#1e2943]/50 px-2.5 py-0.5 rounded">
+                <span className="text-[9.5px] text-slate-700 font-mono bg-slate-50 border border-slate-200/50 px-2.5 py-0.5 rounded">
                   {camiones.length} activos
                 </span>
               </div>
 
               {/* Toggle Filters */}
-              <div className="flex gap-1 bg-[#070a13] p-1 rounded-xl">
+              <div className="flex gap-1 bg-slate-50 p-1 rounded-xl">
                 {(['todos', 'Activo', 'Mantenimiento'] as const).map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setTruckFilterActive(filter)}
                     className={`flex-1 py-1.5 text-[9px] uppercase font-black rounded-lg transition cursor-pointer text-center ${
                       truckFilterActive === filter
-                        ? 'bg-indigo-600 text-white shadow-md'
-                        : 'text-slate-505 hover:text-slate-300'
+                        ? 'bg-blue-600 text-slate-900 shadow-md'
+                        : 'text-slate-505 hover:text-slate-700'
                     }`}
                   >
                     {filter === 'todos' ? 'TODOS' : filter === 'Activo' ? 'EN CARRETERA' : 'TALLER / FALTA'}
@@ -1128,18 +1130,18 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 {filteredTrucks.map((truck, idx) => (
                   <div
                     key={`${truck.id_camion}-${truck.modelo}-${idx}`}
-                    className="flex justify-between items-center p-3 rounded-xl bg-[#0d1324]/80 hover:bg-[#070a13] border border-[#1e2943]/30 hover:border-indigo-500/15 transition duration-300"
+                    className="flex justify-between items-center p-3 rounded-xl bg-white/80 hover:bg-slate-50 border border-slate-200/30 hover:border-blue-300/15 transition duration-300"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-300/20 text-[#1E3A8A] flex items-center justify-center shrink-0">
                         <Truck className="w-4.5 h-4.5" />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="font-black text-white text-xs truncate max-w-[170px]" title={truck.modelo}>
+                        <h4 className="font-black text-slate-900 text-xs truncate max-w-[170px]" title={truck.modelo}>
                           {truck.modelo}
                         </h4>
                         <div className="flex items-center gap-1.5 mt-0.5 text-[9.5px] text-slate-450 font-mono">
-                          <span className="text-indigo-400 font-bold bg-indigo-950/40 px-1 py-0.2 rounded">{truck.id_camion}</span>
+                          <span className="text-[#1E3A8A] font-bold bg-blue-100/40 px-1 py-0.2 rounded">{truck.id_camion}</span>
                           <span>•</span>
                           <span>{safeParse(truck.kilometraje_actual).toLocaleString()} KM</span>
                           <span>•</span>
@@ -1159,7 +1161,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                       {/* Discrete Pencil Edit Icon */}
                       <button
                         onClick={() => openEditTruck(truck)}
-                        className="p-1.5 hover:bg-[#0d1324] border border-transparent hover:border-[#1e2943]/60 rounded-lg text-slate-300 hover:text-indigo-400 transition cursor-pointer"
+                        className="p-1.5 hover:bg-white border border-transparent hover:border-slate-200/60 rounded-lg text-slate-700 hover:text-[#1E3A8A] transition cursor-pointer"
                         title="Ficha Técnica"
                       >
                         <Edit className="w-3.5 h-3.5 stroke-[1.2]" />
@@ -1173,39 +1175,39 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
           <div className="space-y-8">
             {/* REGISTER TRAJECTORY / ROUTE QUICK FORM */}
-            <div className="bg-[#0d1324]/80 backdrop-blur-md border border-[#1e2943]/50 p-6 rounded-2xl space-y-4 shadow-2xl">
-              <h3 className="font-extrabold text-white text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-[#1e2943]/80 pb-2.5">
+            <div className="bg-white/80 backdrop-blur-md border border-slate-200/50 p-6 rounded-2xl space-y-4 shadow-2xl">
+              <h3 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-200/80 pb-2.5">
                 <MapPin className="w-4 h-4 text-emerald-400" />
                 Registrar Tarifa de Trayecto
               </h3>
               <form onSubmit={handleCreateRouteSubmit} className="space-y-3">
                 <div className="grid grid-cols-2 gap-3.5">
                   <div className="space-y-1">
-                    <label className="text-[9px] text-slate-300 block uppercase font-bold">Origen</label>
+                    <label className="text-[9px] text-slate-700 block uppercase font-bold">Origen</label>
                     <input
                       type="text"
                       required
                       placeholder="ej: Oruro"
                       value={origen}
                       onChange={(e) => setOrigen(e.target.value)}
-                      className="w-full bg-[#0d1324]/90 border border-[#1e2943]/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-100 placeholder-slate-700 outline-none transition"
+                      className="w-full bg-white/90 border border-slate-200/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-900 placeholder-slate-400 outline-none transition"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] text-slate-300 block uppercase font-bold">Destino</label>
+                    <label className="text-[9px] text-slate-700 block uppercase font-bold">Destino</label>
                     <input
                       type="text"
                       required
                       placeholder="ej: Santiago..."
                       value={destino}
                       onChange={(e) => setDestino(e.target.value)}
-                      className="w-full bg-[#0d1324]/90 border border-[#1e2943]/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-100 placeholder-slate-700 outline-none transition"
+                      className="w-full bg-white/90 border border-slate-200/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-900 placeholder-slate-400 outline-none transition"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[9px] text-slate-300 block uppercase font-bold">Tarifa Base por Carga Completa (BOB)</label>
+                  <label className="text-[9px] text-slate-700 block uppercase font-bold">Tarifa Base por Carga Completa (BOB)</label>
                   <div className="flex gap-2.5">
                     <input
                       type="number"
@@ -1213,12 +1215,12 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                       placeholder="ej: 7500"
                       value={tarifaBase}
                       onChange={(e) => setTarifaBase(e.target.value)}
-                      className="w-full bg-[#0d1324]/90 border border-[#1e2943]/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-100 font-mono outline-none transition"
+                      className="w-full bg-white/90 border border-slate-200/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-900 font-mono outline-none transition"
                     />
                     <button
                       type="submit"
                       disabled={isCreatingRoute}
-                      className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-[10px] uppercase px-4.5 rounded-lg text-xs cursor-pointer transition shrink-0 flex items-center justify-center shadow-md shadow-emerald-950/20"
+                      className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-emerald-500 hover:to-teal-500 text-slate-900 font-black text-[10px] uppercase px-4.5 rounded-lg text-xs cursor-pointer transition shrink-0 flex items-center justify-center shadow-md shadow-emerald-950/20"
                     >
                       {isCreatingRoute ? '...' : 'Crear'}
                     </button>
@@ -1228,45 +1230,45 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             </div>
 
             {/* REGISTER NEW TRUCK QUICK FORM */}
-            <div className="bg-[#0d1324]/80 backdrop-blur-md border border-[#1e2943]/50 p-6 rounded-2xl space-y-4 shadow-2xl">
-              <h3 className="font-extrabold text-white text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-[#1e2943]/80 pb-2.5">
+            <div className="bg-white/80 backdrop-blur-md border border-slate-200/50 p-6 rounded-2xl space-y-4 shadow-2xl">
+              <h3 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-200/80 pb-2.5">
                 <Truck className="w-4 h-4 text-emerald-400" />
                 Registrar Ficha Vehicular
               </h3>
               <form onSubmit={handleCreateTruckSubmit} className="space-y-3.5">
                 <div className="space-y-1">
-                  <label className="text-[9px] text-slate-300 block uppercase font-bold">Modelo y Patente</label>
+                  <label className="text-[9px] text-slate-700 block uppercase font-bold">Modelo y Patente</label>
                   <input
                     type="text"
                     required
                     placeholder="ej: Scania R500 (Patente: 4893-XCS)"
                     value={camionModelo}
                     onChange={(e) => setCamionModelo(e.target.value)}
-                    className="w-full bg-[#0d1324]/90 border border-[#1e2943]/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-100 placeholder-slate-700 outline-none transition"
+                    className="w-full bg-white/90 border border-slate-200/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-900 placeholder-slate-400 outline-none transition"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3.5">
                   <div className="space-y-1">
-                    <label className="text-[9px] text-slate-300 block uppercase font-bold">Año Fabricación</label>
+                    <label className="text-[9px] text-slate-700 block uppercase font-bold">Año Fabricación</label>
                     <input
                       type="number"
                       required
                       placeholder="ej: 2023"
                       value={camionAnio}
                       onChange={(e) => setCamionAnio(e.target.value)}
-                      className="w-full bg-[#0d1324]/90 border border-[#1e2943]/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-100 font-mono outline-none transition"
+                      className="w-full bg-white/90 border border-slate-200/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-900 font-mono outline-none transition"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] text-slate-300 block uppercase font-bold">Odómetro Inicial (KM)</label>
+                    <label className="text-[9px] text-slate-700 block uppercase font-bold">Odómetro Inicial (KM)</label>
                     <input
                       type="number"
                       required
                       placeholder="ej: 45000"
                       value={camionOdo}
                       onChange={(e) => setCamionOdo(e.target.value)}
-                      className="w-full bg-[#0d1324]/90 border border-[#1e2943]/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-100 font-mono outline-none transition"
+                      className="w-full bg-white/90 border border-slate-200/70 focus:border-emerald-500/40 text-xs px-3 py-2.5 rounded-lg text-slate-900 font-mono outline-none transition"
                     />
                   </div>
                 </div>
@@ -1274,7 +1276,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 <button
                   type="submit"
                   disabled={isCreatingTruck}
-                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs py-2.5 rounded-lg transition cursor-pointer text-center shadow-md shadow-emerald-950/20 flex items-center justify-center gap-1.5"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-emerald-500 hover:to-teal-500 text-slate-900 font-black text-xs py-2.5 rounded-lg transition cursor-pointer text-center shadow-md shadow-emerald-950/20 flex items-center justify-center gap-1.5"
                 >
                   {isCreatingTruck ? (
                     <>
@@ -1327,7 +1329,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
       {/* DETAILED PROFILE POPUP OVERLAY */}
       <AnimatePresence>
         {selectedDriver && (
-          <div className="fixed inset-0 z-40 bg-[#0d1324]/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-40 bg-white/90 backdrop-blur-md flex items-center justify-center p-4">
             <ChoferProfileCard
               chofer={selectedDriver}
               gastos={gastos}
@@ -1346,57 +1348,57 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
       {/* ADD DRIVER MODAL FORM OVERLAY */}
       <AnimatePresence>
         {isAddDriverOpen && (
-          <div className="fixed inset-0 z-50 bg-[#070a13]/95 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-slate-50/95 backdrop-blur-md flex items-center justify-center p-4">
             <motion.form
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onSubmit={handleCreateDriverSubmit}
-              className="w-full max-w-sm bg-[#0d1324] border border-[#1e2943]/50 rounded-3xl p-6 space-y-4 shadow-2xl relative"
+              className="w-full max-w-sm bg-white border border-slate-200/50 rounded-3xl p-6 space-y-4 shadow-2xl relative"
             >
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-indigo-600 rounded-t-3xl" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-blue-600 rounded-t-3xl" />
               
-              <div className="flex justify-between items-center pb-2 border-b border-[#1e2943]/80">
-                <h3 className="text-white font-black text-sm uppercase flex items-center gap-2">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200/80">
+                <h3 className="text-slate-900 font-black text-sm uppercase flex items-center gap-2">
                   <User className="w-4 h-4 text-emerald-400" />
                   Agregar Nuevo Chofer
                 </h3>
                 <button
                   type="button"
                   onClick={() => setIsAddDriverOpen(false)}
-                  className="text-slate-300 hover:text-white p-1 hover:bg-[#1e2943] rounded-lg cursor-pointer"
+                  className="text-slate-700 hover:text-slate-900 p-1 hover:bg-[#1e2943] rounded-lg cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] text-slate-300 uppercase font-black block">Nombre de Conductor</label>
+                <label className="text-[10px] text-slate-700 uppercase font-black block">Nombre de Conductor</label>
                 <input
                   type="text"
                   required
                   placeholder="ej: Walter Melgarejo"
                   value={newDriverName}
                   onChange={e => setNewDriverName(e.target.value)}
-                  className="w-full bg-[#070a13] border border-[#1e2943]/60 p-3 rounded-xl text-sm focus:border-indigo-500 text-slate-100 outline-none"
+                  className="w-full bg-slate-50 border border-slate-200/60 p-3 rounded-xl text-sm focus:border-blue-300 text-slate-900 outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
                 <div className="space-y-1">
-                  <label className="text-[10px] text-slate-300 uppercase font-black block">ID Alfanumérico</label>
+                  <label className="text-[10px] text-slate-700 uppercase font-black block">ID Alfanumérico</label>
                   <input
                     type="text"
                     required
                     placeholder="ej: walter_mel"
                     value={newDriverId}
                     onChange={e => setNewDriverId(e.target.value)}
-                    className="w-full bg-[#070a13] border border-[#1e2943]/60 p-3 rounded-xl text-sm focus:border-indigo-500 font-mono text-slate-100 outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/60 p-3 rounded-xl text-sm focus:border-blue-300 font-mono text-slate-900 outline-none"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] text-slate-300 uppercase font-black block">PIN de Carretera (4 dig)</label>
+                  <label className="text-[10px] text-slate-700 uppercase font-black block">PIN de Carretera (4 dig)</label>
                   <input
                     type="password"
                     maxLength={4}
@@ -1404,30 +1406,30 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                     placeholder="ej: 9021"
                     value={newDriverPin}
                     onChange={e => setNewDriverPin(e.target.value)}
-                    className="w-full bg-[#070a13] border border-[#1e2943]/60 p-3 rounded-xl text-sm focus:border-indigo-500 font-mono text-slate-100 tracking-[0.2em] text-center outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/60 p-3 rounded-xl text-sm focus:border-blue-300 font-mono text-slate-100 tracking-[0.2em] text-center outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
                 <div className="space-y-1">
-                  <label className="text-[10px] text-slate-300 uppercase font-black block">Teléfono Móvil</label>
+                  <label className="text-[10px] text-slate-700 uppercase font-black block">Teléfono Móvil</label>
                   <input
                     type="text"
                     placeholder="ej: 79234567"
                     value={newDriverPhone}
                     onChange={e => setNewDriverPhone(e.target.value)}
-                    className="w-full bg-[#070a13] border border-[#1e2943]/60 p-3 rounded-xl text-sm focus:border-indigo-500 text-slate-100 outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/60 p-3 rounded-xl text-sm focus:border-blue-300 text-slate-900 outline-none"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] text-slate-300 uppercase font-black block">Caja Chica (BOB)</label>
+                  <label className="text-[10px] text-slate-700 uppercase font-black block">Presupuesto Mensual (Bs)</label>
                   <input
                     type="number"
                     value={newDriverBudget}
                     onChange={e => setNewDriverBudget(e.target.value)}
-                    className="w-full bg-[#070a13] border border-[#1e2943]/60 p-3 rounded-xl text-sm focus:border-indigo-500 font-mono text-[#10B981] font-bold outline-none"
+                    className="w-full bg-slate-50 border border-slate-200/60 p-3 rounded-xl text-sm focus:border-blue-300 font-mono text-blue-600 font-bold outline-none"
                   />
                 </div>
               </div>
@@ -1436,14 +1438,14 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 <button
                   type="button"
                   onClick={() => setIsAddDriverOpen(false)}
-                  className="w-full bg-[#16223f] hover:bg-[#1e2943] border border-[#1e2943]/60 rounded-xl py-3 text-xs uppercase font-extrabold cursor-pointer"
+                  className="w-full bg-slate-100 hover:bg-[#1e2943] border border-slate-200/60 rounded-xl py-3 text-xs uppercase font-extrabold cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isCreatingDriver}
-                  className="w-full bg-indigo-500 hover:bg-indigo-455 active:bg-indigo-600 text-slate-950 rounded-xl py-3 text-xs uppercase font-extrabold cursor-pointer transition flex items-center justify-center gap-1.5"
+                  className="w-full bg-blue-500 hover:bg-indigo-455 active:bg-blue-600 text-slate-950 rounded-xl py-3 text-xs uppercase font-extrabold cursor-pointer transition flex items-center justify-center gap-1.5"
                 >
                   {isCreatingDriver ? (
                     <Sparkles className="w-4 h-4 animate-spin" />
