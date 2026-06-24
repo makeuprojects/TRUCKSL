@@ -171,12 +171,12 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
     }
   };
 
-  // Trigger loading when driver changes or lists reload
+  // Trigger loading when driver is authenticated
   useEffect(() => {
-    if (authenticatedDriver && !camiones.length) {
+    if (authenticatedDriver) {
       loadDriverData(true);
     }
-  }, [authenticatedDriver]);
+  }, [authenticatedDriver?.id_chofer]);
 
   // Load state from localStorage on load if offline
   useEffect(() => {
