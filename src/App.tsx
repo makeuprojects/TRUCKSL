@@ -105,7 +105,7 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-screen bg-gradient-to-br from-[#3b0b59] via-[#1f0535] to-[#0a0216] text-white font-sans selection:bg-fuchsia-500/30 selection:text-white overflow-x-hidden">
+      <div className="min-h-[100dvh] bg-gradient-to-br from-[#3b0b59] via-[#1f0535] to-[#0a0216] text-white font-sans selection:bg-fuchsia-500/30 selection:text-white overflow-x-hidden">
         <Routes>
           {/* Main Select Portal Page */}
           <Route

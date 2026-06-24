@@ -13,6 +13,9 @@
   .bg-navy-850 {
     background-color: #1e293b;
   }
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
 }
 
 /* Animations */

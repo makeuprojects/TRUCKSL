@@ -1,5 +1,5 @@
 {
-  "name": "Gestión de Flota",
+  "name": "SL ROAD TRUCKING",
   "description": "Sistema PWA y Dashboard para la gestión de flota de camiones, conductores, rutas, gastos y mantenimiento con base de datos en Google Sheets.",
   "requestFramePermissions": [
     "camera"

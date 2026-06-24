@@ -12,6 +12,47 @@ import { uploadMiddleware, handleMultipleUploads } from './uploadController';
 
 export const apiRouter = express.Router();
 
+async function getChoferesWithCalculatedBalance(authHeader: string | undefined) {
+  const choferes = await getCachedSheetRows<any>(authHeader, 'Choferes');
+  try {
+    const gastos = await getCachedSheetRows<any>(authHeader, 'Gastos');
+    
+    // Sum current month's expenses per chofer
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    const expensesPerChofer: Record<string, number> = {};
+    for (const g of gastos) {
+      if (!g.id_chofer || !g.monto) continue;
+      if (g.tipo_gasto === 'Pago Chofer') continue;
+      
+      const dateStr = g.timestamp_registro || g.fecha;
+      let date = dateStr ? new Date(dateStr) : new Date();
+      if (isNaN(date.getTime())) {
+         date = new Date(); // fallback to current date
+      }
+
+      if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+        expensesPerChofer[g.id_chofer] = (expensesPerChofer[g.id_chofer] || 0) + Number(g.monto || 0);
+      }
+    }
+
+    // Map and inject dynamically calculated saldo_actual
+    return choferes.map(c => {
+      const presupuesto = Number(c.presupuesto || 10000);
+      const spent = expensesPerChofer[c.id_chofer] || 0;
+      return {
+        ...c,
+        presupuesto: String(presupuesto),
+        saldo_actual: String(presupuesto - spent)
+      };
+    });
+  } catch (err) {
+    console.warn("Failed to fetch gastos to calculate driver balances", err);
+    return choferes;
+  }
+}
+
 /**
  * Global Memory holder for Server-side Google sheets OAuth header.
  * Whenever an admin performs any credentialed Google request, we cache their Bearer token
@@ -110,7 +151,7 @@ apiRouter.post('/auth/login', async (req, res) => {
     const normalizedName = normalizeName(nombre_completo);
 
     const authHeader = getAuthHeader(req);
-    const choferes = await getCachedSheetRows<any>(authHeader, 'Choferes');
+    const choferes = await getChoferesWithCalculatedBalance(authHeader);
 
     const trimmedNameInput = normalizedName.toLowerCase().trim();
     let match = choferes.find(
@@ -157,7 +198,7 @@ apiRouter.post('/choferes/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Se requiere PIN de acceso.' });
     }
 
-    const choferes = await getCachedSheetRows<any>(authHeader, 'Choferes');
+    const choferes = await getChoferesWithCalculatedBalance(authHeader);
     let match = choferes.find(c => String(c.pin_acceso || '') === String(pin) && String(c.estado || '').toLowerCase() === 'activo');
 
     if (!match && String(pin) === '1234') {
@@ -257,7 +298,7 @@ apiRouter.get('/choferes', async (req, res) => {
   try {
     const authHeader = getAuthHeader(req);
     console.log('[API] GET /choferes authHeader:', authHeader?.substring(0, 20));
-    const data = await getCachedSheetRows(authHeader, 'Choferes');
+    const data = await getChoferesWithCalculatedBalance(authHeader);
     res.json({ success: true, data });
   } catch (error: any) {
     console.error('[API] GET /choferes Error:', error);
@@ -622,19 +663,7 @@ apiRouter.post('/gastos', async (req, res) => {
         saldo_presupuesto: String(updatedBudget)
       });
 
-      // 2. Update driver budget if present
-      if (id_chofer) {
-        const choferes = await getSheetRows<any>(authHeader, 'Choferes');
-        const targetChofer = choferes.find(d => d.id_chofer === id_chofer);
-        if (targetChofer) {
-          const activeDriverBalance = Number(targetChofer.saldo_actual ?? targetChofer.presupuesto ?? 10000);
-          const updatedDriverBalance = activeDriverBalance - discountAmount;
-          await updateSheetRow(authHeader, 'Choferes', 'id_chofer', id_chofer, {
-            saldo_actual: String(updatedDriverBalance)
-          });
-          invalidateSheetCache('Choferes');
-        }
-      }
+      // 2. Driver budget is now computed dynamically on GET /choferes based on Gastos (step removed to prevent dual-state issues)
 
       // 3. Write Gastos entry
       const expensePayload = {

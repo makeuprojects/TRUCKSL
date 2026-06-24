@@ -37,7 +37,9 @@ import {
   Calendar,
   Gauge,
   Plus,
-  ArrowRightLeft
+  ArrowRightLeft,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface DashboardAdminTowerProps {
@@ -85,6 +87,7 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
   const [newDriverPhone, setNewDriverPhone] = useState('');
   const [newDriverPin, setNewDriverPin] = useState('');
   const [newDriverBudget, setNewDriverBudget] = useState('10000');
+  const [showDriverPin, setShowDriverPin] = useState(false);
 
   // Quick Add Routes Form states
   const [origen, setOrigen] = useState('');
@@ -1058,8 +1061,8 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
                 </button>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] text-slate-400 uppercase font-black block">Nombre Completo Conductor</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Nombre Completo Conductor</label>
                 <input
                   type="text"
                   required
@@ -1071,8 +1074,8 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">ID Alfanumérico</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">ID Alfanumérico</label>
                   <input
                     type="text"
                     required
@@ -1083,23 +1086,33 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">PIN de Acceso (4 dig)</label>
-                  <input
-                    type="password"
-                    maxLength={4}
-                    required
-                    placeholder="ej: 1234"
-                    value={newDriverPin}
-                    onChange={e => setNewDriverPin(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm focus:border-emerald-500 font-mono text-slate-100 tracking-[0.2em] text-center outline-none"
-                  />
+                <div className="space-y-1.5 relative">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">PIN de Acceso (4 dig)</label>
+                  <div className="relative">
+                    <input
+                      type={showDriverPin ? "text" : "password"}
+                      inputMode="numeric"
+                      maxLength={4}
+                      required
+                      placeholder="ej: 1234"
+                      value={newDriverPin}
+                      onChange={e => setNewDriverPin(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 p-3 pr-10 rounded-xl text-sm focus:border-emerald-500 font-mono text-slate-100 tracking-[0.2em] text-center outline-none"
+                    />
+                    <button 
+                      type="button" 
+                      className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-emerald-400 transition-colors"
+                      onClick={() => setShowDriverPin(!showDriverPin)}
+                    >
+                      {showDriverPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">Teléfono Móvil</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Teléfono Móvil</label>
                   <input
                     type="text"
                     placeholder="ej: 71234567"
@@ -1109,8 +1122,8 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">Presupuesto Inicial (BOB)</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Presupuesto Inicial (BOB)</label>
                   <input
                     type="number"
                     value={newDriverBudget}

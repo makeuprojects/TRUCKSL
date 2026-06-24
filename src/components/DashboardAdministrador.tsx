@@ -31,7 +31,9 @@ import {
   Phone,
   Settings,
   Database,
-  LogOut
+  LogOut,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 const safeParse = (val: any): number => {
@@ -80,6 +82,7 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
   const [newDriverPhone, setNewDriverPhone] = useState('');
   const [newDriverPin, setNewDriverPin] = useState('');
   const [newDriverBudget, setNewDriverBudget] = useState('10000');
+  const [showDriverPin, setShowDriverPin] = useState(false);
 
   // Edit Permissions Form states
   const [activePermissionDriver, setActivePermissionDriver] = useState<Chofer | null>(null);
@@ -88,6 +91,7 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
   const [editDriverPin, setEditDriverPin] = useState('');
   const [editDriverStatus, setEditDriverStatus] = useState('Activo');
   const [editDriverBudget, setEditDriverBudget] = useState('10000');
+  const [showEditDriverPin, setShowEditDriverPin] = useState(false);
 
   // Core Data Creators
   const [origen, setOrigen] = useState('');
@@ -448,7 +452,7 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
   const isMargenNegative = margenValue < 0;
 
   return (
-    <div className="relative bg-gradient-to-br from-[#3b0b59] via-[#1f0535] to-[#0a0216] min-h-screen text-slate-100 overflow-hidden font-sans">
+    <div className="relative bg-gradient-to-br from-[#3b0b59] via-[#1f0535] to-[#0a0216] min-h-[100dvh] text-slate-100 overflow-hidden font-sans">
       
       {/* Subtle Noise Texture Overlay */}
       <div 
@@ -1005,8 +1009,8 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
                 </button>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] text-slate-400 uppercase font-black block">Nombre Completo Conductor</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Nombre Completo Conductor</label>
                 <input
                   type="text"
                   required
@@ -1018,8 +1022,8 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">ID Alfanumérico</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">ID Alfanumérico</label>
                   <input
                     type="text"
                     required
@@ -1030,24 +1034,34 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">PIN de Acceso (4 dig)</label>
-                  <input
-                    type="number"
-                    required
-                    minLength={4}
-                    maxLength={4}
-                    placeholder="ej: 1234"
-                    value={newDriverPin}
-                    onChange={e => setNewDriverPin(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-sm focus:border-emerald-500 font-mono text-slate-100 tracking-[0.2em] text-center outline-none"
-                  />
+                <div className="space-y-1.5 relative">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">PIN de Acceso (4 dig)</label>
+                  <div className="relative">
+                    <input
+                      type={showDriverPin ? "text" : "password"}
+                      inputMode="numeric"
+                      required
+                      minLength={4}
+                      maxLength={4}
+                      placeholder="ej: 1234"
+                      value={newDriverPin}
+                      onChange={e => setNewDriverPin(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 p-3 pr-10 rounded-xl text-sm focus:border-emerald-500 font-mono text-slate-100 tracking-[0.2em] text-center outline-none"
+                    />
+                    <button 
+                      type="button" 
+                      className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-emerald-400 transition-colors"
+                      onClick={() => setShowDriverPin(!showDriverPin)}
+                    >
+                      {showDriverPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">Teléfono Móvil</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Teléfono Móvil</label>
                   <input
                     type="text"
                     placeholder="ej: 71234567"
@@ -1057,8 +1071,8 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">Presupuesto Inicial (BOB)</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Presupuesto Inicial (BOB)</label>
                   <input
                     type="number"
                     value={newDriverBudget}
@@ -1115,8 +1129,8 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
                 </button>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] text-slate-400 uppercase font-black block">Nombre de Chofer</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Nombre de Chofer</label>
                 <input
                   type="text"
                   required
@@ -1127,19 +1141,29 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">PIN de Entrada (4 dig)</label>
-                  <input
-                    type="text"
-                    required
-                    value={editDriverPin}
-                    onChange={e => setEditDriverPin(e.target.value)}
-                    className="w-full bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-sm focus:border-amber-500 tracking-wider text-center outline-none text-slate-100"
-                  />
+                <div className="space-y-1.5 relative">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">PIN de Entrada (4 dig)</label>
+                  <div className="relative">
+                    <input
+                      type={showEditDriverPin ? "text" : "password"}
+                      inputMode="numeric"
+                      required
+                      value={editDriverPin}
+                      onChange={e => setEditDriverPin(e.target.value)}
+                      className="w-full bg-slate-950 p-3 pr-10 rounded-xl border border-slate-800 font-mono text-sm focus:border-amber-500 tracking-wider text-center outline-none text-slate-100"
+                    />
+                    <button 
+                      type="button" 
+                      className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-amber-400 transition-colors"
+                      onClick={() => setShowEditDriverPin(!showEditDriverPin)}
+                    >
+                      {showEditDriverPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">Estado Operativo</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Estado Operativo</label>
                   <select
                     value={editDriverStatus}
                     onChange={e => setEditDriverStatus(e.target.value)}
@@ -1152,8 +1176,8 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">Teléfono Móvil</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Teléfono Móvil</label>
                   <input
                     type="text"
                     value={editDriverPhone}
@@ -1162,8 +1186,8 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-400 uppercase font-black block">Límite Caja Chica (BOB)</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-400 uppercase font-bold block tracking-wide">Límite Caja Chica (BOB)</label>
                   <input
                     type="number"
                     value={editDriverBudget}

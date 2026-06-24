@@ -47,7 +47,9 @@ import {
   ChevronRight,
   ShieldCheck,
   Search,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface DashboardDonSaulProps {
@@ -122,6 +124,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   const [newDriverPhone, setNewDriverPhone] = useState('');
   const [newDriverPin, setNewDriverPin] = useState('');
   const [newDriverBudget, setNewDriverBudget] = useState('10000');
+  const [showDriverPin, setShowDriverPin] = useState(false);
 
   const [origen, setOrigen] = useState('');
   const [destino, setDestino] = useState('');
@@ -583,83 +586,94 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   });
 
   return (
-    <div className="relative bg-gradient-to-br from-[#3b0b59] via-[#1f0535] to-[#0a0216] min-h-screen text-slate-100 overflow-hidden font-sans pb-24">
+    <div className="relative bg-gradient-to-br from-[#1e3a8a] via-[#0f172a] to-[#020617] min-h-[100dvh] text-slate-100 overflow-hidden font-sans pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-24">
       {/* Toasting system integrated */}
       <Toaster richColors closeButton theme="dark" position="bottom-right" />
 
       {/* Industrial background gradient grids */}
-      <div className="absolute top-0 left-0 w-full h-[550px] bg-gradient-to-b from-fuchsia-600/10 to-transparent pointer-events-none" />
-      <div className="absolute top-1/3 left-1/12 w-[550px] h-[550px] bg-fuchsia-500/5 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/3 right-1/12 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-[550px] bg-gradient-to-b from-sky-600/15 to-transparent pointer-events-none" />
+      <div className="absolute top-1/3 left-1/12 w-[550px] h-[550px] bg-sky-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/12 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* NOCTURNAL MAP IN THE BACKGROUND WITH EM SECTIONS (z-index: -1, sutil opacity) */}
       <div 
         id="nocturnal-geotrack-map" 
-        className="absolute inset-[1%] top-16 bottom-[10%] pointer-events-none select-none opacity-15"
+        className="fixed inset-0 pointer-events-none select-none opacity-20 flex items-center justify-center overflow-hidden"
         style={{ zIndex: 0 }}
       >
         <svg
           viewBox="0 0 1600 1100"
-          className="w-full h-full text-blue-500"
+          className="w-full h-full min-w-[1200px] object-cover text-sky-400"
           fill="none"
           stroke="currentColor"
           strokeWidth="0.8"
+          preserveAspectRatio="xMidYMid slice"
         >
           {/* Grid visual lines */}
-          <g className="text-slate-900" strokeWidth="0.3">
+          <g className="text-sky-200" strokeWidth="0.3" strokeOpacity="0.2">
             <line x1="0" y1="200" x2="1600" y2="200" strokeDasharray="3,3" />
             <line x1="0" y1="400" x2="1600" y2="400" strokeDasharray="3,3" />
             <line x1="0" y1="600" x2="1600" y2="600" strokeDasharray="3,3" />
             <line x1="0" y1="800" x2="1600" y2="800" strokeDasharray="3,3" />
+            <line x1="0" y1="1000" x2="1600" y2="1000" strokeDasharray="3,3" />
+            
             <line x1="300" y1="0" x2="300" y2="1100" strokeDasharray="3,3" />
             <line x1="600" y1="0" x2="600" y2="1100" strokeDasharray="3,3" />
             <line x1="900" y1="0" x2="900" y2="1100" strokeDasharray="3,3" />
             <line x1="1200" y1="0" x2="1200" y2="1100" strokeDasharray="3,3" />
+            <line x1="1500" y1="0" x2="1500" y2="1100" strokeDasharray="3,3" />
           </g>
 
           {/* Connected routes representation */}
-          <g className="text-[#1E3A8A]" strokeWidth="1.2" strokeOpacity="0.4" strokeDasharray="8,6">
+          <g className="text-sky-300" strokeWidth="1.5" strokeOpacity="0.3" strokeDasharray="10,8">
             <path d="M410 230 L550 420" id="route-lp-or" />
             <path d="M550 420 L820 480" id="route-or-co" />
             <path d="M820 480 L1210 520" id="route-co-sc" />
             <path d="M550 420 L760 840" id="route-or-po" />
             <path d="M820 480 L760 840" id="route-co-po" />
+            <path d="M1210 520 L1400 300" id="route-sc-be" />
+          </g>
+
+          {/* Abstract Truck Graphic Graphic (Center background) */}
+          <g transform="translate(600, 300) scale(4)" className="text-slate-800 opacity-20" fill="currentColor">
+            <path d="M78 28.5V23H67.5V14C67.5 12.8954 66.6046 12 65.5 12H19C17.8954 12 17 12.8954 17 14V33C17 34.1046 17.8954 35 19 35H21.5C21.5 38.0376 23.9624 40.5 27 40.5C30.0376 40.5 32.5 38.0376 32.5 35H55.5C55.5 38.0376 57.9624 40.5 61 40.5C64.0376 40.5 66.5 38.0376 66.5 35H67.5V28.5H78ZM27 38.5C25.067 38.5 23.5 36.933 23.5 35C23.5 33.067 25.067 31.5 27 31.5C28.933 31.5 30.5 33.067 30.5 35C30.5 36.933 28.933 38.5 27 38.5ZM61 38.5C59.067 38.5 57.5 36.933 57.5 35C57.5 33.067 59.067 31.5 61 31.5C62.933 31.5 64.5 33.067 64.5 35C64.5 36.933 62.933 38.5 61 38.5ZM19 14H65.5V33H19V14ZM67.5 25H76V30H67.5V25Z"/>
+            <path d="M4 14H15V33H4V14Z"/>
           </g>
 
           {/* Base Cities nodes with Electromagnetic ping effect */}
           {/* Base Central: La Paz */}
           <g transform="translate(410, 230)">
-            <circle cx="0" cy="0" r="16" className="animate-ping text-emerald-450 fill-emerald-500/10" strokeWidth="1" />
-            <circle cx="0" cy="0" r="6" fill="#10B981" />
-            <text x="16" y="4" fill="#94A3B8" fontSize="12" fontWeight="bold" fontFamily="monospace">La Paz (Sede Central)</text>
+            <circle cx="0" cy="0" r="24" className="animate-ping text-emerald-450 fill-emerald-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="8" fill="#10B981" />
+            <text x="20" y="6" fill="#64748B" fontSize="16" fontWeight="bold" fontFamily="monospace">La Paz (Sede Central)</text>
           </g>
 
           {/* Base Oruro */}
           <g transform="translate(550, 420)">
-            <circle cx="0" cy="0" r="14" className="animate-ping text-[#1E3A8A] fill-blue-500/10" strokeWidth="1" />
-            <circle cx="0" cy="0" r="5.5" fill="#6366F1" />
-            <text x="16" y="4" fill="#94A3B8" fontSize="11" fontWeight="bold" fontFamily="monospace">Oruro (Taller Base)</text>
+            <circle cx="0" cy="0" r="20" className="animate-ping text-[#1E3A8A] fill-blue-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="7" fill="#6366F1" />
+            <text x="20" y="6" fill="#64748B" fontSize="15" fontWeight="bold" fontFamily="monospace">Oruro (Taller Base)</text>
           </g>
 
           {/* Base Cochabamba */}
           <g transform="translate(820, 480)">
-            <circle cx="0" cy="0" r="14" className="animate-ping text-[#1E3A8A] fill-blue-500/10" strokeWidth="1" />
-            <circle cx="0" cy="0" r="5.5" fill="#6366F1" />
-            <text x="16" y="4" fill="#94A3B8" fontSize="11" fontWeight="bold" fontFamily="monospace">Cochabamba</text>
+            <circle cx="0" cy="0" r="20" className="animate-ping text-[#1E3A8A] fill-blue-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="7" fill="#6366F1" />
+            <text x="20" y="6" fill="#64748B" fontSize="15" fontWeight="bold" fontFamily="monospace">Cochabamba</text>
           </g>
 
           {/* Base Santa Cruz */}
           <g transform="translate(1210, 520)">
-            <circle cx="0" cy="0" r="15" className="animate-ping text-amber-450 fill-orange-500/10" strokeWidth="1" />
-            <circle cx="0" cy="0" r="5.5" fill="#F59E0B" />
-            <text x="16" y="4" fill="#94A3B8" fontSize="11" fontWeight="bold" fontFamily="monospace">Santa Cruz (Distribución)</text>
+            <circle cx="0" cy="0" r="22" className="animate-ping text-amber-450 fill-orange-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="7" fill="#F59E0B" />
+            <text x="20" y="6" fill="#64748B" fontSize="15" fontWeight="bold" fontFamily="monospace">Santa Cruz (Distribución)</text>
           </g>
 
           {/* Control Frontera: Potosí */}
           <g transform="translate(760, 840)">
-            <circle cx="0" cy="0" r="14" className="animate-ping text-rose-450 fill-rose-500/10" strokeWidth="1" />
-            <circle cx="0" cy="0" r="5.5" fill="#EC4899" />
-            <text x="16" y="4" fill="#94A3B8" fontSize="11" fontWeight="bold" fontFamily="monospace">Frontera Potosí</text>
+            <circle cx="0" cy="0" r="20" className="animate-ping text-rose-450 fill-rose-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="7" fill="#EC4899" />
+            <text x="20" y="6" fill="#64748B" fontSize="15" fontWeight="bold" fontFamily="monospace">Frontera Potosí</text>
           </g>
         </svg>
       </div>
@@ -670,18 +684,24 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.04] backdrop-blur-md">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 bg-blue-500/10 border border-blue-300/30 text-[#1E3A8A] font-mono text-[9px] font-black uppercase tracking-widest rounded-md leading-none">
+              <span className="px-2 py-0.5 bg-blue-500/20 border border-blue-300/30 text-sky-300 font-mono text-[9px] font-black uppercase tracking-widest rounded-md leading-none">
                 SL ROAD TRUCKING Console
               </span>
               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black font-sans text-slate-900 tracking-tight flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-black font-sans text-slate-100 tracking-tight flex items-center gap-3">
               <span className="bg-gradient-to-br from-blue-500 to-indigo-700 text-slate-950 w-8.5 h-8.5 rounded-xl flex items-center justify-center shadow-lg font-black text-sm">
                 🛰
               </span>
               Bienvenido Saul
+              <motion.div
+                animate={{ x: [0, 15, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Truck className="w-8 h-8 text-sky-400" />
+              </motion.div>
             </h1>
-            <p className="text-xs text-slate-700 font-sans leading-relaxed">
+            <p className="text-xs text-slate-300 font-sans leading-relaxed">
               Consola del Administrador para la sincronización, auditorías y monitoreo en vivo de flotas bolivianas.
             </p>
           </div>
@@ -1220,7 +1240,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                     <button
                       type="submit"
                       disabled={isCreatingRoute}
-                      className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-emerald-500 hover:to-teal-500 text-slate-900 font-black text-[10px] uppercase px-4.5 rounded-lg text-xs cursor-pointer transition shrink-0 flex items-center justify-center shadow-md shadow-emerald-950/20"
+                      className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-[10px] uppercase px-4.5 rounded-lg text-xs cursor-pointer transition shrink-0 flex items-center justify-center shadow-md shadow-emerald-950/20"
                     >
                       {isCreatingRoute ? '...' : 'Crear'}
                     </button>
@@ -1276,7 +1296,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 <button
                   type="submit"
                   disabled={isCreatingTruck}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-emerald-500 hover:to-teal-500 text-slate-900 font-black text-xs py-2.5 rounded-lg transition cursor-pointer text-center shadow-md shadow-emerald-950/20 flex items-center justify-center gap-1.5"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs py-2.5 rounded-lg transition cursor-pointer text-center shadow-md shadow-emerald-950/20 flex items-center justify-center gap-1.5"
                 >
                   {isCreatingTruck ? (
                     <>
@@ -1372,8 +1392,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 </button>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] text-slate-700 uppercase font-black block">Nombre de Conductor</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-slate-700 uppercase font-bold block tracking-wide">Nombre de Conductor</label>
                 <input
                   type="text"
                   required
@@ -1385,8 +1405,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-700 uppercase font-black block">ID Alfanumérico</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-700 uppercase font-bold block tracking-wide">ID Alfanumérico</label>
                   <input
                     type="text"
                     required
@@ -1397,23 +1417,33 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-700 uppercase font-black block">PIN de Carretera (4 dig)</label>
-                  <input
-                    type="password"
-                    maxLength={4}
-                    required
-                    placeholder="ej: 9021"
-                    value={newDriverPin}
-                    onChange={e => setNewDriverPin(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200/60 p-3 rounded-xl text-sm focus:border-blue-300 font-mono text-slate-100 tracking-[0.2em] text-center outline-none"
-                  />
+                <div className="space-y-1.5 relative">
+                  <label className="text-xs text-slate-700 uppercase font-bold block tracking-wide">PIN de Carretera (4 dig)</label>
+                  <div className="relative">
+                    <input
+                      type={showDriverPin ? "text" : "password"}
+                      inputMode="numeric"
+                      maxLength={4}
+                      required
+                      placeholder="ej: 9021"
+                      value={newDriverPin}
+                      onChange={e => setNewDriverPin(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200/60 p-3 pr-10 rounded-xl text-sm focus:border-blue-300 font-mono text-slate-900 tracking-[0.2em] text-center outline-none"
+                    />
+                    <button 
+                      type="button" 
+                      className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-blue-500 transition-colors"
+                      onClick={() => setShowDriverPin(!showDriverPin)}
+                    >
+                      {showDriverPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3.5">
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-700 uppercase font-black block">Teléfono Móvil</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-700 uppercase font-bold block tracking-wide">Teléfono Móvil</label>
                   <input
                     type="text"
                     placeholder="ej: 79234567"
@@ -1423,8 +1453,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] text-slate-700 uppercase font-black block">Presupuesto Mensual (Bs)</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs text-slate-700 uppercase font-bold block tracking-wide">Presupuesto Mensual (Bs)</label>
                   <input
                     type="number"
                     value={newDriverBudget}

@@ -752,7 +752,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-100 flex flex-col font-sans">
+    <div className="min-h-[100dvh] bg-transparent text-slate-100 flex flex-col font-sans">
       {/* 1. Header (Mobile Visible, Desktop Hidden) */}
       <header className="lg:hidden bg-[#0A192F]/80 backdrop-blur-md border-b border-[#112240]/50 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center space-x-2">
@@ -1032,7 +1032,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
         </AnimatePresence>
 
         {/* 3-Column Layout: Column 2 (Central Main Workspace Area) */}
-        <main className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto w-full space-y-6 pb-28 lg:pb-10 overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 max-w-4xl mx-auto w-full space-y-6 pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-10 overflow-y-auto">
           
           {/* Messaging alerts */}
           <AnimatePresence>
