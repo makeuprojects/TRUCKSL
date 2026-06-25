@@ -614,7 +614,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   });
 
   return (
-    <div className="relative bg-gradient-to-br from-[#0a1731] via-[#030712] to-[#010206] min-h-[100dvh] text-slate-100 overflow-hidden font-sans pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-24">
+    <div className="relative bg-gradient-to-br from-[#0284c7] via-[#0b1b3d] to-[#020617] min-h-[100dvh] text-slate-100 overflow-hidden font-sans pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-24">
       {/* Toasting system integrated */}
       <Toaster richColors closeButton theme="dark" position="bottom-right" />
 

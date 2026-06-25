@@ -452,7 +452,7 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
   const isMargenNegative = margenValue < 0;
 
   return (
-    <div className="relative bg-gradient-to-br from-[#3b0b59] via-[#1f0535] to-[#0a0216] min-h-[100dvh] text-slate-100 overflow-hidden font-sans">
+    <div className="relative bg-gradient-to-br from-[#0284c7] via-[#0b1b3d] to-[#020617] min-h-[100dvh] text-slate-100 overflow-hidden font-sans">
       
       {/* Subtle Noise Texture Overlay */}
       <div 

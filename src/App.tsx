@@ -105,7 +105,7 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-[100dvh] bg-gradient-to-br from-[#3b0b59] via-[#1f0535] to-[#0a0216] text-white font-sans selection:bg-fuchsia-500/30 selection:text-white overflow-x-hidden">
+      <div className="min-h-[100dvh] bg-gradient-to-br from-[#0284c7] via-[#0b1b3d] to-[#020617] text-white font-sans selection:bg-emerald-500/30 selection:text-white overflow-x-hidden">
         <Routes>
           {/* Main Select Portal Page */}
           <Route
@@ -192,7 +192,7 @@ function PortalSelector({ currentUser, googleToken, onSignOut, localDriver }: Po
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#0A192F] flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center p-4 relative">
       {/* Visual background ambient glow elements */}
       <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-blue-900/20 rounded-full blur-[80px] pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none"></div>
@@ -413,7 +413,7 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
   };
 
   return (
-    <div className="min-h-screen bg-[#0A192F] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
       <div className="max-w-md w-full backdrop-blur-[12px] bg-[#112240]/80 border border-[#233554]/50 rounded-[24px] p-8 space-y-6 shadow-2xl relative">
         
         <div className="flex flex-col items-center text-center space-y-2">
@@ -626,14 +626,14 @@ function AdminConsoleLayout({ token, userEmail, onSignOut }: AdminConsoleLayoutP
   return (
     <div className="min-h-screen bg-transparent relative flex flex-col text-white">
       {/* Premium Desktop Navigation Bar */}
-      <div className="bg-[#0d1324]/80 text-white flex items-center justify-between px-6 py-4 border-b border-fuchsia-900/50 backdrop-blur-[12px]">
+      <div className="bg-[#0d1324]/80 text-white flex items-center justify-between px-6 py-4 border-b border-slate-800/80 backdrop-blur-[12px]">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-fuchsia-500/20 text-fuchsia-400 rounded-lg border border-fuchsia-500/20">
+          <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
             <Layout className="w-5 h-5" />
           </div>
           <div>
             <span className="font-extrabold text-white text-sm tracking-wide">SL ROAD TRUCKING</span>
-            <span className="text-[9px] bg-fuchsia-950 text-fuchsia-400 border border-fuchsia-900/60 ml-2 px-1.5 py-0.5 rounded uppercase font-bold font-mono tracking-widest">
+            <span className="text-[9px] bg-[#0a192f] text-emerald-400 border border-emerald-900/40 ml-2 px-1.5 py-0.5 rounded uppercase font-bold font-mono tracking-widest">
               Admin Consola
             </span>
           </div>
@@ -645,7 +645,7 @@ function AdminConsoleLayout({ token, userEmail, onSignOut }: AdminConsoleLayoutP
           </span>
           <button
             onClick={() => navigate('/')}
-            className="text-xs text-slate-100 hover:text-white font-bold transition py-1 px-2.5 rounded-lg border border-fuchsia-900/80 bg-[#0d1324]/80 cursor-pointer"
+            className="text-xs text-slate-100 hover:text-white font-bold transition py-1 px-2.5 rounded-lg border border-slate-800 bg-[#0d1324]/80 cursor-pointer"
           >
             Selector General
           </button>
