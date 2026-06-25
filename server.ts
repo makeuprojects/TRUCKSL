@@ -6,15 +6,19 @@ import { apiRouter } from './server/routes';
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = Number(process.env.PORT || 3000);
 
   // Parse JSON and form-url bodies with high limit for image uploads
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-  // Simple health check endpoint for UptimeRobot
-  app.get('/ping', (req, res) => {
-    res.status(200).send('pong');
+  // Simple health check endpoints for UptimeRobot or similar services
+  app.get(['/ping', '/api/health'], (req, res) => {
+    res.status(200).json({ 
+      status: 'ok', 
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString()
+    });
   });
 
   // Register the Google Sheets and Fleet controllers router

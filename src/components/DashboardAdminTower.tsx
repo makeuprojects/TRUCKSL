@@ -98,6 +98,8 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
   const [camionModelo, setCamionModelo] = useState('');
   const [camionAnio, setCamionAnio] = useState('');
   const [camionOdo, setCamionOdo] = useState('');
+  const [camionPlaca, setCamionPlaca] = useState('');
+  const [camionChasis, setCamionChasis] = useState('');
 
   // Sync Google Sheets Data Hub
   const syncDatabase = async () => {
@@ -289,7 +291,9 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
           anio: updatedFields.anio,
           kilometraje_actual: updatedFields.kilometraje_actual,
           saldo_presupuesto: updatedFields.saldo_presupuesto,
-          estado: updatedFields.estado
+          estado: updatedFields.estado,
+          placa: updatedFields.placa,
+          chasis: updatedFields.chasis
         })
       });
       const data = await res.json();
@@ -386,7 +390,9 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
         body: JSON.stringify({
           modelo: camionModelo,
           anio: String(camionAnio),
-          kilometraje_actual: String(camionOdo)
+          kilometraje_actual: String(camionOdo),
+          placa: camionPlaca.trim(),
+          chasis: camionChasis.trim()
         })
       });
       const data = await res.json();
@@ -395,6 +401,8 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
         setCamionModelo('');
         setCamionAnio('');
         setCamionOdo('');
+        setCamionPlaca('');
+        setCamionChasis('');
         await syncDatabase();
       }
     } catch (err: any) {
@@ -697,7 +705,7 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
             </div>
 
             {/* LIVE SYSTEM EXPENSES COMPARED WITH LIGHTBOX */}
-            <LiveExpenseFeed gastos={gastos} choferes={choferes} />
+            <LiveExpenseFeed gastos={gastos} choferes={choferes} camiones={camiones} />
 
             {/* SEEDING & SPARE PARTS RECYCLING MONITOR */}
             <div className="bg-[#1E293B]/30 border border-white/[0.05] p-6 rounded-2xl space-y-4 shadow-xl">
@@ -959,6 +967,31 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
                     onChange={(e) => setCamionModelo(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 text-xs px-3 py-2.5 rounded-lg text-slate-100 outline-none"
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[9px] text-slate-400 block uppercase font-bold">Placa / Patente</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="ej: 4893-XCS"
+                      value={camionPlaca}
+                      onChange={(e) => setCamionPlaca(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 text-xs px-3 py-2.5 rounded-lg text-slate-100 font-mono outline-none uppercase"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] text-slate-400 block uppercase font-bold">Número de Chasis</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="ej: 9BWZZZ90Z..."
+                      value={camionChasis}
+                      onChange={(e) => setCamionChasis(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 text-xs px-3 py-2.5 rounded-lg text-slate-100 font-mono outline-none uppercase"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

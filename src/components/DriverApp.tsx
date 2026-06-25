@@ -28,6 +28,7 @@ import {
 import { Camion, Chofer, Ruta, Viaje, Gasto } from '../types';
 import RutaCard from './RutaCard';
 import GastoForm from './GastoForm';
+import RouteMiniMap from './RouteMiniMap';
 
 interface DriverAppProps {
   token: string;
@@ -650,9 +651,9 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
   // Auth Screen if not logged in using PIN
   if (!authenticatedDriver) {
     return (
-      <div className="max-w-md w-full bg-[#112240] rounded-3xl border border-[#233554] p-8 space-y-6 mx-auto animate-fade-in shadow-2xl">
+      <div className="max-w-md w-full bg-slate-900 rounded-3xl border border-slate-800 p-8 space-y-6 mx-auto animate-fade-in shadow-2xl">
         <div className="flex flex-col items-center justify-center space-y-3">
-          <div className="p-4 bg-orange-500/10 text-emerald-400 rounded-full border border-emerald-500/20 shadow-md">
+          <div className="p-4 bg-orange-500/10 text-emerald-400 rounded-full border border-slate-800/80 shadow-md">
             <Truck className="w-12 h-12" />
           </div>
           <h1 className="text-2xl font-bold text-white text-center">Choferes de Ruta</h1>
@@ -660,7 +661,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
         </div>
 
         {/* Network Stager warning */}
-        <div className="flex items-center justify-between bg-[#0A192F] px-4 py-2.5 rounded-xl border border-[#233554]/60 text-xs">
+        <div className="flex items-center justify-between bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800/60 text-xs">
           <div className="flex items-center space-x-2">
             {currentNetworkActive ? (
               <>
@@ -677,10 +678,10 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           {/* Debug connection layout modifier */}
           <button
             onClick={() => setSimulateOffline(!simulateOffline)}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono leading-none border transition-colors ${
+            className={`px-2 py-0.5 rounded text-[10px] font-mono leading-none border transition-colors cursor-pointer ${
               simulateOffline 
                 ? 'bg-orange-950/40 text-orange-400 border-amber-800' 
-                : 'bg-slate-750 text-slate-200 border-[#233554] hover:bg-[#233554]'
+                : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-750'
             }`}
           >
             {simulateOffline ? 'SIM: OFFLINE' : 'PROBAR OFFLINE'}
@@ -702,7 +703,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 placeholder="••••"
-                className="w-full bg-slate-950 border border-[#233554] text-white font-mono text-center tracking-widest text-2xl py-3 pl-10 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
+                className="w-full bg-slate-950 border border-slate-800 text-white font-mono text-center tracking-widest text-2xl py-3 pl-10 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
               />
             </div>
             <p className="text-[10px] text-slate-200 text-center mt-1">
@@ -754,11 +755,11 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
   return (
     <div className="min-h-[100dvh] bg-transparent text-slate-100 flex flex-col font-sans">
       {/* 1. Header (Mobile Visible, Desktop Hidden) */}
-      <header className="lg:hidden bg-[#0A192F]/80 backdrop-blur-md border-b border-[#112240]/50 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+      <header className="lg:hidden bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setIsMobileSidebarOpen(true)}
-            className="p-1.5 hover:bg-[#112240] rounded-lg text-slate-200 hover:text-white transition cursor-pointer font-bold uppercase text-[10px]"
+            className="p-1.5 hover:bg-slate-850 rounded-lg text-slate-200 hover:text-white transition cursor-pointer font-bold uppercase text-[10px]"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -789,10 +790,10 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
       <div className="flex flex-1 relative overflow-x-hidden">
         
         {/* Desktop Sidebar (Docked) */}
-        <aside className="hidden lg:flex flex-col w-80 shrink-0 border-r border-[#112240]/50 bg-[#0A192F]/60 backdrop-blur-md p-6 h-[calc(100vh-0px)] sticky top-0 justify-between">
+        <aside className="hidden lg:flex flex-col w-80 shrink-0 border-r border-slate-800/65 bg-slate-950/60 backdrop-blur-md p-6 h-[calc(100vh-0px)] sticky top-0 justify-between">
           <div className="space-y-6">
-            <div className="flex items-center space-x-2.5 pb-2 border-b border-[#112240]/50">
-              <span className="p-2 bg-orange-500/10 text-emerald-400 rounded-2xl border border-emerald-500/20 shadow-inner">
+            <div className="flex items-center space-x-2.5 pb-2 border-b border-slate-850">
+              <span className="p-2 bg-orange-500/10 text-emerald-400 rounded-2xl border border-slate-800/80 shadow-inner">
                 <Truck className="w-6 h-6" />
               </span>
               <div>
@@ -804,7 +805,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             {/* Profile Summary */}
             <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-3xl space-y-3">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-orange-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-extrabold shadow-inner shrink-0 leading-none">
+                <div className="w-10 h-10 rounded-full bg-orange-500/10 text-emerald-400 border border-slate-800/80 flex items-center justify-center font-extrabold shadow-inner shrink-0 leading-none">
                   {authenticatedDriver.nombre_completo.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -817,7 +818,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               <div className="space-y-1.5 pt-2">
                 <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">Vehículo Activo</label>
                 {activeViaje ? (
-                  <div className="bg-[#0A192F] border border-[#112240] p-2 py-2.5 rounded-xl text-xs text-white font-bold truncate flex items-center gap-2">
+                  <div className="bg-slate-950 border border-slate-800 p-2 py-2.5 rounded-xl text-xs text-white font-bold truncate flex items-center gap-2">
                     <Truck className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
                     {camiones.find(c => c.id_camion === selectedCamionId)?.modelo || 'Camión Asignado'}
                   </div>
@@ -825,7 +826,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   <select
                     value={selectedCamionId}
                     onChange={(e) => setSelectedCamionId(e.target.value)}
-                    className="w-full bg-slate-950 border border-[#112240] p-2.5 rounded-xl focus:ring-1 focus:ring-emerald-500 text-xs outline-none text-white font-medium cursor-pointer"
+                    className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl focus:ring-1 focus:ring-emerald-500 text-xs outline-none text-white font-medium cursor-pointer"
                   >
                     <option value="">Selecciona un camión...</option>
                     {camiones.map((c, idx) => (
@@ -857,7 +858,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 <button
                   onClick={handleSyncOfflineActions}
                   disabled={isLoading || !currentNetworkActive}
-                  className="w-full bg-blue-600 hover:bg-indigo-505 disabled:opacity-40 text-white text-xs py-2 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow"
+                  className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white text-xs py-2 rounded-xl font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow"
                 >
                   <RotateCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
                   Sincronizar Pendientes
@@ -869,7 +870,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 className={`w-full py-2 border rounded-xl text-xs font-bold leading-none transition duration-200 cursor-pointer ${
                   simulateOffline 
                     ? 'bg-orange-950/40 text-orange-400 border-amber-800' 
-                    : 'bg-[#112240] border-[#233554] hover:bg-slate-750 text-slate-100'
+                    : 'bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-100'
                 }`}
               >
                 {simulateOffline ? 'DESACTIVAR SIMULADOR' : 'PROBAR MODO OFFLINE'}
@@ -880,7 +881,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           <div className="space-y-3 pt-6 border-t border-slate-850">
             <button
               onClick={onLogout}
-              className="w-full border border-[#112240] hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full border border-slate-800 hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
             >
               ← Volver al Portal
             </button>
@@ -912,19 +913,19 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                className="fixed inset-y-0 left-0 z-50 w-80 bg-[#0A192F] border-r border-[#112240] p-6 flex flex-col justify-between shadow-2xl lg:hidden"
+                className="fixed inset-y-0 left-0 z-50 w-80 bg-slate-950 border-r border-slate-850 p-6 flex flex-col justify-between shadow-2xl lg:hidden"
               >
                 <div className="space-y-6">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-850">
                     <div className="flex items-center space-x-2">
-                      <span className="p-1.5 bg-orange-500/10 text-emerald-400 rounded-xl border border-emerald-500/20 shadow-inner">
+                      <span className="p-1.5 bg-orange-500/10 text-emerald-400 rounded-xl border border-slate-800 shadow-inner">
                         <Truck className="w-5 h-5" />
                       </span>
                       <span className="font-extrabold text-sm text-white">Menú Conductor</span>
                     </div>
                     <button
                       onClick={() => setIsMobileSidebarOpen(false)}
-                      className="p-1 hover:bg-[#112240] rounded-lg text-slate-200 hover:text-white transition cursor-pointer"
+                      className="p-1 hover:bg-slate-850 rounded-lg text-slate-200 hover:text-white transition cursor-pointer"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -933,7 +934,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   {/* Profile section */}
                   <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-2xl space-y-3">
                     <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-full bg-orange-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center font-bold shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-orange-500/10 text-emerald-400 border border-slate-800 flex items-center justify-center font-bold shrink-0">
                         {authenticatedDriver.nombre_completo.charAt(0)}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -945,7 +946,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                     <div className="space-y-1.5 pt-2">
                       <label className="text-[9px] text-slate-200 font-bold uppercase tracking-wider block">Vehículo Activo</label>
                       {activeViaje ? (
-                        <div className="bg-[#0A192F] border border-[#112240] p-2 rounded-xl text-xs text-white font-bold truncate flex items-center gap-2">
+                        <div className="bg-slate-950 border border-slate-800 p-2 rounded-xl text-xs text-white font-bold truncate flex items-center gap-2">
                           <Truck className="w-3.5 h-3.5 text-emerald-400" />
                           {camiones.find(c => c.id_camion === selectedCamionId)?.modelo || 'Camión Asignado'}
                         </div>
@@ -953,7 +954,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                         <select
                           value={selectedCamionId}
                           onChange={(e) => setSelectedCamionId(e.target.value)}
-                          className="w-full bg-slate-950 border border-[#112240] p-2.5 rounded-xl focus:ring-1 focus:ring-emerald-500 text-xs outline-none text-white font-medium"
+                          className="w-full bg-slate-950 border border-slate-800 p-2.5 rounded-xl focus:ring-1 focus:ring-emerald-500 text-xs outline-none text-white font-medium"
                         >
                           <option value="">Selecciona un camión...</option>
                           {camiones.map((c, index) => (
@@ -1000,7 +1001,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                       className={`w-full py-2 border rounded-lg text-xs font-bold transition duration-200 cursor-pointer ${
                         simulateOffline 
                           ? 'bg-orange-950/40 text-orange-400 border-amber-800' 
-                          : 'bg-[#112240] border-slate-705 hover:bg-slate-750 text-slate-100'
+                          : 'bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-100'
                       }`}
                     >
                       {simulateOffline ? 'DESACTIVAR SIMULADOR' : 'PROBAR MODO OFFLINE'}
@@ -1011,7 +1012,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 <div className="space-y-3 pt-4 border-t border-slate-850">
                   <button
                     onClick={onLogout}
-                    className="w-full border border-[#112240] hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2 px-4 rounded-lg text-xs transition"
+                    className="w-full border border-slate-800 hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2 px-4 rounded-lg text-xs transition cursor-pointer"
                   >
                     ← Volver al Portal
                   </button>
@@ -1020,7 +1021,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                       setIsMobileSidebarOpen(false);
                       clearAuth();
                     }}
-                    className="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold py-2 px-4 rounded-lg text-xs transition flex items-center justify-center gap-2 border border-rose-500/10"
+                    className="w-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold py-2 px-4 rounded-lg text-xs transition flex items-center justify-center gap-2 border border-rose-500/10 cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     Cerrar Sesión
@@ -1169,6 +1170,15 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                     <p className="text-xs text-slate-200 max-w-md mx-auto leading-relaxed">
                       Llevando cargamento de <strong className="text-emerald-400">45 Toneladas Base</strong>. Rutas secundarias bloqueadas hasta completar el pesaje.
                     </p>
+                  </div>
+
+                  {/* Visual tracking mini-map with animated road and moving truck */}
+                  <div className="w-full max-w-md mx-auto pt-1 pb-1">
+                    <RouteMiniMap 
+                      origen={rutas.find(r => r.id_ruta === activeViaje?.id_ruta)?.origen || ''} 
+                      destino={rutas.find(r => r.id_ruta === activeViaje?.id_ruta)?.destino || ''} 
+                      idViaje={activeViaje?.id_viaje} 
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2">

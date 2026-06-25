@@ -22,6 +22,8 @@ interface EditSlideOverProps {
     kilometraje_actual?: string;
     saldo_presupuesto?: string;
     estado?: string;
+    placa?: string;
+    chasis?: string;
   }) => Promise<boolean>;
 }
 
@@ -50,6 +52,8 @@ export default function EditSlideOver({
   const [kilometrajeActual, setKilometrajeActual] = useState('');
   const [saldoPresupuesto, setSaldoPresupuesto] = useState('');
   const [truckEstado, setTruckEstado] = useState('Activo');
+  const [placa, setPlaca] = useState('');
+  const [chasis, setChasis] = useState('');
 
   // Initialize fields once data changes or panel opens
   useEffect(() => {
@@ -71,6 +75,8 @@ export default function EditSlideOver({
       setKilometrajeActual(t.kilometraje_actual || '');
       setSaldoPresupuesto(t.saldo_presupuesto || '10000');
       setTruckEstado(t.estado || 'Activo');
+      setPlaca(t.placa || '');
+      setChasis(t.chasis || '');
     }
   }, [type, data, isOpen]);
 
@@ -104,7 +110,7 @@ export default function EditSlideOver({
         if (success) onClose();
       } else if (type === 'camion') {
         if (!modelo.trim()) {
-          setErrorText('El modelo/patente es requerido.');
+          setErrorText('El modelo del camión es requerido.');
           setIsSaving(false);
           return;
         }
@@ -114,7 +120,9 @@ export default function EditSlideOver({
           anio,
           kilometraje_actual: kilometrajeActual,
           saldo_presupuesto: saldoPresupuesto,
-          estado: truckEstado
+          estado: truckEstado,
+          placa,
+          chasis
         });
 
         if (success) onClose();
@@ -145,16 +153,16 @@ export default function EditSlideOver({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-y-0 right-0 max-w-md w-full bg-[#1E293B]/95 backdrop-blur-xl border-l border-white/[0.08] p-6 sm:p-8 flex flex-col z-50 text-slate-100 shadow-2xl"
+            className="fixed inset-y-0 right-0 max-w-md w-full bg-slate-900 border-l border-slate-800 p-6 sm:p-8 flex flex-col z-50 text-slate-100 shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between pb-5 border-b border-white/[0.05] shrink-0">
+            <div className="flex items-center justify-between pb-5 border-b border-slate-800 shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-blue-500/10 text-[#1E3A8A] rounded-xl border border-blue-300/20">
+                <div className="p-2 bg-slate-850 text-emerald-400 rounded-xl border border-slate-800">
                   {type === 'chofer' ? <User className="w-5 h-5" /> : <Truck className="w-5 h-5" />}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-slate-900 text-base tracking-tight leading-none mb-1">
+                  <h3 className="font-extrabold text-slate-100 text-base tracking-tight leading-none mb-1">
                     {type === 'chofer' ? 'Editar Conductor' : 'Ficha de Camión'}
                   </h3>
                   <p className="text-[10px] text-slate-300 font-mono">
@@ -164,7 +172,7 @@ export default function EditSlideOver({
               </div>
               <button
                 onClick={onClose}
-                className="text-slate-300 hover:text-slate-900 p-2 hover:bg-[#0A192F] border border-transparent hover:border-[#112240] rounded-xl cursor-pointer transition"
+                className="text-slate-300 hover:text-white p-2 hover:bg-slate-800 border border-transparent hover:border-slate-700 rounded-xl cursor-pointer transition"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -184,18 +192,18 @@ export default function EditSlideOver({
                 <>
                   {/* Driver Name */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
                       Nombre Completo
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                         <User className="w-4 h-4" />
                       </span>
                       <input
                         type="text"
                         value={nombreCompleto}
                         onChange={(e) => setNombreCompleto(e.target.value)}
-                        className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-700 focus:outline-none focus:border-blue-300"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-750 focus:outline-none focus:border-emerald-500"
                         placeholder="ej: Mauricio Sotomayor"
                       />
                     </div>
@@ -203,18 +211,18 @@ export default function EditSlideOver({
 
                   {/* Telephone / Phone number */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
                       Celular / Teléfono
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                         <Phone className="w-4 h-4" />
                       </span>
                       <input
                         type="tel"
                         value={telefono}
                         onChange={(e) => setTelefono(e.target.value)}
-                        className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-700 focus:outline-none focus:border-blue-300"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 placeholder-slate-750 focus:outline-none focus:border-emerald-500"
                         placeholder="ej: +591 76543210"
                       />
                     </div>
@@ -222,12 +230,12 @@ export default function EditSlideOver({
 
                   {/* PIN acceso */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block flex items-center justify-between">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block flex items-center justify-between">
                       <span>PIN Secreto Operativo (4 dígitos)</span>
-                      <span className="font-mono text-[9px] text-orange-500">Requerido</span>
+                      <span className="font-mono text-[9px] text-amber-500">Requerido</span>
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                         <KeyRound className="w-4 h-4" />
                       </span>
                       <input
@@ -237,7 +245,7 @@ export default function EditSlideOver({
                         inputMode="numeric"
                         value={pinAcceso}
                         onChange={(e) => setPinAcceso(e.target.value)}
-                        className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 tracking-widest font-mono text-center focus:outline-none focus:border-blue-300"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 tracking-widest font-mono text-center focus:outline-none focus:border-emerald-500"
                         placeholder="••••"
                       />
                     </div>
@@ -245,13 +253,13 @@ export default function EditSlideOver({
 
                   {/* Estado / Status selector */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
                       Estado Operativo
                     </label>
                     <select
                       value={driverEstado}
                       onChange={(e) => setDriverEstado(e.target.value)}
-                      className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-blue-300 cursor-pointer appearance-none"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 cursor-pointer appearance-none"
                     >
                       <option value="Activo">Activo (Habilitado)</option>
                       <option value="Inactivo">Inactivo (Suspendido)</option>
@@ -260,36 +268,36 @@ export default function EditSlideOver({
 
                   {/* Presupuesto Inicial (Asignado) */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
                       Presupuesto Caja Chica Asignado (BOB)
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                         <DollarSign className="w-4 h-4" />
                       </span>
                       <input
                         type="number"
                         value={presupuesto}
                         onChange={(e) => setPresupuesto(e.target.value)}
-                        className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-blue-300"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
 
                   {/* Saldo Actual (Caja Chica Dinámica) */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
                       Saldo Disponible en Caja Chica Actual (BOB)
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
-                        <DollarSign className="w-4 h-4 text-emerald-405" />
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                        <DollarSign className="w-4 h-4 text-emerald-400" />
                       </span>
                       <input
                         type="number"
                         value={saldoActual}
                         onChange={(e) => setSaldoActual(e.target.value)}
-                        className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-blue-300"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
@@ -298,37 +306,75 @@ export default function EditSlideOver({
                 <>
                   {/* Modelo Camion */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
-                      Modelo y Patente del Vehículo
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
+                      Modelo del Vehículo
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                         <Truck className="w-4 h-4" />
                       </span>
                       <input
                         type="text"
                         value={modelo}
                         onChange={(e) => setModelo(e.target.value)}
-                        className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-blue-300"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                         placeholder="ej: Volvo FH 540 Globetrotter"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Placa Camion */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
+                      Placa / Patente del Camión
+                    </label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-xs font-bold font-mono">
+                        #
+                      </span>
+                      <input
+                        type="text"
+                        value={placa}
+                        onChange={(e) => setPlaca(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500 uppercase"
+                        placeholder="ej: 4893-XCS"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Chasis Camion */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
+                      Número de Chasis (VIN)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-xs font-bold font-mono">
+                        C
+                      </span>
+                      <input
+                        type="text"
+                        value={chasis}
+                        onChange={(e) => setChasis(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500 uppercase"
+                        placeholder="ej: 9BWZZZ90Z..."
                       />
                     </div>
                   </div>
 
                   {/* Año vehiculo */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
                       Año de Fabricación
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                         <Calendar className="w-4 h-4" />
                       </span>
                       <input
                         type="number"
                         value={anio}
                         onChange={(e) => setAnio(e.target.value)}
-                        className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-blue-300"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                         placeholder="ej: 2022"
                       />
                     </div>
@@ -336,49 +382,49 @@ export default function EditSlideOver({
 
                   {/* Kms actual */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
                       Odómetro / Kilometraje Actual (KM)
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                         <Gauge className="w-4 h-4" />
                       </span>
                       <input
                         type="number"
                         value={kilometrajeActual}
                         onChange={(e) => setKilometrajeActual(e.target.value)}
-                        className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-blue-300"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
 
                   {/* Presupuesto Camion */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
                       Saldo Remanente de Presupuesto Mantenimiento (BOB)
                     </label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
                         <DollarSign className="w-4 h-4" />
                       </span>
                       <input
                         type="number"
                         value={saldoPresupuesto}
                         onChange={(e) => setSaldoPresupuesto(e.target.value)}
-                        className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-blue-300"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
 
                   {/* Estado Camion */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider block">
+                    <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
                       Estado Operativo / Taller
                     </label>
                     <select
                       value={truckEstado}
                       onChange={(e) => setTruckEstado(e.target.value)}
-                      className="w-full bg-slate-950/70 border border-[#112240]/80 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-blue-300 cursor-pointer appearance-none"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 cursor-pointer appearance-none"
                     >
                       <option value="Activo">Activo (Habilitado)</option>
                       <option value="Mantenimiento">Mantenimiento (Faltas/Taller)</option>
@@ -390,12 +436,12 @@ export default function EditSlideOver({
             </form>
 
             {/* Footer containing action buttons */}
-            <div className="pt-4 border-t border-white/[0.05] flex gap-3 shrink-0">
+            <div className="pt-4 border-t border-slate-800 flex gap-3 shrink-0">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isSaving}
-                className="flex-1 bg-[#0A192F] border border-[#112240] hover:bg-slate-850 text-slate-700 font-bold text-xs py-3 rounded-xl transition cursor-pointer text-center"
+                className="flex-1 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs py-3 rounded-xl transition cursor-pointer text-center"
               >
                 CANCELAR
               </button>
@@ -403,7 +449,7 @@ export default function EditSlideOver({
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSaving}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 active:bg-indigo-700 text-slate-950 font-black text-xs py-3 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-blue-500/10"
+                className="flex-1 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-slate-950 font-black text-xs py-3 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/10"
               >
                 {isSaving ? (
                   <>

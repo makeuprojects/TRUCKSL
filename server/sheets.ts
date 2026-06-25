@@ -171,7 +171,7 @@ export function healGastosRows<T extends Record<string, any>>(rawParsedObjects: 
  * Tab names with their respective column schemas (headers).
  */
 export const SHEET_SCHEMAS = {
-  Camiones: ['id_camion', 'modelo', 'anio', 'kilometraje_actual', 'saldo_presupuesto', 'estado'],
+  Camiones: ['id_camion', 'modelo', 'anio', 'kilometraje_actual', 'saldo_presupuesto', 'estado', 'placa', 'chasis'],
   Choferes: ['id_chofer', 'nombre_completo', 'telefono', 'pin_acceso', 'estado', 'presupuesto', 'saldo_actual'],
   Rutas: ['id_ruta', 'origen', 'destino', 'tarifa_base', 'estado'],
   Viajes: ['id_viaje', 'id_camion', 'id_chofer', 'id_ruta', 'fecha_inicio', 'fecha_fin', 'estado_viaje', 'toneladas_base', 'toneladas_extras', 'foto_pesaje_url'],

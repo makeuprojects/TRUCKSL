@@ -245,7 +245,9 @@ apiRouter.post('/camiones', async (req, res) => {
       anio: body.anio || new Date().getFullYear().toString(),
       kilometraje_actual: body.kilometraje_actual || '0',
       saldo_presupuesto: body.saldo_presupuesto || '10000',
-      estado: body.estado || 'Activo'
+      estado: body.estado || 'Activo',
+      placa: body.placa || '',
+      chasis: body.chasis || ''
     };
 
     const result = await sheetsQueue.enqueue(async () => {
@@ -264,7 +266,7 @@ apiRouter.post('/camiones/update', async (req, res) => {
   try {
     const authHeader = getAuthHeader(req);
     const body = req.body;
-    const { id_camion, modelo, anio, kilometraje_actual, saldo_presupuesto, estado } = body;
+    const { id_camion, modelo, anio, kilometraje_actual, saldo_presupuesto, estado, placa, chasis } = body;
     
     if (!id_camion) {
       return res.status(400).json({ success: false, message: 'El id_camion es requerido.' });
@@ -277,6 +279,8 @@ apiRouter.post('/camiones/update', async (req, res) => {
       if (kilometraje_actual !== undefined) updatePayload.kilometraje_actual = String(kilometraje_actual);
       if (saldo_presupuesto !== undefined) updatePayload.saldo_presupuesto = String(saldo_presupuesto);
       if (estado !== undefined) updatePayload.estado = estado;
+      if (placa !== undefined) updatePayload.placa = placa;
+      if (chasis !== undefined) updatePayload.chasis = chasis;
 
       await updateSheetRow(authHeader, 'Camiones', 'id_camion', id_camion, updatePayload);
       invalidateSheetCache('Camiones');

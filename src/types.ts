@@ -5,6 +5,8 @@ export interface Camion {
   kilometraje_actual: string;
   saldo_presupuesto: string;
   estado: string; // 'Activo' | 'Mantenimiento' | 'Inactivo'
+  placa?: string;
+  chasis?: string;
 }
 
 export interface Chofer {
