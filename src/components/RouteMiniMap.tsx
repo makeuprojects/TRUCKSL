@@ -119,6 +119,54 @@ const getRouteMetadata = (orig: string | undefined, dest: string | undefined) =>
   return { dist: 'Variables', msg: 'Ruta Logística Fletada', alert: 'Sincronización GPS activa' };
 };
 
+// Highway path curve mapping helper for realistic winding mountain roads
+const getHighwayPath = (originId: string, destId: string): string => {
+  const key = `${originId}_${destId}`;
+  const paths: { [key: string]: string } = {
+    // LP to OR and vice versa
+    lapaz_oruro: "M 60,36 C 65,42 70,45 74,52 C 78,59 78,62 80,66",
+    oruro_lapaz: "M 80,66 C 78,62 78,59 74,52 C 70,45 65,42 60,36",
+
+    // OR to PT and vice versa
+    oruro_potosi: "M 80,66 C 90,76 100,82 105,86 C 110,90 115,93 120,96",
+    potosi_oruro: "M 120,96 C 115,93 110,90 105,86 C 100,82 90,76 80,66",
+
+    // OR to CB and vice versa
+    oruro_cochabamba: "M 80,66 C 105,62 130,70 145,64 C 160,58 170,55 180,54",
+    cochabamba_oruro: "M 180,54 C 170,55 160,58 145,64 C 130,70 105,62 80,66",
+
+    // CB to SC and vice versa
+    cochabamba_santacruz: "M 180,54 C 210,65 220,45 240,58 C 260,70 280,60 300,66",
+    santacruz_cochabamba: "M 300,66 C 280,60 260,70 240,58 C 220,45 210,65 180,54",
+
+    // CB to PT and vice versa
+    cochabamba_potosi: "M 180,54 C 160,70 145,80 135,88 C 128,92 124,94 120,96",
+    potosi_cochabamba: "M 120,96 C 124,94 128,92 135,88 C 145,80 160,70 180,54",
+
+    // LP to CB (via Oruro) and vice versa
+    lapaz_cochabamba: "M 60,36 C 65,42 70,45 74,52 C 78,59 78,62 80,66 C 105,62 130,70 145,64 C 160,58 170,55 180,54",
+    cochabamba_lapaz: "M 180,54 C 170,55 160,58 145,64 C 130,70 105,62 80,66 C 78,62 78,59 74,52 C 70,45 65,42 60,36",
+
+    // LP to SC (via Oruro & Cochabamba) and vice versa
+    lapaz_santacruz: "M 60,36 C 65,42 70,45 74,52 C 78,59 78,62 80,66 C 105,62 130,70 145,64 C 160,58 170,55 180,54 C 210,65 220,45 240,58 C 260,70 280,60 300,66",
+    santacruz_lapaz: "M 300,66 C 280,60 260,70 240,58 C 220,45 210,65 180,54 C 170,55 160,58 145,64 C 130,70 105,62 80,66 C 78,62 78,59 74,52 C 70,45 65,42 60,36",
+
+    // LP to PT (via Oruro) and vice versa
+    lapaz_potosi: "M 60,36 C 65,42 70,45 74,52 C 78,59 78,62 80,66 C 90,76 100,82 105,86 C 110,90 115,93 120,96",
+    potosi_lapaz: "M 120,96 C 115,93 110,90 105,86 C 100,82 90,76 80,66 C 78,62 78,59 74,52 C 70,45 65,42 60,36",
+
+    // SC to OR (via Cochabamba) and vice versa
+    santacruz_oruro: "M 300,66 C 280,60 260,70 240,58 C 220,45 210,65 180,54 C 170,55 160,58 145,64 C 130,70 105,62 80,66",
+    oruro_santacruz: "M 80,66 C 105,62 130,70 145,64 C 160,58 170,55 180,54 C 210,65 220,45 240,58 C 260,70 280,60 300,66",
+
+    // SC to PT (via Cochabamba & Oruro/direct) and vice versa
+    santacruz_potosi: "M 300,66 C 280,60 260,70 240,58 C 220,45 210,65 180,54 C 160,70 145,80 135,88 C 128,92 124,94 120,96",
+    potosi_santacruz: "M 120,96 C 124,94 128,92 135,88 C 145,80 160,70 180,54 C 210,65 220,45 240,58 C 260,70 280,60 300,66"
+  };
+
+  return paths[key] || `M 60,36 L 300,66`; // safe fallback
+};
+
 export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapProps) {
   const originNode = findCityNode(origen);
   const destNode = findCityNode(destino);
@@ -127,52 +175,54 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
   const [selectedCity, setSelectedCity] = useState<CityNode | null>(destNode || originNode || null);
 
   const isRouteConnected = originNode && destNode;
+  const highwayPath = isRouteConnected ? getHighwayPath(originNode.id, destNode.id) : '';
 
   return (
     <div id={`minimap-${idViaje || 'demo'}`} className="space-y-3 w-full">
-      <div className="bg-[#030915] border border-slate-800/80 rounded-2xl overflow-hidden relative h-[150px] transition duration-300 w-full select-none shadow-2xl">
-        
-        {/* Neon style overrides and optimizations */}
-        <style>{`
-          @keyframes dashEffect {
-            to {
-              stroke-dashoffset: -24;
+      <div className="bg-[#030915] border border-slate-800/80 rounded-2xl overflow-hidden relative w-full aspect-[8/3] min-h-[145px] transition duration-300 select-none shadow-2xl">
+        <div className="absolute inset-0 w-full h-full">
+          
+          {/* Neon style overrides and optimizations */}
+          <style>{`
+            @keyframes dashEffect {
+              to {
+                stroke-dashoffset: -24;
+              }
             }
-          }
-          @keyframes headlightPulse {
-            0%, 100% { opacity: 0.65; }
-            50% { opacity: 0.95; }
-          }
-          @keyframes taillightPulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.45; }
-          }
-          @keyframes radarRotation {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-          @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-          }
-          .animate-route-dash {
-            animation: dashEffect 0.6s linear infinite;
-          }
-          .animate-headlight-flicker {
-            animation: headlightPulse 0.12s ease-in-out infinite alternate;
-          }
-          .animate-taillight-flicker {
-            animation: taillightPulse 0.2s ease-in-out infinite alternate;
-          }
-          .animate-radar-sweep {
-            animation: radarRotation 8s linear infinite;
-            transform-origin: 200px 75px;
-          }
-          .gpu-accelerated {
-            transform: translate3d(0,0,0);
-            will-change: transform, opacity;
-          }
-        `}</style>
+            @keyframes headlightPulse {
+              0%, 100% { opacity: 0.65; }
+              50% { opacity: 0.95; }
+            }
+            @keyframes taillightPulse {
+              0%, 100% { opacity: 0.8; }
+              50% { opacity: 0.45; }
+            }
+            @keyframes radarRotation {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+            @keyframes scanline {
+              0% { transform: translateY(-100%); }
+              100% { transform: translateY(100%); }
+            }
+            .animate-route-dash {
+              animation: dashEffect 0.6s linear infinite;
+            }
+            .animate-headlight-flicker {
+              animation: headlightPulse 0.12s ease-in-out infinite alternate;
+            }
+            .animate-taillight-flicker {
+              animation: taillightPulse 0.2s ease-in-out infinite alternate;
+            }
+            .animate-radar-sweep {
+              animation: radarRotation 8s linear infinite;
+              transform-origin: 200px 75px;
+            }
+            .gpu-accelerated {
+              transform: translate3d(0,0,0);
+              will-change: transform, opacity;
+            }
+          `}</style>
 
         {/* Ambient Topography Scanline overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0ea5e9]/5 to-transparent pointer-events-none h-full w-full"
@@ -199,7 +249,15 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
               </feMerge>
             </filter>
             
-            {/* Background Map Gradient */}
+            {/* Real Topographical Relief Map Gradient of Bolivia (Highlands West to tropical Lowlands East) */}
+            <linearGradient id="topographyGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#080e1a" />  {/* Altiplano - deep dark slate */}
+              <stop offset="35%" stopColor="#0b1324" /> {/* Altiplano/Cordillera border */}
+              <stop offset="60%" stopColor="#031e24" /> {/* Valleys - beautiful deep teal-green */}
+              <stop offset="85%" stopColor="#022119" /> {/* Plains - lush emerald green shadow */}
+              <stop offset="100%" stopColor="#011812" />
+            </linearGradient>
+
             <radialGradient id="gridGlow" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.08" />
               <stop offset="60%" stopColor="#0284c7" stopOpacity="0.02" />
@@ -235,8 +293,27 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
             </radialGradient>
           </defs>
 
-          {/* Grid ambient glow overlay */}
+          {/* Full Realistic Altitude Relief background */}
+          <rect width="400" height="150" fill="url(#topographyGrad)" pointerEvents="none" />
           <rect width="400" height="150" fill="url(#gridGlow)" pointerEvents="none" />
+
+          {/* Subtle Mountain Ridges background vectors for the majestic Andes in the West */}
+          <path 
+            d="M -10,150 L 30,110 L 70,135 L 110,105 L 150,130 L 190,110 L 220,150 Z" 
+            fill="#1e293b" 
+            fillOpacity="0.04" 
+            stroke="#334155" 
+            strokeWidth="0.5" 
+            strokeOpacity="0.08" 
+          />
+          <path 
+            d="M -10,150 L 50,120 L 100,140 L 130,115 L 175,138 L 210,125 L 240,150 Z" 
+            fill="#0f172a" 
+            fillOpacity="0.06" 
+            stroke="#475569" 
+            strokeWidth="0.5" 
+            strokeOpacity="0.12" 
+          />
 
           {/* Tactical grid background overlay */}
           <g stroke="#0ea5e9" strokeWidth="0.15" strokeOpacity="0.15">
@@ -258,93 +335,93 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
             <circle cx="120" cy="96" r="28" strokeDasharray="2,5" />
           </g>
 
-          {/* BACKGROUND ROAD NETWORK CONNECTIONS (Sleek dark vector highways) */}
-          <g stroke="#1e293b" strokeWidth="3" strokeLinecap="round" strokeOpacity="0.8">
+          {/* BACKGROUND ROAD NETWORK CONNECTIONS (Sleek dark curved highways for 100% realism) */}
+          <g stroke="#1e293b" strokeWidth="3" strokeLinecap="round" strokeOpacity="0.6" fill="none">
             {/* LP ➔ OR */}
-            <line x1="60" y1="36" x2="80" y2="66" />
+            <path d="M 60,36 C 65,42 70,45 74,52 C 78,59 78,62 80,66" />
             {/* OR ➔ PT */}
-            <line x1="80" y1="66" x2="120" y2="96" />
+            <path d="M 80,66 C 90,76 100,82 105,86 C 110,90 115,93 120,96" />
             {/* OR ➔ CB */}
-            <line x1="80" y1="66" x2="180" y2="54" />
+            <path d="M 80,66 C 105,62 130,70 145,64 C 160,58 170,55 180,54" />
             {/* CB ➔ SC */}
-            <line x1="180" y1="54" x2="300" y2="66" />
+            <path d="M 180,54 C 210,65 220,45 240,58 C 260,70 280,60 300,66" />
             {/* CB ➔ PT */}
-            <line x1="180" y1="54" x2="120" y2="96" />
+            <path d="M 180,54 C 160,70 145,80 135,88 C 128,92 124,94 120,96" />
           </g>
-          <g stroke="#071126" strokeWidth="1" strokeLinecap="round" strokeOpacity="0.9">
+          <g stroke="#071126" strokeWidth="1" strokeLinecap="round" strokeOpacity="0.8" fill="none">
             {/* LP ➔ OR */}
-            <line x1="60" y1="36" x2="80" y2="66" />
+            <path d="M 60,36 C 65,42 70,45 74,52 C 78,59 78,62 80,66" />
             {/* OR ➔ PT */}
-            <line x1="80" y1="66" x2="120" y2="96" />
+            <path d="M 80,66 C 90,76 100,82 105,86 C 110,90 115,93 120,96" />
             {/* OR ➔ CB */}
-            <line x1="80" y1="66" x2="180" y2="54" />
+            <path d="M 80,66 C 105,62 130,70 145,64 C 160,58 170,55 180,54" />
             {/* CB ➔ SC */}
-            <line x1="180" y1="54" x2="300" y2="66" />
+            <path d="M 180,54 C 210,65 220,45 240,58 C 260,70 280,60 300,66" />
             {/* CB ➔ PT */}
-            <line x1="180" y1="54" x2="120" y2="96" />
+            <path d="M 180,54 C 160,70 145,80 135,88 C 128,92 124,94 120,96" />
           </g>
 
-          {/* ACTIVE TRAVEL TRUNK ROAD (High intensity glow) */}
+          {/* ACTIVE TRAVEL TRUNK ROAD (High intensity curved glow) */}
           {isRouteConnected && (
             <g>
               {/* Ultra thick dark asphalt highway base */}
-              <line
-                x1={originNode.x}
-                y1={originNode.y}
-                x2={destNode.x}
-                y2={destNode.y}
+              <path
+                d={highwayPath}
                 stroke="#020815"
                 strokeWidth="10"
                 strokeLinecap="round"
+                fill="none"
               />
-              <line
-                x1={originNode.x}
-                y1={originNode.y}
-                x2={destNode.x}
-                y2={destNode.y}
+              <path
+                d={highwayPath}
                 stroke="#0284c7"
                 strokeWidth="2.5"
                 strokeOpacity="0.4"
                 strokeLinecap="round"
+                fill="none"
               />
 
               {/* Glowing Neon Vector Path Overlay */}
-              <line
-                x1={originNode.x}
-                y1={originNode.y}
-                x2={destNode.x}
-                y2={destNode.y}
+              <path
+                d={highwayPath}
                 stroke="#0ea5e9"
                 strokeWidth="4"
                 strokeLinecap="round"
                 strokeOpacity="0.6"
                 filter="url(#neonGlow)"
+                fill="none"
               />
               
-              {/* Dynamic highway dash indicators */}
-              <line
-                x1={originNode.x}
-                y1={originNode.y}
-                x2={destNode.x}
-                y2={destNode.y}
+              {/* Dynamic highway dash indicators crawling along curve */}
+              <path
+                d={highwayPath}
                 stroke="#38bdf8"
                 strokeWidth="1.2"
                 strokeLinecap="round"
                 strokeDasharray="6,6"
                 className="animate-route-dash"
+                fill="none"
               />
 
-              {/* Invisible path wrapper for precise vehicle follow */}
+              {/* Invisible path wrapper for precise vehicle curve follow */}
               <path
                 id={`route-path-${idViaje || 'demo'}`}
-                d={`M ${originNode.x} ${originNode.y} L ${destNode.x} ${destNode.y}`}
+                d={highwayPath}
                 fill="none"
                 stroke="none"
               />
 
-              {/* HEAVY CARGO TRUCK: Ultimate detailed vector design & responsive motion lights */}
+              {/* HEAVY CARGO TRUCK: Ultimate detailed vector design & organic easing motion */}
               <g className="gpu-accelerated">
-                <animateMotion dur="9s" repeatCount="indefinite" rotate="auto">
+                <animateMotion 
+                  dur="11s" 
+                  repeatCount="indefinite" 
+                  rotate="auto"
+                  calcMode="spline"
+                  keyTimes="0;0.12;0.88;1"
+                  keyPoints="0;0.05;0.95;1"
+                  keySplines="0.4 0 0.2 1; 0.4 0 0.2 1; 0.4 0 0.2 1"
+                >
                   <mpath href={`#route-path-${idViaje || 'demo'}`} />
                 </animateMotion>
                 
@@ -379,19 +456,38 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
                   style={{ mixBlendMode: 'screen' }}
                 />
 
-                {/* 🚛 ULTRA DETAILED CUSTOM TRUCK VECTOR */}
+                {/* 🚛 ULTRA HIGH-FIDELITY DETAILED CUSTOM TRUCK VECTOR */}
                 <g transform="translate(-4, 0)">
+                  {/* Neon chassis underglow */}
+                  <rect x="-18" y="2.5" width="26" height="1.5" rx="0.75" fill="#38bdf8" opacity="0.6" filter="url(#neonGlow)" />
+
                   {/* Heavy double double axle rear chassis */}
                   <rect x="-17" y="-2.5" width="23" height="5" rx="1" fill="#020617" stroke="#0ea5e9" strokeWidth="0.6" />
 
-                  {/* Cargo Container 1 with detailed locking bars & structural lines */}
+                  {/* Cargo Container 1 with detailed locking bars, rib panels & structural lines */}
                   <rect x="-16.5" y="-5.5" width="16" height="9.5" rx="1.5" fill="#032b45" stroke="#38bdf8" strokeWidth="0.9" />
                   <line x1="-16.5" y1="-2" x2="-0.5" y2="-2" stroke="#021f32" strokeWidth="0.7" />
                   <line x1="-16.5" y1="1" x2="-0.5" y2="1" stroke="#021f32" strokeWidth="0.7" />
+                  
+                  {/* Container vertical structural rib columns (Add realistic relief texture) */}
+                  <line x1="-13.5" y1="-5" x2="-13.5" y2="3.5" stroke="#38bdf8" strokeWidth="0.5" opacity="0.5" />
+                  <line x1="-10.5" y1="-5" x2="-10.5" y2="3.5" stroke="#38bdf8" strokeWidth="0.5" opacity="0.5" />
+                  <line x1="-7.5" y1="-5" x2="-7.5" y2="3.5" stroke="#38bdf8" strokeWidth="0.5" opacity="0.5" />
+                  <line x1="-4.5" y1="-5" x2="-4.5" y2="3.5" stroke="#38bdf8" strokeWidth="0.5" opacity="0.5" />
+                  
+                  {/* Warning Chevron stripes at the rear end */}
+                  <rect x="-18" y="-4.5" width="1.5" height="8" fill="#f59e0b" opacity="0.9" />
+                  <line x1="-18" y1="-3" x2="-16.5" y2="-1.5" stroke="#020617" strokeWidth="0.6" />
+                  <line x1="-18" y1="-1" x2="-16.5" y2="0.5" stroke="#020617" strokeWidth="0.6" />
+                  <line x1="-18" y1="1" x2="-16.5" y2="2.5" stroke="#020617" strokeWidth="0.6" />
+
                   {/* Container safety reflectors (Amber side LED dots) */}
-                  <circle cx="-13" cy="-4" r="0.6" fill="#f59e0b" />
-                  <circle cx="-5" cy="-4" r="0.6" fill="#f59e0b" />
-                  <circle cx="-9" cy="-4" r="0.6" fill="#f59e0b" />
+                  <circle cx="-13" cy="-4.5" r="0.6" fill="#f59e0b" />
+                  <circle cx="-5" cy="-4.5" r="0.6" fill="#f59e0b" />
+                  <circle cx="-9" cy="-4.5" r="0.6" fill="#f59e0b" />
+                  {/* Additional upper red marker LEDs */}
+                  <circle cx="-16" cy="-5" r="0.5" fill="#ef4444" />
+                  <circle cx="-1" cy="-5" r="0.5" fill="#ef4444" />
 
                   {/* Connection coupler bar with safety wires */}
                   <rect x="-2" y="-1" width="3" height="2" fill="#475569" />
@@ -405,28 +501,99 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
                   {/* Modern cybernetic transparent cyan windshield */}
                   <path d="M 5.5,-3.8 L 8.5,-1.8 L 5.5,-1.8 Z" fill="#38bdf8" fillOpacity="0.8" stroke="#e0f2fe" strokeWidth="0.4" />
 
+                  {/* Chrome cylindrical side diesel fuel tank */}
+                  <rect x="-7" y="2" width="4.5" height="1.8" rx="0.5" fill="#e2e8f0" stroke="#64748b" strokeWidth="0.4" />
+
                   {/* Upper cabin aerodynamic wind-spoiler wing */}
                   <path d="M -1,-5.5 L 4.5,-5.5 L 5,-4.5 L -1,-4.5 Z" fill="#0369a1" />
 
+                  {/* Cab roof amber marker lights */}
+                  <circle cx="1.5" cy="-4.8" r="0.5" fill="#f59e0b" className="animate-pulse" />
+                  <circle cx="3.5" cy="-4.8" r="0.5" fill="#f59e0b" className="animate-pulse" />
+
                   {/* Dynamic upright dual Chrome Exhaust Stack (Chimenea metalica) */}
                   <rect x="-0.8" y="-9" width="0.9" height="5.5" fill="#f1f5f9" stroke="#94a3b8" strokeWidth="0.4" />
-                  {/* Small dark exhaust gas cloud */}
-                  <circle cx="-0.3" cy="-10" r="1.2" fill="#0e7490" fillOpacity="0.2" className="animate-ping" />
+                  
+                  {/* 💨 Animated real-time drifting diesel smoke puffs (drifts backward, floats upward, dissolves) */}
+                  <circle cx="-0.5" cy="-9.5" r="1" fill="#38bdf8" fillOpacity="0.4">
+                    <animate attributeName="r" values="1;4;6" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.8;0.3;0" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="cx" values="-0.5;-2;-4.5" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="-9.5;-12.5;-14.5" dur="2s" repeatCount="indefinite" />
+                  </circle>
 
-                  {/* Micro-Wheels with detailed rubber tire and glowing cyan alloy rims */}
-                  {/* Trailer wheels */}
-                  <circle cx="-13.5" cy="4" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
-                  <circle cx="-13.5" cy="4" r="0.8" fill="#e0f2fe" />
-                  <circle cx="-9.5" cy="4" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
-                  <circle cx="-9.5" cy="4" r="0.8" fill="#e0f2fe" />
+                  {/* Micro-Wheels with detailed rubber tire and rotating alloy rims using 100% stable local coordinates (Prevents layout/wobble bugs on iOS and Android!) */}
+                  {/* Trailer Wheel 1 */}
+                  <g transform="translate(-13.5, 4)">
+                    <circle cx="0" cy="0" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
+                    <g>
+                      <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#e0f2fe" strokeWidth="0.4" />
+                      <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#e0f2fe" strokeWidth="0.4" />
+                      <animateTransform 
+                        attributeName="transform" 
+                        type="rotate" 
+                        from="0 0 0" 
+                        to="360 0 0" 
+                        dur="1.2s" 
+                        repeatCount="indefinite" 
+                      />
+                    </g>
+                    <circle cx="0" cy="0" r="0.8" fill="#e0f2fe" />
+                  </g>
 
-                  {/* Drive Axle wheels */}
-                  <circle cx="-2" cy="4" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
-                  <circle cx="-2" cy="4" r="0.8" fill="#e0f2fe" />
+                  {/* Trailer Wheel 2 */}
+                  <g transform="translate(-9.5, 4)">
+                    <circle cx="0" cy="0" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
+                    <g>
+                      <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#e0f2fe" strokeWidth="0.4" />
+                      <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#e0f2fe" strokeWidth="0.4" />
+                      <animateTransform 
+                        attributeName="transform" 
+                        type="rotate" 
+                        from="0 0 0" 
+                        to="360 0 0" 
+                        dur="1.2s" 
+                        repeatCount="indefinite" 
+                      />
+                    </g>
+                    <circle cx="0" cy="0" r="0.8" fill="#e0f2fe" />
+                  </g>
 
-                  {/* Steer Axle cabin wheel */}
-                  <circle cx="6" cy="4" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
-                  <circle cx="6" cy="4" r="0.8" fill="#e0f2fe" />
+                  {/* Drive Axle Wheel */}
+                  <g transform="translate(-2, 4)">
+                    <circle cx="0" cy="0" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
+                    <g>
+                      <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#e0f2fe" strokeWidth="0.4" />
+                      <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#e0f2fe" strokeWidth="0.4" />
+                      <animateTransform 
+                        attributeName="transform" 
+                        type="rotate" 
+                        from="0 0 0" 
+                        to="360 0 0" 
+                        dur="1.2s" 
+                        repeatCount="indefinite" 
+                      />
+                    </g>
+                    <circle cx="0" cy="0" r="0.8" fill="#e0f2fe" />
+                  </g>
+
+                  {/* Steer Axle Wheel */}
+                  <g transform="translate(6, 4)">
+                    <circle cx="0" cy="0" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
+                    <g>
+                      <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#e0f2fe" strokeWidth="0.4" />
+                      <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#e0f2fe" strokeWidth="0.4" />
+                      <animateTransform 
+                        attributeName="transform" 
+                        type="rotate" 
+                        from="0 0 0" 
+                        to="360 0 0" 
+                        dur="1.2s" 
+                        repeatCount="indefinite" 
+                      />
+                    </g>
+                    <circle cx="0" cy="0" r="0.8" fill="#e0f2fe" />
+                  </g>
                 </g>
               </g>
             </g>
@@ -456,11 +623,11 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
 
             return (
               <g key={city.id} className="transition-all duration-300">
-                {/* Interactive Touch Target - Enlarged to 36px diameter for mobile finger accuracy! */}
+                {/* Interactive Touch Target - Enlarged to 48px diameter for maximum mobile finger tap accuracy! */}
                 <circle
                   cx={city.x}
                   cy={city.y}
-                  r="18"
+                  r="24"
                   fill="transparent"
                   className="cursor-pointer"
                   onClick={() => setSelectedCity(city)}
@@ -547,6 +714,7 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
           <span className="text-[8px] font-mono font-black text-slate-300 uppercase tracking-widest">
             {isRouteConnected ? 'RT_FEED_ACTIVE' : 'FEED_WAIT'}
           </span>
+        </div>
         </div>
       </div>
 

@@ -18,6 +18,7 @@ import LiveExpenseFeed from './LiveExpenseFeed';
 import RouteMiniMap from './RouteMiniMap';
 import RouteDetailDrawer from './RouteDetailDrawer';
 import TripHistoryArchive from './TripHistoryArchive';
+import SaulDashboardOverview from './SaulDashboardOverview';
 import {
   User,
   Users,
@@ -137,7 +138,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   const [camionChasis, setCamionChasis] = useState('');
 
   // Top navigation structure (Enterprise Tab Layout)
-  const [activeTab, setActiveTab] = useState<'monitoreo' | 'historial' | 'personal'>('monitoreo');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'monitoreo' | 'historial' | 'personal'>('dashboard');
 
   // Core Sync Engine
   const syncDatabase = async (): Promise<void> => {
@@ -846,10 +847,21 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
         </div>
 
         {/* TOP COMMAND NAVIGATION */}
-        <div className="flex bg-slate-900/85 backdrop-blur-md border border-white/[0.08] mb-6 rounded-2xl p-1.5 mt-6 shadow-xl gap-1.5">
+        <div className="flex flex-wrap bg-slate-900/85 backdrop-blur-md border border-white/[0.08] mb-6 rounded-2xl p-1.5 mt-6 shadow-xl gap-1.5">
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
+              activeTab === 'dashboard'
+                ? 'text-slate-50 bg-white/10 border border-white/20 shadow-[0_4px_20px_rgba(255,255,255,0.06),inset_0_1px_1px_rgba(255,255,255,0.1)] font-extrabold'
+                : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.03]'
+            }`}
+          >
+            <TrendingUp className="w-4.5 h-4.5 text-emerald-400" />
+            Dashboard General
+          </button>
           <button
             onClick={() => setActiveTab('monitoreo')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
+            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
               activeTab === 'monitoreo'
                 ? 'text-slate-50 bg-white/10 border border-white/20 shadow-[0_4px_20px_rgba(255,255,255,0.06),inset_0_1px_1px_rgba(255,255,255,0.1)] font-extrabold'
                 : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.03]'
@@ -860,7 +872,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
           </button>
           <button
             onClick={() => setActiveTab('historial')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
+            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
               activeTab === 'historial'
                 ? 'text-slate-50 bg-white/10 border border-white/20 shadow-[0_4px_20px_rgba(255,255,255,0.06),inset_0_1px_1px_rgba(255,255,255,0.1)] font-extrabold'
                 : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.03]'
@@ -871,7 +883,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
           </button>
           <button
             onClick={() => setActiveTab('personal')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
+            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
               activeTab === 'personal'
                 ? 'text-slate-50 bg-white/10 border border-white/20 shadow-[0_4px_20px_rgba(255,255,255,0.06),inset_0_1px_1px_rgba(255,255,255,0.1)] font-extrabold'
                 : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.03]'
@@ -884,6 +896,21 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
         {/* CONDITIONALLY RENDER MAIN CONTENT BASED ON TABS */}
         <div className="w-full">
+          {activeTab === 'dashboard' && (
+            <div className="max-w-5xl mx-auto animate-fade-in">
+              <SaulDashboardOverview 
+                viajes={viajes}
+                choferes={choferes}
+                camiones={camiones}
+                gastos={gastos}
+                rutas={rutas}
+                ingresosValue={ingresosValue}
+                totalExpensesValue={totalExpensesThisMonth}
+                margenValue={margenValue}
+              />
+            </div>
+          )}
+
           {activeTab === 'monitoreo' && (
             <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
               {/* MONITOREO DE RUTAS EN TIEMPO REAL */}

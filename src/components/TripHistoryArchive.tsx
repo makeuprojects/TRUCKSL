@@ -127,6 +127,82 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
     }, 1500);
   };
 
+  const handleExportExcel = () => {
+    if (filteredTrips.length === 0) {
+      toast.error("No hay viajes para exportar");
+      return;
+    }
+    toast.info("Generando reporte Excel...", { duration: 1500 });
+    
+    setTimeout(() => {
+      try {
+        // 1. Column Headers
+        const headers = [
+          "ID Viaje",
+          "Fecha Fin",
+          "Chofer",
+          "Origen",
+          "Destino",
+          "Toneladas Base",
+          "Toneladas Extras",
+          "Tarifa Base (BOB)",
+          "Tarifa Extra (BOB)",
+          "Gastos Totales (BOB)",
+          "Estado"
+        ];
+
+        // 2. Map trips data
+        const rows = filteredTrips.map(viaje => {
+          const drv = choferes.find(c => c.id_chofer === viaje.id_chofer);
+          const route = rutas.find(r => r.id_ruta === viaje.id_ruta);
+          const totalGastado = getTripTotalExpenses(viaje.id_viaje);
+          const basePrice = Number(route?.tarifa_base || 5000);
+          const extraTons = Number(viaje.toneladas_extras) || 0;
+          const extraRateValue = (basePrice / 45) * extraTons;
+          
+          return [
+            viaje.id_viaje || "",
+            viaje.fecha_fin || viaje.fecha_inicio || "Sin Fecha",
+            drv?.nombre_completo || "Sin Chofer",
+            route?.origen || "",
+            route?.destino || "",
+            viaje.toneladas_base || 0,
+            viaje.toneladas_extras || 0,
+            basePrice,
+            extraRateValue.toFixed(2),
+            totalGastado.toFixed(2),
+            viaje.estado_viaje || ""
+          ];
+        });
+
+        // 3. Build CSV Content with semi-colon separator (highly recommended for Spanish locales & Excel auto-detection)
+        // and escape values containing semi-colons or newlines
+        const csvContent = [
+          headers.join(";"),
+          ...rows.map(row => row.map(val => {
+            const strVal = String(val).replace(/"/g, '""');
+            return strVal.includes(";") || strVal.includes("\n") || strVal.includes(",") ? `"${strVal}"` : strVal;
+          }).join(";"))
+        ].join("\n");
+
+        // 4. Create blob with UTF-8 BOM so Excel decodes accented letters correctly
+        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Boveda_Viajes_FlotasDonSaul_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast.success("Excel (CSV) exportado con éxito");
+      } catch (error) {
+        toast.error("Error al exportar a Excel");
+        console.error(error);
+      }
+    }, 1200);
+  };
+
   return (
     <div className="bg-slate-900/80 hover:bg-slate-900/95 backdrop-blur-md border border-white/[0.08] rounded-2xl p-6 mt-6 shadow-xl animate-fade-in transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pt-2">
@@ -138,15 +214,25 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
           <p className="text-sm text-slate-200">Historial y liquidaciones de ruteo completado</p>
         </div>
         
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Buscar chofer, ruta, o ID..." 
-            className="w-full bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-500 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl pl-9 pr-4 py-2 text-sm outline-none transition"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <button
+            onClick={handleExportExcel}
+            className="flex items-center justify-center gap-2 px-4 py-2 border border-emerald-500/30 hover:border-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-white text-xs font-bold rounded-xl transition cursor-pointer"
+          >
+            <FileDown className="w-4 h-4 text-emerald-400" />
+            Descargar Todo en Excel
+          </button>
+
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="Buscar chofer, ruta, o ID..." 
+              className="w-full bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-500 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl pl-9 pr-4 py-2 text-sm outline-none transition"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
