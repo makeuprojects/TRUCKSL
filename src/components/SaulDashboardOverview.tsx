@@ -149,9 +149,84 @@ export default function SaulDashboardOverview({
   const activeTrucksCount = camiones.filter(c => c.estado === 'Activo').length;
   const profitabilityRate = ingresosValue > 0 ? ((margenValue / ingresosValue) * 100) : 0;
 
+  // Filter low balance drivers (<20% of budget or < 1200 BOB)
+  const lowBalanceDrivers = choferes.filter(d => {
+    const isAdmin = d.id_chofer === 'don_saul' || d.nombre_completo === 'Don Saúl' || d.id_chofer === 'admin';
+    if (isAdmin) return false;
+    const budget = safeParse(d.presupuesto) || 10000;
+    const balance = d.saldo_actual !== undefined && d.saldo_actual !== "" ? safeParse(d.saldo_actual) : budget;
+    return balance < (budget * 0.20) || balance < 1200;
+  });
+
   return (
     <div id="saul-dashboard-overview-root" className="space-y-8 animate-fade-in">
       
+      {/* ALERTA CRÍTICA: CHOFERES CON SALDO BAJO */}
+      {lowBalanceDrivers.length > 0 && (
+        <div className="relative overflow-hidden bg-rose-950/40 border border-rose-500/30 rounded-2xl p-5 shadow-2xl animate-pulse-subtle">
+          <div className="absolute top-0 right-0 p-4 text-rose-500/10 pointer-events-none">
+            <AlertCircle className="w-24 h-24 stroke-[1.2]" />
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                </span>
+                <span className="text-[10px] text-rose-400 font-extrabold uppercase tracking-widest font-mono">
+                  Alerta de Presupuesto Crítico
+                </span>
+              </div>
+              <h3 className="text-base font-black text-rose-100 font-sans tracking-tight">
+                Hay {lowBalanceDrivers.length} choferes con caja chica en nivel crítico de saldo
+              </h3>
+              <p className="text-xs text-rose-300 max-w-2xl leading-relaxed">
+                Su saldo actual disponible está por debajo del 20% de su fondo asignado o es menor a 1,200 Bs. Realice un desembolso para evitar paradas o falta de caja en retenes/peajes.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 relative z-10">
+            {lowBalanceDrivers.map((driver, index) => {
+              const budget = safeParse(driver.presupuesto) || 10000;
+              const balance = driver.saldo_actual !== undefined && driver.saldo_actual !== "" ? safeParse(driver.saldo_actual) : budget;
+              const percentage = budget > 0 ? (balance / budget) * 100 : 0;
+              return (
+                <div 
+                  key={`${driver.id_chofer}-${index}`}
+                  className="bg-slate-950/70 border border-rose-500/20 rounded-xl p-3 flex flex-col justify-between hover:border-rose-500/45 transition duration-300"
+                >
+                  <div>
+                    <div className="flex justify-between items-start gap-1.5">
+                      <span className="font-extrabold text-xs text-slate-100 block truncate max-w-[120px]">
+                        👤 {driver.nombre_completo}
+                      </span>
+                      <span className="px-1.5 py-0.5 bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[8px] font-black uppercase rounded leading-none shrink-0 font-mono">
+                        {percentage.toFixed(0)}% Restante
+                      </span>
+                    </div>
+                    <div className="mt-2 flex items-baseline gap-1">
+                      <span className="text-[10px] font-bold text-slate-400 font-mono">Bs.</span>
+                      <span className="text-lg font-black text-rose-400 font-mono leading-none">
+                        {balance.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                      <span className="text-[10px] text-slate-500 font-mono">/ {budget.toLocaleString('es-BO', { maximumFractionDigits: 0 })}</span>
+                    </div>
+                  </div>
+                  <div className="mt-2.5 pt-2 border-t border-rose-500/10 flex justify-between items-center">
+                    <span className="text-[9px] text-slate-400 font-mono">Tel: {driver.telefono || 'Sin celular'}</span>
+                    <span className="text-[8px] text-rose-400 font-black uppercase tracking-wider animate-pulse">
+                      ⚡ Requiere Recarga
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 4 Multi-Dimension Cards row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         

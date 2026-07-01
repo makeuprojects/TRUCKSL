@@ -269,7 +269,7 @@ export default function EditSlideOver({
                   {/* Presupuesto Inicial (Asignado) */}
                   <div className="space-y-1.5">
                     <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
-                      Presupuesto Caja Chica Asignado (BOB)
+                      Monto Inicial Mensual (BOB)
                     </label>
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
@@ -287,7 +287,7 @@ export default function EditSlideOver({
                   {/* Saldo Actual (Caja Chica Dinámica) */}
                   <div className="space-y-1.5">
                     <label className="text-[10px] text-slate-200 font-bold uppercase tracking-wider block">
-                      Saldo Disponible en Caja Chica Actual (BOB)
+                      Saldo Actual Disponible (BOB)
                     </label>
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">

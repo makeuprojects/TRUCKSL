@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CloudRain, Compass, Eye, ShieldCheck, Sun, Thermometer, Wind, AlertCircle } from 'lucide-react';
 
 interface RouteMiniMapProps {
@@ -173,13 +173,32 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
   const metadata = getRouteMetadata(origen, destino);
 
   const [selectedCity, setSelectedCity] = useState<CityNode | null>(destNode || originNode || null);
+  const [liveSpeed, setLiveSpeed] = useState<number>(81.5);
+  const [liveRpm, setLiveRpm] = useState<number>(1420);
+  const [liveGear, setLiveGear] = useState<number>(11);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveSpeed(prev => {
+        const delta = (Math.random() - 0.5) * 2.5;
+        const next = Math.max(76, Math.min(84, prev + delta));
+        return parseFloat(next.toFixed(1));
+      });
+      setLiveRpm(prev => {
+        const delta = (Math.random() - 0.5) * 45;
+        const next = Math.max(1360, Math.min(1480, prev + delta));
+        return Math.round(next);
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const isRouteConnected = originNode && destNode;
   const highwayPath = isRouteConnected ? getHighwayPath(originNode.id, destNode.id) : '';
 
   return (
     <div id={`minimap-${idViaje || 'demo'}`} className="space-y-3 w-full">
-      <div className="bg-[#030915] border border-slate-800/80 rounded-2xl overflow-hidden relative w-full aspect-[8/3] min-h-[145px] transition duration-300 select-none shadow-2xl">
+      <div className="bg-[#030915] border border-slate-800/80 rounded-2xl overflow-hidden relative w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[8/3] min-h-[160px] sm:min-h-[180px] transition duration-300 select-none shadow-2xl">
         <div className="absolute inset-0 w-full h-full">
           
           {/* Neon style overrides and optimizations */}
@@ -368,10 +387,45 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
               <path
                 d={highwayPath}
                 stroke="#020815"
-                strokeWidth="10"
+                strokeWidth="11"
                 strokeLinecap="round"
                 fill="none"
               />
+              {/* Real road asphalt lane overlay */}
+              <path
+                d={highwayPath}
+                stroke="#1e293b"
+                strokeWidth="6.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* White shoulder lane borders */}
+              <path
+                d={highwayPath}
+                stroke="#ffffff"
+                strokeWidth="5.5"
+                strokeOpacity="0.15"
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Solid asphalt separator */}
+              <path
+                d={highwayPath}
+                stroke="#0f172a"
+                strokeWidth="4.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Center yellow divider line */}
+              <path
+                d={highwayPath}
+                stroke="#f59e0b"
+                strokeWidth="0.75"
+                strokeDasharray="4,4"
+                strokeOpacity="0.7"
+                fill="none"
+              />
+
               <path
                 d={highwayPath}
                 stroke="#0284c7"
@@ -456,144 +510,100 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
                   style={{ mixBlendMode: 'screen' }}
                 />
 
-                {/* 🚛 ULTRA HIGH-FIDELITY DETAILED CUSTOM TRUCK VECTOR */}
+                {/* 🚛 ULTRA HIGH-FIDELITY DETAILED CUSTOM TRUCK VECTOR (TOP-DOWN VIEW) */}
                 <g transform="translate(-4, 0)">
-                  {/* Neon chassis underglow */}
-                  <rect x="-18" y="2.5" width="26" height="1.5" rx="0.75" fill="#38bdf8" opacity="0.6" filter="url(#neonGlow)" />
+                  {/* Ground shadow underneath */}
+                  <rect x="-19" y="-6" width="31" height="12" rx="2" fill="#000000" opacity="0.65" />
 
-                  {/* Heavy double double axle rear chassis */}
-                  <rect x="-17" y="-2.5" width="23" height="5" rx="1" fill="#020617" stroke="#0ea5e9" strokeWidth="0.6" />
+                  {/* Neon underglow */}
+                  <rect x="-18" y="-5.5" width="29" height="11" rx="1.5" stroke="#38bdf8" strokeWidth="0.8" fill="none" opacity="0.4" filter="url(#neonGlow)" />
 
-                  {/* Cargo Container 1 with detailed locking bars, rib panels & structural lines */}
-                  <rect x="-16.5" y="-5.5" width="16" height="9.5" rx="1.5" fill="#032b45" stroke="#38bdf8" strokeWidth="0.9" />
-                  <line x1="-16.5" y1="-2" x2="-0.5" y2="-2" stroke="#021f32" strokeWidth="0.7" />
-                  <line x1="-16.5" y1="1" x2="-0.5" y2="1" stroke="#021f32" strokeWidth="0.7" />
-                  
-                  {/* Container vertical structural rib columns (Add realistic relief texture) */}
-                  <line x1="-13.5" y1="-5" x2="-13.5" y2="3.5" stroke="#38bdf8" strokeWidth="0.5" opacity="0.5" />
-                  <line x1="-10.5" y1="-5" x2="-10.5" y2="3.5" stroke="#38bdf8" strokeWidth="0.5" opacity="0.5" />
-                  <line x1="-7.5" y1="-5" x2="-7.5" y2="3.5" stroke="#38bdf8" strokeWidth="0.5" opacity="0.5" />
-                  <line x1="-4.5" y1="-5" x2="-4.5" y2="3.5" stroke="#38bdf8" strokeWidth="0.5" opacity="0.5" />
-                  
-                  {/* Warning Chevron stripes at the rear end */}
-                  <rect x="-18" y="-4.5" width="1.5" height="8" fill="#f59e0b" opacity="0.9" />
-                  <line x1="-18" y1="-3" x2="-16.5" y2="-1.5" stroke="#020617" strokeWidth="0.6" />
-                  <line x1="-18" y1="-1" x2="-16.5" y2="0.5" stroke="#020617" strokeWidth="0.6" />
-                  <line x1="-18" y1="1" x2="-16.5" y2="2.5" stroke="#020617" strokeWidth="0.6" />
+                  {/* Left side wheels visible from above */}
+                  <rect x="-16" y="-5.6" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
+                  <rect x="-12" y="-5.6" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
+                  <rect x="-3" y="-5.1" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
+                  <rect x="5" y="-4.6" width="3" height="1.0" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
 
-                  {/* Container safety reflectors (Amber side LED dots) */}
-                  <circle cx="-13" cy="-4.5" r="0.6" fill="#f59e0b" />
-                  <circle cx="-5" cy="-4.5" r="0.6" fill="#f59e0b" />
-                  <circle cx="-9" cy="-4.5" r="0.6" fill="#f59e0b" />
-                  {/* Additional upper red marker LEDs */}
-                  <circle cx="-16" cy="-5" r="0.5" fill="#ef4444" />
-                  <circle cx="-1" cy="-5" r="0.5" fill="#ef4444" />
+                  {/* Right side wheels visible from above */}
+                  <rect x="-16" y="4.4" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
+                  <rect x="-12" y="4.4" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
+                  <rect x="-3" y="3.9" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
+                  <rect x="5" y="3.6" width="3" height="1.0" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
 
-                  {/* Connection coupler bar with safety wires */}
-                  <rect x="-2" y="-1" width="3" height="2" fill="#475569" />
-                  
-                  {/* Sleek metallic long-nose master Cabin structure */}
-                  <path d="M 0,-4.5 L 6.5,-4.5 L 9.5,-2 L 10.5,1 L 10.5,3.5 L 0,3.5 Z" fill="#0c4a6e" stroke="#38bdf8" strokeWidth="0.9" />
-                  
-                  {/* Front chrome metallic radiator grill */}
-                  <path d="M 10.5,-0.5 L 10.5,3 L 11,3 L 11,-0.5 Z" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="0.5" />
+                  {/* Connection Coupler (Fifth Wheel) */}
+                  <rect x="-4" y="-1.5" width="4" height="3" fill="#1e293b" stroke="#475569" strokeWidth="0.5" />
 
-                  {/* Modern cybernetic transparent cyan windshield */}
-                  <path d="M 5.5,-3.8 L 8.5,-1.8 L 5.5,-1.8 Z" fill="#38bdf8" fillOpacity="0.8" stroke="#e0f2fe" strokeWidth="0.4" />
+                  {/* Cargo Container Trailer Box */}
+                  <rect x="-18" y="-5" width="14" height="10" rx="1" fill="#032b45" stroke="#38bdf8" strokeWidth="0.9" />
+                  {/* Center roof line */}
+                  <line x1="-18" y1="0" x2="-4" y2="0" stroke="#0ea5e9" strokeWidth="0.5" opacity="0.6" />
+                  {/* Rib panels on roof */}
+                  <line x1="-16" y1="-5" x2="-16" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
+                  <line x1="-14" y1="-5" x2="-14" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
+                  <line x1="-12" y1="-5" x2="-12" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
+                  <line x1="-10" y1="-5" x2="-10" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
+                  <line x1="-8" y1="-5" x2="-8" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
+                  <line x1="-6" y1="-5" x2="-6" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
 
-                  {/* Chrome cylindrical side diesel fuel tank */}
-                  <rect x="-7" y="2" width="4.5" height="1.8" rx="0.5" fill="#e2e8f0" stroke="#64748b" strokeWidth="0.4" />
+                  {/* Rear security Chevron decals */}
+                  <path d="M -18,-4.5 L -18.5,-3.5 L -18.5,-2.5 L -18,-3.5 Z" fill="#f59e0b" />
+                  <path d="M -18,4.5 L -18.5,3.5 L -18.5,2.5 L -18,3.5 Z" fill="#f59e0b" />
 
-                  {/* Upper cabin aerodynamic wind-spoiler wing */}
-                  <path d="M -1,-5.5 L 4.5,-5.5 L 5,-4.5 L -1,-4.5 Z" fill="#0369a1" />
+                  {/* Cabin body */}
+                  <path d="M 0,-4 L 7,-3.5 C 9,-3 10,-2 10,0 C 10,2 9,3 7,3.5 L 0,4 Z" fill="#0c4a6e" stroke="#38bdf8" strokeWidth="0.8" />
+                  {/* Wind Deflector */}
+                  <path d="M -0.5,-3 L 4.5,-2.5 L 4.5,2.5 L -0.5,3 Z" fill="#0284c7" opacity="0.9" stroke="#38bdf8" strokeWidth="0.4" />
+                  {/* Front cyber windshield */}
+                  <path d="M 5.5,-2.5 C 7.5,-2 8.5,-1 8.5,0 C 8.5,1 7.5,2 5.5,2.5 Z" fill="#38bdf8" fillOpacity="0.85" stroke="#e0f2fe" strokeWidth="0.4" />
 
-                  {/* Cab roof amber marker lights */}
-                  <circle cx="1.5" cy="-4.8" r="0.5" fill="#f59e0b" className="animate-pulse" />
-                  <circle cx="3.5" cy="-4.8" r="0.5" fill="#f59e0b" className="animate-pulse" />
+                  {/* Left Mirror */}
+                  <path d="M 4.5,-4 L 3.5,-5.5 L 2,-5.5 L 3,-4" fill="#0369a1" stroke="#38bdf8" strokeWidth="0.4" />
+                  {/* Right Mirror */}
+                  <path d="M 4.5,4 L 3.5,5.5 L 2,5.5 L 3,4" fill="#0369a1" stroke="#38bdf8" strokeWidth="0.4" />
 
-                  {/* Dynamic upright dual Chrome Exhaust Stack (Chimenea metalica) */}
-                  <rect x="-0.8" y="-9" width="0.9" height="5.5" fill="#f1f5f9" stroke="#94a3b8" strokeWidth="0.4" />
-                  
-                  {/* 💨 Animated real-time drifting diesel smoke puffs (drifts backward, floats upward, dissolves) */}
-                  <circle cx="-0.5" cy="-9.5" r="1" fill="#38bdf8" fillOpacity="0.4">
-                    <animate attributeName="r" values="1;4;6" dur="2s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.8;0.3;0" dur="2s" repeatCount="indefinite" />
-                    <animate attributeName="cx" values="-0.5;-2;-4.5" dur="2s" repeatCount="indefinite" />
-                    <animate attributeName="cy" values="-9.5;-12.5;-14.5" dur="2s" repeatCount="indefinite" />
+                  {/* Exhaust stack tips */}
+                  <rect x="-1" y="-4.6" width="1.5" height="0.8" rx="0.2" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="0.3" />
+                  <rect x="-1" y="3.8" width="1.5" height="0.8" rx="0.2" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="0.3" />
+
+                  {/* Dual live exhaust smoke puffs */}
+                  <circle cx="-1" cy="-4.2" r="0.8" fill="#38bdf8" fillOpacity="0.35">
+                    <animate attributeName="r" values="0.8;2.5;4" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.8;0.3;0" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="cx" values="-1;-4;-7" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="-4.2;-4.8;-5.4" dur="1.8s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="-1" cy="4.0" r="0.8" fill="#38bdf8" fillOpacity="0.35">
+                    <animate attributeName="r" values="0.8;2.5;4" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.8;0.3;0" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="cx" values="-1;-4;-7" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="4.0;4.6;5.2" dur="1.8s" repeatCount="indefinite" />
                   </circle>
 
-                  {/* Micro-Wheels with detailed rubber tire and rotating alloy rims using 100% stable local coordinates (Prevents layout/wobble bugs on iOS and Android!) */}
-                  {/* Trailer Wheel 1 */}
-                  <g transform="translate(-13.5, 4)">
-                    <circle cx="0" cy="0" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
-                    <g>
-                      <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#e0f2fe" strokeWidth="0.4" />
-                      <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#e0f2fe" strokeWidth="0.4" />
-                      <animateTransform 
-                        attributeName="transform" 
-                        type="rotate" 
-                        from="0 0 0" 
-                        to="360 0 0" 
-                        dur="1.2s" 
-                        repeatCount="indefinite" 
-                      />
-                    </g>
-                    <circle cx="0" cy="0" r="0.8" fill="#e0f2fe" />
-                  </g>
+                  {/* Dynamic Sand/Dust Trails spinning from the heavy rear tires (Altiplano Dust Storm effect) */}
+                  <circle cx="-16" cy="-5" r="0.5" fill="#e2b95b" fillOpacity="0.45">
+                    <animate attributeName="r" values="0.5;4;7.5" dur="1.1s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.7;0.25;0" dur="1.1s" repeatCount="indefinite" />
+                    <animate attributeName="cx" values="-16;-25;-38" dur="1.1s" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="-5;-6.5;-8" dur="1.1s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx="-16" cy="5" r="0.5" fill="#e2b95b" fillOpacity="0.45">
+                    <animate attributeName="r" values="0.5;4;7.5" dur="1.1s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.7;0.25;0" dur="1.1s" repeatCount="indefinite" />
+                    <animate attributeName="cx" values="-16;-25;-38" dur="1.1s" repeatCount="indefinite" />
+                    <animate attributeName="cy" values="5;6.5;8" dur="1.1s" repeatCount="indefinite" />
+                  </circle>
 
-                  {/* Trailer Wheel 2 */}
-                  <g transform="translate(-9.5, 4)">
-                    <circle cx="0" cy="0" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
-                    <g>
-                      <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#e0f2fe" strokeWidth="0.4" />
-                      <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#e0f2fe" strokeWidth="0.4" />
-                      <animateTransform 
-                        attributeName="transform" 
-                        type="rotate" 
-                        from="0 0 0" 
-                        to="360 0 0" 
-                        dur="1.2s" 
-                        repeatCount="indefinite" 
-                      />
-                    </g>
-                    <circle cx="0" cy="0" r="0.8" fill="#e0f2fe" />
-                  </g>
+                  {/* Amber safety side LED dots */}
+                  <circle cx="-15" cy="-5" r="0.5" fill="#f59e0b" className="animate-pulse" />
+                  <circle cx="-10" cy="-5" r="0.5" fill="#f59e0b" className="animate-pulse" />
+                  <circle cx="-5" cy="-5" r="0.5" fill="#f59e0b" className="animate-pulse" />
+                  <circle cx="-15" cy="5" r="0.5" fill="#f59e0b" className="animate-pulse" />
+                  <circle cx="-10" cy="5" r="0.5" fill="#f59e0b" className="animate-pulse" />
+                  <circle cx="-5" cy="5" r="0.5" fill="#f59e0b" className="animate-pulse" />
 
-                  {/* Drive Axle Wheel */}
-                  <g transform="translate(-2, 4)">
-                    <circle cx="0" cy="0" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
-                    <g>
-                      <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#e0f2fe" strokeWidth="0.4" />
-                      <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#e0f2fe" strokeWidth="0.4" />
-                      <animateTransform 
-                        attributeName="transform" 
-                        type="rotate" 
-                        from="0 0 0" 
-                        to="360 0 0" 
-                        dur="1.2s" 
-                        repeatCount="indefinite" 
-                      />
-                    </g>
-                    <circle cx="0" cy="0" r="0.8" fill="#e0f2fe" />
-                  </g>
-
-                  {/* Steer Axle Wheel */}
-                  <g transform="translate(6, 4)">
-                    <circle cx="0" cy="0" r="2.2" fill="#020617" stroke="#38bdf8" strokeWidth="0.7" />
-                    <g>
-                      <line x1="0" y1="-2.2" x2="0" y2="2.2" stroke="#e0f2fe" strokeWidth="0.4" />
-                      <line x1="-2.2" y1="0" x2="2.2" y2="0" stroke="#e0f2fe" strokeWidth="0.4" />
-                      <animateTransform 
-                        attributeName="transform" 
-                        type="rotate" 
-                        from="0 0 0" 
-                        to="360 0 0" 
-                        dur="1.2s" 
-                        repeatCount="indefinite" 
-                      />
-                    </g>
-                    <circle cx="0" cy="0" r="0.8" fill="#e0f2fe" />
-                  </g>
+                  {/* Rear security red LED indicators */}
+                  <circle cx="-18.5" cy="-4.5" r="0.6" fill="#ef4444" className="animate-pulse" />
+                  <circle cx="-18.5" cy="4.5" r="0.6" fill="#ef4444" className="animate-pulse" />
                 </g>
               </g>
             </g>
@@ -718,48 +728,123 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
         </div>
       </div>
 
-      {/* Dynamic Telemetry Box (Updated instantly upon tapping any map node!) */}
-      {selectedCity && (
-        <div className="bg-[#030915]/85 backdrop-blur-md border border-slate-800/90 p-3 rounded-2xl flex items-center justify-between gap-4 transition-all duration-300">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-[#0ea5e9]/10 text-[#38bdf8] border border-[#0ea5e9]/20 shadow-inner">
-              {selectedCity.label === 'La Paz' || selectedCity.label === 'Oruro' ? (
-                <CloudRain className="w-4 h-4 text-[#38bdf8]" />
-              ) : selectedCity.label === 'Santa Cruz' ? (
-                <Sun className="w-4 h-4 text-amber-400" />
-              ) : (
-                <Wind className="w-4 h-4 text-sky-300" />
-              )}
+      {/* Dynamic Cabin Telemetry & Weather Dashboard */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Left Side: Real-time Live Truck Cockpit Telemetry */}
+        <div className="bg-slate-950/80 backdrop-blur-md border border-slate-800/90 p-4 rounded-2xl flex flex-col justify-between shadow-xl">
+          <div className="flex items-center justify-between border-b border-slate-800/60 pb-2 mb-2">
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span className="text-[9px] text-cyan-400 font-extrabold uppercase tracking-wider font-mono">
+                🛰️ Telemetría de Cabina (En Vivo)
+              </span>
             </div>
-            <div className="text-left">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wide">ESTACIÓN METEOROLÓGICA</span>
-                <span className="text-[8.5px] bg-slate-950 border border-slate-800/80 px-1 py-0.5 rounded font-mono text-slate-400 font-extrabold">
-                  {selectedCity.altitude}
-                </span>
-                <span className="text-[8px] text-slate-500 font-mono">
-                  [{selectedCity.coords}]
-                </span>
+            <span className="text-[8px] text-slate-400 font-mono font-bold">SCANIA R500 OPTICRUISE</span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 py-1">
+            {/* Speed Gauge */}
+            <div className="bg-slate-900/60 border border-slate-850 p-2 rounded-xl text-center">
+              <span className="text-[8px] text-slate-400 font-bold block uppercase tracking-wide leading-none">Velocidad</span>
+              <div className="mt-1.5 flex items-baseline justify-center gap-0.5">
+                <span className="text-base font-black text-cyan-400 font-mono leading-none">{liveSpeed}</span>
+                <span className="text-[8px] text-slate-400 font-mono font-bold">km/h</span>
               </div>
-              <h5 className="text-white text-xs font-black tracking-tight leading-none mt-1">
-                {selectedCity.label}: <span className="text-[#38bdf8]">{selectedCity.weather}</span>
-              </h5>
-              <p className="text-[10px] text-slate-400 leading-normal mt-1 flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-[#38bdf8]" />
-                {selectedCity.status}
-              </p>
+              <div className="w-full bg-slate-850 h-1 rounded-full overflow-hidden mt-1.5">
+                <div className="bg-cyan-400 h-full transition-all duration-300" style={{ width: `${(liveSpeed / 100) * 100}%` }}></div>
+              </div>
+            </div>
+
+            {/* RPM Gauge */}
+            <div className="bg-slate-900/60 border border-slate-850 p-2 rounded-xl text-center">
+              <span className="text-[8px] text-slate-400 font-bold block uppercase tracking-wide leading-none">Régimen Motor</span>
+              <div className="mt-1.5 flex items-baseline justify-center gap-0.5">
+                <span className="text-base font-black text-emerald-400 font-mono leading-none">{liveRpm}</span>
+                <span className="text-[8px] text-slate-400 font-mono font-bold">RPM</span>
+              </div>
+              <div className="w-full bg-slate-850 h-1 rounded-full overflow-hidden mt-1.5">
+                <div className="bg-emerald-400 h-full transition-all duration-300" style={{ width: `${(liveRpm / 2000) * 100}%` }}></div>
+              </div>
+            </div>
+
+            {/* Gear and Efficiency */}
+            <div className="bg-slate-900/60 border border-slate-850 p-2 rounded-xl text-center flex flex-col justify-between">
+              <div>
+                <span className="text-[8px] text-slate-400 font-bold block uppercase tracking-wide leading-none">Marcha</span>
+                <span className="text-sm font-black text-indigo-400 font-mono block mt-1 leading-none">M{liveGear}</span>
+              </div>
+              <span className="text-[8px] text-emerald-400/90 font-mono font-extrabold block mt-1">
+                2.8 km/L ✓
+              </span>
             </div>
           </div>
 
-          <div className="flex flex-col items-end text-right shrink-0">
-            <span className="text-[8px] text-slate-500 font-black uppercase tracking-wider leading-none">Temperatura</span>
-            <div className="flex items-center gap-0.5 mt-1 text-white font-black text-xs">
-              <Thermometer className="w-3.5 h-3.5 text-rose-400" />
-              {selectedCity.temp}
-            </div>
+          <div className="mt-2 text-[9px] text-slate-400 flex items-center justify-between font-mono bg-slate-900/40 px-2 py-1 rounded-lg">
+            <span>Frenos Retarder: <span className="text-cyan-400 font-bold">AUTOMÁTICO</span></span>
+            <span>•</span>
+            <span>Eje Tractor: <span className="text-emerald-400 font-bold">ÓPTIMO</span></span>
           </div>
         </div>
-      )}
+
+        {/* Right Side: Meteorological & Station Details */}
+        {selectedCity ? (
+          <div className="bg-slate-950/80 backdrop-blur-md border border-slate-800/90 p-4 rounded-2xl flex flex-col justify-between shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800/60 pb-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span className="text-[9px] text-amber-400 font-extrabold uppercase tracking-wider font-mono">
+                  🌦️ Estación Meteorológica e Info
+                </span>
+              </div>
+              <span className="text-[8.5px] bg-slate-900 border border-slate-800 px-1.5 py-0.2 rounded font-mono text-slate-400 font-black leading-none">
+                {selectedCity.altitude}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-amber-400 shadow-inner">
+                  {selectedCity.label === 'La Paz' || selectedCity.label === 'Oruro' ? (
+                    <CloudRain className="w-5 h-5 text-sky-400" />
+                  ) : selectedCity.label === 'Santa Cruz' ? (
+                    <Sun className="w-5 h-5 text-amber-400" />
+                  ) : (
+                    <Wind className="w-5 h-5 text-sky-300" />
+                  )}
+                </div>
+                <div className="text-left">
+                  <h5 className="text-white text-xs font-black tracking-tight leading-none">
+                    {selectedCity.label}: <span className="text-sky-300 font-bold">{selectedCity.weather}</span>
+                  </h5>
+                  <p className="text-[9.5px] text-slate-400 leading-normal mt-1 flex items-center gap-1">
+                    <span className="w-1 h-1 rounded-full bg-sky-400" />
+                    {selectedCity.status}
+                  </p>
+                  <span className="text-[8px] text-slate-500 font-mono block mt-0.5">Coords: {selectedCity.coords}</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-end text-right shrink-0 bg-slate-900/50 p-2 rounded-xl border border-slate-850">
+                <span className="text-[8px] text-slate-400 font-black uppercase tracking-wider leading-none">Temperatura</span>
+                <div className="flex items-center gap-0.5 mt-1 text-white font-black text-xs leading-none">
+                  <Thermometer className="w-3.5 h-3.5 text-rose-400" />
+                  {selectedCity.temp}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-2 text-[9px] text-slate-400 flex items-center justify-between font-mono bg-slate-900/40 px-2 py-1 rounded-lg">
+              <span>Humedad: <span className="text-slate-300 font-bold">64%</span></span>
+              <span>•</span>
+              <span>Presión Atmo: <span className="text-slate-300 font-bold">1012 hPa</span></span>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-slate-950/80 backdrop-blur-md border border-slate-800/90 p-4 rounded-2xl flex items-center justify-center shadow-xl text-center text-slate-400 text-xs">
+            Toque un nodo de la ruta en el mapa para ver la telemetría climática local.
+          </div>
+        )}
+      </div>
     </div>
   );
 }

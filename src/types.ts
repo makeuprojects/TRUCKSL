@@ -15,8 +15,8 @@ export interface Chofer {
   telefono: string;
   pin_acceso: string;
   estado: string; // 'Activo' | 'Inactivo'
-  presupuesto?: string; // Assigned budget, e.g., '10000'
-  saldo_actual?: string; // Current available balance
+  presupuesto?: string; // Monto Inicial Mensual (Bs.), e.g., '10000'
+  saldo_actual?: string; // Saldo Actual (BOB) (disminuye con gastos, se mantiene entre viajes)
 }
 
 export interface Ruta {

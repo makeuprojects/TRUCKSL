@@ -117,32 +117,32 @@ export default function ChoferProfileCard({
           {/* Presupuesto */}
           <div className="bg-slate-950/60 border border-white/[0.05] p-4 rounded-2xl">
             <span className="text-[10px] text-slate-300 font-bold block uppercase tracking-wider">
-              Límite Presupuesto
+              Monto Inicial Mensual
             </span>
             <div className="flex items-baseline space-x-1 mt-1.5 font-sans">
-              <span className="text-xs text-slate-300 font-mono font-bold">BOB</span>
+              <span className="text-xs text-slate-300 font-mono font-bold">Bs.</span>
               <span className="text-xl font-black text-slate-100 font-mono leading-none">
                 {budgetNum.toLocaleString('es-BO', { minimumFractionDigits: 2 })}
               </span>
             </div>
             <p className="text-[10px] text-slate-200 mt-1 leading-normal">
-              Asignado para caja chica.
+              Fondo inicial mensual en BOB.
             </p>
           </div>
 
           {/* Saldo Disponible */}
           <div className="bg-slate-950/60 border border-white/[0.05] p-4 rounded-2xl">
             <span className="text-[10px] text-slate-300 font-bold block uppercase tracking-wider">
-              Saldo Restante
+              Saldo Actual
             </span>
             <div className="flex items-baseline space-x-1 mt-1.5 font-sans">
-              <span className="text-xs font-mono font-bold text-emerald-400">BOB</span>
+              <span className="text-xs font-mono font-bold text-emerald-400">Bs.</span>
               <span className="text-xl font-black text-emerald-400 font-mono leading-none">
                 {balanceNum.toLocaleString('es-BO', { minimumFractionDigits: 2 })}
               </span>
             </div>
             <p className="text-[10px] text-slate-200 mt-1 leading-normal">
-              Disponible para compras.
+              Disminuye con gastos del chofer.
             </p>
           </div>
 
@@ -150,7 +150,7 @@ export default function ChoferProfileCard({
           {/* Saldo Restante Card */}
           <div className="bg-slate-900 border border-white/[0.06] p-4 rounded-2xl col-span-2 sm:col-span-1">
             <span className="text-[10px] text-slate-200 font-bold block uppercase tracking-wider">
-              Saldo Restante Mensual
+              Presupuesto Restante
             </span>
             <div className="flex items-baseline space-x-1 mt-1.5 font-sans">
               <span className="text-xl font-black text-white font-mono leading-none">
@@ -159,7 +159,7 @@ export default function ChoferProfileCard({
               <span className="text-xs font-mono font-bold text-slate-300 font-sans"> / {budgetNum.toLocaleString('es-BO', { minimumFractionDigits: 0 })} Bs</span>
             </div>
             <p className="text-[10px] text-slate-300 mt-1 leading-normal">
-              Disponible para caja chica
+              Persiste entre viajes realizados.
             </p>
           </div>
         </div>

@@ -1131,24 +1131,40 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
               </div>
 
               {/* Reorder list with AutoAnimate */}
-              <div ref={driversListRef} className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+              <div ref={driversListRef} className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
                 {filteredDrivers.map((driver, index) => {
                   const isAdmin = driver.id_chofer === 'don_saul' || driver.nombre_completo === 'Don Saúl' || driver.id_chofer === 'admin';
+                  const budgetNum = Number(driver.presupuesto !== undefined && driver.presupuesto !== "" ? driver.presupuesto : 10000) || 10000;
+                  const balanceNum = Number(driver.saldo_actual !== undefined && driver.saldo_actual !== "" ? driver.saldo_actual : budgetNum);
+                  const isLow = !isAdmin && (balanceNum < (budgetNum * 0.20) || balanceNum < 1200);
+
                   return (
                     <div
                       key={`${driver.id_chofer}-${driver.nombre_completo}-${index}`}
-                      className="group/card flex items-center justify-between p-3 rounded-xl bg-slate-900/40 hover:bg-[#131d35]/65 border border-slate-800/40 hover:border-sky-500/20 transition duration-300"
+                      className={`group/card flex items-center justify-between p-3 rounded-xl transition duration-300 ${
+                        isLow 
+                          ? 'bg-rose-950/20 hover:bg-rose-950/35 border border-rose-500/20 hover:border-rose-500/40' 
+                          : 'bg-slate-900/40 hover:bg-[#131d35]/65 border border-slate-800/40 hover:border-sky-500/20'
+                      }`}
                     >
                       <div
                         onClick={() => setSelectedDriver(driver)}
                         className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
                       >
-                        <div className="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+                        <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${
+                          isLow 
+                            ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 animate-pulse' 
+                            : 'bg-sky-500/10 border-sky-500/20 text-sky-400'
+                        }`}>
                           <User className="w-4.5 h-4.5" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <h4 className="font-extrabold text-slate-100 text-xs group-hover/card:text-sky-400 transition truncate max-w-[124px]">
+                            <h4 className={`font-extrabold text-xs transition truncate max-w-[124px] ${
+                              isLow 
+                                ? 'text-rose-200 group-hover/card:text-rose-100' 
+                                : 'text-slate-100 group-hover/card:text-sky-400'
+                            }`}>
                               {driver.nombre_completo}
                             </h4>
                             {isAdmin && (
@@ -1156,22 +1172,40 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                                 Operator
                               </span>
                             )}
+                            {isLow && (
+                              <span className="bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[8px] font-black uppercase px-1.5 py-0.5 rounded leading-none shrink-0 animate-bounce">
+                                ⚠️ Saldo Bajo
+                              </span>
+                            )}
                           </div>
-                          <span className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
-                            <Phone className="w-3 h-3 text-slate-400" />
-                            {driver.telefono || 'Sin celular'}
-                          </span>
+                          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            <span className="text-[10px] text-slate-450 flex items-center gap-1">
+                              <Phone className="w-3 h-3 text-slate-500" />
+                              {driver.telefono || 'Sin celular'}
+                            </span>
+                            {!isAdmin && (
+                              <span className={`text-[10px] font-mono font-bold ${isLow ? 'text-rose-400' : 'text-emerald-400/90'}`}>
+                                Bs. {balanceNum.toLocaleString('es-BO', { maximumFractionDigits: 0 })}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Discret Pencil Edit Button */}
-                      <button
-                        onClick={() => openEditDriver(driver)}
-                        className="p-2 hover:bg-slate-800/45 border border-transparent hover:border-slate-700/60 rounded-lg text-slate-400 hover:text-sky-400 transition cursor-pointer ml-1"
-                        title="Ficha y Caja Chica"
-                      >
-                        <Edit className="w-3.5 h-3.5 stroke-[1.2]" />
-                      </button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {/* Discret Pencil Edit Button */}
+                        <button
+                          onClick={() => openEditDriver(driver)}
+                          className={`p-2 border border-transparent rounded-lg transition cursor-pointer ml-1 ${
+                            isLow 
+                              ? 'hover:bg-rose-950/40 hover:border-rose-800/40 text-rose-300 hover:text-rose-100' 
+                              : 'hover:bg-slate-800/45 hover:border-slate-700/60 text-slate-400 hover:text-sky-400'
+                          }`}
+                          title="Ficha y Caja Chica"
+                        >
+                          <Edit className="w-3.5 h-3.5 stroke-[1.2]" />
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -1544,13 +1578,14 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs text-slate-700 uppercase font-bold block tracking-wide">Presupuesto Mensual (Bs)</label>
+                  <label className="text-xs text-slate-700 uppercase font-bold block tracking-wide">Monto Inicial Mensual (Bs.)</label>
                   <input
                     type="number"
                     value={newDriverBudget}
                     onChange={e => setNewDriverBudget(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200/60 p-3 rounded-xl text-sm focus:border-blue-300 font-mono text-blue-600 font-bold outline-none"
                   />
+                  <span className="text-[9px] text-slate-400 block leading-tight">Este monto mensual se deposita en Bolivianos y disminuye con los gastos del chofer, manteniéndose sin importar el número de viajes.</span>
                 </div>
               </div>
 

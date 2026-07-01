@@ -1406,7 +1406,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl space-y-2">
                 <div className="flex justify-between items-end">
                   <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none mb-1">
-                    Saldo Mensual Disponible
+                    Saldo Actual Disponible (Bs.)
                   </span>
                   {(() => {
                     const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
@@ -1420,7 +1420,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   })()}
                 </div>
                 <div className="flex justify-between items-center text-[9px] text-slate-400 font-extrabold uppercase tracking-wider leading-none mt-1">
-                  <span>Consumo de Caja Chica</span>
+                  <span>Caja Chica del Chofer</span>
                   {(() => {
                     const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
                     const statSaldoActual = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : statPresupuesto);
