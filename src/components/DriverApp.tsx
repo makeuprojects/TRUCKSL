@@ -1178,6 +1178,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                       origen={rutas.find(r => r.id_ruta === activeViaje?.id_ruta)?.origen || ''} 
                       destino={rutas.find(r => r.id_ruta === activeViaje?.id_ruta)?.destino || ''} 
                       idViaje={activeViaje?.id_viaje} 
+                      variant="chofer"
                     />
                   </div>
 

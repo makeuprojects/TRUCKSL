@@ -228,9 +228,113 @@ function PortalSelector({ currentUser, googleToken, onSignOut, localDriver }: Po
           )}
         </div>
 
-        <div className="space-y-3">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-tr from-blue-900/20 to-blue-500/20 text-blue-400 rounded-full border border-[#233554]/50 flex items-center justify-center shadow-lg">
-            <Truck className="w-8 h-8" />
+        <div className="space-y-3 flex flex-col items-center">
+          <div className="w-36 h-16 relative bg-slate-950/60 border border-[#233554]/50 rounded-2xl overflow-hidden flex items-center justify-center shadow-inner select-none mb-2">
+            {/* Parallax moving ground line under the truck */}
+            <div className="absolute bottom-1 left-0 right-0 h-0.5 bg-slate-800 overflow-hidden opacity-40">
+              <div className="w-[200%] h-full bg-transparent">
+                <svg viewBox="0 0 100 2" className="w-full h-full text-blue-500" preserveAspectRatio="none">
+                  <line x1="0" y1="1" x2="200" y2="1" stroke="currentColor" strokeWidth="1" strokeDasharray="3,6" />
+                  <animateTransform 
+                    attributeName="transform" 
+                    type="translate" 
+                    from="0 0" 
+                    to="-50 0" 
+                    dur="0.8s" 
+                    repeatCount="indefinite" 
+                  />
+                </svg>
+              </div>
+            </div>
+
+            {/* Scale-down Profile Truck SVG container */}
+            <div className="w-24 h-12 relative z-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+              <svg viewBox="-20 -15 38 23" className="w-full h-full" fill="none">
+                {/* Underglow */}
+                <rect x="-17" y="2" width="28" height="2" rx="1" fill="#00f2ff" opacity="0.45" />
+                {/* Frame */}
+                <rect x="-16.5" y="1" width="26.5" height="1.8" fill="#1e293b" stroke="#334155" strokeWidth="0.5" />
+                {/* Trailer with custom brushed gradient */}
+                <rect x="-17" y="-9.5" width="16" height="10.5" rx="0.5" fill="url(#logo_trailerGrad)" stroke="#475569" strokeWidth="0.8" />
+                {[-15.2, -11.8, -8.4, -5.0, -1.6].map((rx, idx) => (
+                  <line key={`logo-rib-${idx}`} x1={rx} y1="-9" x2={rx} y2="0.5" stroke="#ffffff" strokeWidth="0.4" strokeOpacity="0.3" />
+                ))}
+                
+                {/* Blue-Orange striped design */}
+                <rect x="-17" y="-5.5" width="16" height="1.6" fill="#0284c7" fillOpacity="0.9" />
+                <rect x="-17" y="-4.2" width="16" height="0.4" fill="#f59e0b" fillOpacity="0.9" />
+                
+                {/* Deflector */}
+                <path d="M -0.5,-9.5 C 1,-10.8 3,-10.8 4.2,-9.5 L 4.5,-8 L -0.5,-8 Z" fill="#7f1d1d" stroke="#ef4444" strokeWidth="0.5" />
+                {/* Cabin */}
+                <path d="M -1,-8 L 4.5,-8 C 6.5,-8 8.5,-4 10.5,-2 L 11.2,1.5 L 11.2,3 L -1,3 Z" fill="url(#logo_cabGrad)" stroke="#ef4444" strokeWidth="0.6" />
+                {/* Side Window */}
+                <path d="M 3.8,-7.2 L 6.8,-7.2 L 8.3,-4.2 L 3.8,-4.2 Z" fill="url(#logo_windowGrad)" stroke="#1e293b" strokeWidth="0.5" />
+                {/* Fuel Tank */}
+                <rect x="0.8" y="1.5" width="5.2" height="1.6" rx="0.8" fill="url(#logo_chromeGrad)" stroke="#475569" strokeWidth="0.3" />
+
+                {/* Chimney Stack */}
+                <rect x="-0.8" y="-12.5" width="0.8" height="9" rx="0.2" fill="url(#logo_chromeGrad)" stroke="#475569" strokeWidth="0.3" />
+                
+                {/* Exhaust puffs */}
+                <circle cx="-0.4" cy="-13" r="0.8" fill="#38bdf8" fillOpacity="0.4">
+                  <animate attributeName="r" values="0.8;3;4.5" dur="1.2s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.9;0.35;0" dur="1.2s" repeatCount="indefinite" />
+                  <animate attributeName="cx" values="-0.4;-3;-6" dur="1.2s" repeatCount="indefinite" />
+                  <animate attributeName="cy" values="-13;-15;-16.5" dur="1.2s" repeatCount="indefinite" />
+                </circle>
+
+                {/* Steer wheel */}
+                <g transform="translate(8, 3.5)">
+                  <circle cx="0" cy="0" r="2.4" fill="#0f172a" stroke="#334155" strokeWidth="0.4" />
+                  <circle cx="0" cy="0" r="1.1" fill="url(#logo_chromeGrad)" />
+                  <g>
+                    <line x1="-1.1" y1="0" x2="1.1" y2="0" stroke="#334155" strokeWidth="0.3" />
+                    <line x1="0" y1="-1.1" x2="0" y2="1.1" stroke="#334155" strokeWidth="0.3" />
+                    <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.4s" repeatCount="indefinite" />
+                  </g>
+                </g>
+                {/* Rear Wheels */}
+                <g transform="translate(4, 3.5)">
+                  <circle cx="0" cy="0" r="2.4" fill="#0f172a" stroke="#334155" strokeWidth="0.4" />
+                  <circle cx="0" cy="0" r="1.1" fill="url(#logo_chromeGrad)" />
+                  <g>
+                    <line x1="-1.1" y1="0" x2="1.1" y2="0" stroke="#334155" strokeWidth="0.3" />
+                    <line x1="0" y1="-1.1" x2="0" y2="1.1" stroke="#334155" strokeWidth="0.3" />
+                    <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.4s" repeatCount="indefinite" />
+                  </g>
+                </g>
+                <g transform="translate(-10.5, 3.5)">
+                  <circle cx="0" cy="0" r="2.4" fill="#0f172a" stroke="#334155" strokeWidth="0.4" />
+                  <circle cx="0" cy="0" r="1.1" fill="url(#logo_chromeGrad)" />
+                  <g>
+                    <line x1="-1.1" y1="0" x2="1.1" y2="0" stroke="#334155" strokeWidth="0.3" />
+                    <line x1="0" y1="-1.1" x2="0" y2="1.1" stroke="#334155" strokeWidth="0.3" />
+                    <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.4s" repeatCount="indefinite" />
+                  </g>
+                </g>
+
+                <defs>
+                  <linearGradient id="logo_cabGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#ef4444" />
+                    <stop offset="100%" stopColor="#7f1d1d" />
+                  </linearGradient>
+                  <linearGradient id="logo_trailerGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#f8fafc" />
+                    <stop offset="100%" stopColor="#475569" />
+                  </linearGradient>
+                  <linearGradient id="logo_chromeGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#94a3b8" />
+                    <stop offset="50%" stopColor="#ffffff" />
+                    <stop offset="100%" stopColor="#334155" />
+                  </linearGradient>
+                  <linearGradient id="logo_windowGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#38bdf8" />
+                    <stop offset="100%" stopColor="#0284c7" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white font-sans">
             SL ROAD <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-300">TRUCKING</span>

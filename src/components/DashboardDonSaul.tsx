@@ -945,6 +945,11 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                     const truck = camiones.find((c) => c.id_camion === viaje.id_camion);
                     const route = rutas.find((r) => r.id_ruta === viaje.id_ruta);
 
+                    // Check if driver has low balance (<20% of budget or < 1200 BOB)
+                    const budgetNum = Number(drv?.presupuesto !== undefined && drv?.presupuesto !== "" ? drv.presupuesto : 10000) || 10000;
+                    const balanceNum = Number(drv?.saldo_actual !== undefined && drv?.saldo_actual !== "" ? drv.saldo_actual : budgetNum);
+                    const isLowBalance = drv && (drv.id_chofer !== 'don_saul' && drv.id_chofer !== 'admin' && (balanceNum < (budgetNum * 0.20) || balanceNum < 1200));
+
                     return (
                       <div
                         key={`${viaje.id_viaje}-${drv?.id_chofer || 'no-drv'}-${truck?.id_camion || 'no-trk'}-${index}`}
@@ -952,19 +957,28 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                           setSelectedRouteViaje(viaje);
                           setIsRouteDetailOpen(true);
                         }}
-                        className="relative overflow-hidden group p-4 bg-slate-950 border border-slate-800 hover:border-emerald-500/40 rounded-xl flex flex-col gap-4 transition duration-300 animate-fade-in cursor-pointer hover:scale-[1.02] active:scale-[0.99] shadow-lg hover:shadow-emerald-950/10 animate-pulse-subtle"
+                        className={`relative overflow-hidden group p-4 bg-slate-950 rounded-xl flex flex-col gap-4 transition duration-300 animate-fade-in cursor-pointer hover:scale-[1.02] active:scale-[0.99] shadow-lg ${
+                          isLowBalance 
+                            ? 'border border-rose-500/45 hover:border-rose-400 shadow-rose-950/5 animate-pulse-subtle'
+                            : 'border border-slate-800 hover:border-emerald-500/40 hover:shadow-emerald-950/10'
+                        }`}
                         title="Haga clic para auditar la ruta y los comprobantes en detalle"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 group-hover:scale-125 transition-all duration-300 animate-pulse"></span>
+                              <span className={`w-1.5 h-1.5 rounded-full group-hover:scale-125 transition-all duration-300 animate-pulse ${isLowBalance ? 'bg-rose-500' : 'bg-emerald-400'}`}></span>
                               <span className="text-[10px] font-black font-mono text-sky-400/90 group-hover:text-sky-300 uppercase transition-colors">
                                 ID {viaje.id_viaje}
                               </span>
-                              <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[8px] font-black px-1.5 py-0.5 rounded">
-                                EN MONITOREO
+                              <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${isLowBalance ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'}`}>
+                                {isLowBalance ? '⚠️ ATENCIÓN: SALDO CRÍTICO' : 'EN MONITOREO'}
                               </span>
+                              {isLowBalance && (
+                                <span className="bg-rose-500/30 text-rose-300 border border-rose-500/40 text-[8px] font-black px-1.5 py-0.5 rounded animate-bounce">
+                                  Recarga requerida: Bs. {balanceNum.toLocaleString('es-BO')}
+                                </span>
+                              )}
                             </div>
                             <h4 className="text-slate-100 font-black text-sm tracking-tight flex items-center gap-1.5 group-hover:text-white transition-colors duration-300">
                               📍 En Ruta: {route?.origen || 'La Paz'} ➔ {route?.destino || 'Oruro'}
@@ -983,10 +997,14 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                           </div>
 
                           {/* Right dynamic Badge */}
-                          <div className="bg-slate-900 group-hover:bg-slate-850 border border-slate-800/80 group-hover:border-emerald-500/20 rounded-xl px-4 py-2 flex flex-col justify-center text-left shrink-0 sm:min-w-48 shadow-inner transition-colors duration-300">
-                            <span className="text-[8px] text-slate-400 group-hover:text-slate-300 uppercase font-black tracking-wider transition-colors">Chofer y Camión</span>
-                            <span className="text-xs font-black text-slate-200 group-hover:text-white mt-0.5 truncate max-w-[130px] transition-colors" title={drv?.nombre_completo}>
-                              👤 {drv?.nombre_completo || 'Sin chofer'}
+                          <div className={`border rounded-xl px-4 py-2 flex flex-col justify-center text-left shrink-0 sm:min-w-48 shadow-inner transition-colors duration-300 ${
+                            isLowBalance 
+                              ? 'bg-rose-950/40 border-rose-500/40 text-rose-200' 
+                              : 'bg-slate-900 group-hover:bg-slate-850 border border-slate-800/80 group-hover:border-emerald-500/20 text-slate-200 group-hover:text-white'
+                          }`}>
+                            <span className={`text-[8px] uppercase font-black tracking-wider transition-colors ${isLowBalance ? 'text-rose-400' : 'text-slate-400 group-hover:text-slate-300'}`}>Chofer y Camión</span>
+                            <span className="text-xs font-black mt-0.5 truncate max-w-[130px] transition-colors" title={drv?.nombre_completo}>
+                              👤 {drv?.nombre_completo || 'Sin chofer'} {isLowBalance && '⚠️'}
                             </span>
                             <span className="text-[10.5px] font-mono text-indigo-300 group-hover:text-indigo-200 mt-0.5 transition-colors" title={truck?.modelo}>
                               Ref: {truck?.modelo || 'Sin camión'}
@@ -999,6 +1017,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                           origen={route?.origen || 'La Paz'} 
                           destino={route?.destino || 'Oruro'} 
                           idViaje={viaje.id_viaje}
+                          variant="saul"
                         />
 
                         {/* Quick Action Overlay (Hover) */}

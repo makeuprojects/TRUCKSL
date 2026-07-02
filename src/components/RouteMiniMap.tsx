@@ -5,6 +5,7 @@ interface RouteMiniMapProps {
   origen: string;
   destino: string;
   idViaje?: string;
+  variant?: 'saul' | 'chofer';
 }
 
 interface CityNode {
@@ -167,10 +168,46 @@ const getHighwayPath = (originId: string, destId: string): string => {
   return paths[key] || `M 60,36 L 300,66`; // safe fallback
 };
 
-export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapProps) {
-  const originNode = findCityNode(origen);
-  const destNode = findCityNode(destino);
-  const metadata = getRouteMetadata(origen, destino);
+const getWaypoints = (originId: string, destId: string): { x: number; y: number }[] => {
+  const key = `${originId}_${destId}`;
+  const waypointsMap: { [key: string]: { x: number; y: number }[] } = {
+    lapaz_oruro: [{ x: 65, y: 42 }, { x: 70, y: 45 }, { x: 74, y: 52 }, { x: 78, y: 59 }],
+    oruro_lapaz: [{ x: 78, y: 59 }, { x: 74, y: 52 }, { x: 70, y: 45 }, { x: 65, y: 42 }],
+    
+    oruro_potosi: [{ x: 90, y: 76 }, { x: 100, y: 82 }, { x: 105, y: 86 }, { x: 110, y: 90 }, { x: 115, y: 93 }],
+    potosi_oruro: [{ x: 115, y: 93 }, { x: 110, y: 90 }, { x: 105, y: 86 }, { x: 100, y: 82 }, { x: 90, y: 76 }],
+    
+    oruro_cochabamba: [{ x: 105, y: 62 }, { x: 130, y: 70 }, { x: 145, y: 64 }, { x: 160, y: 58 }, { x: 170, y: 55 }],
+    cochabamba_oruro: [{ x: 170, y: 55 }, { x: 160, y: 58 }, { x: 145, y: 64 }, { x: 130, y: 70 }, { x: 105, y: 62 }],
+    
+    cochabamba_santacruz: [{ x: 210, y: 65 }, { x: 220, y: 45 }, { x: 240, y: 58 }, { x: 260, y: 70 }, { x: 280, y: 60 }],
+    santacruz_cochabamba: [{ x: 280, y: 60 }, { x: 260, y: 70 }, { x: 240, y: 58 }, { x: 220, y: 45 }, { x: 210, y: 65 }],
+    
+    cochabamba_potosi: [{ x: 160, y: 70 }, { x: 145, y: 80 }, { x: 135, y: 88 }, { x: 128, y: 92 }, { x: 124, y: 94 }],
+    potosi_cochabamba: [{ x: 124, y: 94 }, { x: 128, y: 92 }, { x: 135, y: 88 }, { x: 145, y: 80 }, { x: 160, y: 70 }],
+    
+    lapaz_cochabamba: [{ x: 65, y: 42 }, { x: 74, y: 52 }, { x: 80, y: 66 }, { x: 115, y: 63 }, { x: 145, y: 64 }, { x: 165, y: 56 }],
+    cochabamba_lapaz: [{ x: 165, y: 56 }, { x: 145, y: 64 }, { x: 115, y: 63 }, { x: 80, y: 66 }, { x: 74, y: 52 }, { x: 65, y: 42 }],
+
+    lapaz_santacruz: [{ x: 65, y: 42 }, { x: 80, y: 66 }, { x: 130, y: 70 }, { x: 180, y: 54 }, { x: 240, y: 58 }, { x: 280, y: 60 }],
+    santacruz_lapaz: [{ x: 280, y: 60 }, { x: 240, y: 58 }, { x: 180, y: 54 }, { x: 130, y: 70 }, { x: 80, y: 66 }, { x: 65, y: 42 }],
+
+    lapaz_potosi: [{ x: 65, y: 42 }, { x: 80, y: 66 }, { x: 100, y: 82 }, { x: 110, y: 90 }, { x: 115, y: 93 }],
+    potosi_lapaz: [{ x: 115, y: 93 }, { x: 110, y: 90 }, { x: 100, y: 82 }, { x: 80, y: 66 }, { x: 65, y: 42 }],
+
+    santacruz_oruro: [{ x: 280, y: 60 }, { x: 240, y: 58 }, { x: 180, y: 54 }, { x: 145, y: 64 }, { x: 105, y: 62 }],
+    oruro_santacruz: [{ x: 105, y: 62 }, { x: 145, y: 64 }, { x: 180, y: 54 }, { x: 240, y: 58 }, { x: 280, y: 60 }],
+
+    santacruz_potosi: [{ x: 280, y: 60 }, { x: 240, y: 58 }, { x: 180, y: 54 }, { x: 145, y: 80 }, { x: 128, y: 92 }],
+    potosi_santacruz: [{ x: 128, y: 92 }, { x: 145, y: 80 }, { x: 180, y: 54 }, { x: 240, y: 58 }, { x: 280, y: 60 }]
+  };
+  return waypointsMap[key] || [];
+};
+
+export default function RouteMiniMap({ origen, destino, idViaje, variant = 'saul' }: RouteMiniMapProps) {
+  const originNode = findCityNode(origen) || findCityNode('La Paz') || BOLIVIA_CITIES[0];
+  const destNode = findCityNode(destino) || findCityNode('Oruro') || BOLIVIA_CITIES[1];
+  const metadata = getRouteMetadata(origen || 'La Paz', destino || 'Oruro');
 
   const [selectedCity, setSelectedCity] = useState<CityNode | null>(destNode || originNode || null);
   const [liveSpeed, setLiveSpeed] = useState<number>(81.5);
@@ -195,6 +232,7 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
 
   const isRouteConnected = originNode && destNode;
   const highwayPath = isRouteConnected ? getHighwayPath(originNode.id, destNode.id) : '';
+  const activeWaypoints = isRouteConnected ? getWaypoints(originNode.id, destNode.id) : [];
 
   return (
     <div id={`minimap-${idViaje || 'demo'}`} className="space-y-3 w-full">
@@ -224,8 +262,52 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
               0% { transform: translateY(-100%); }
               100% { transform: translateY(100%); }
             }
+            @keyframes drawRoute {
+              0% { stroke-dashoffset: 100; opacity: 0; }
+              5% { opacity: 1; }
+              95% { stroke-dashoffset: 0; opacity: 1; }
+              98% { stroke-dashoffset: 0; opacity: 0; }
+              100% { stroke-dashoffset: 0; opacity: 0; }
+            }
+            @keyframes truckFade {
+              0% { opacity: 0; }
+              5% { opacity: 1; }
+              92% { opacity: 1; }
+              98% { opacity: 0; }
+              100% { opacity: 0; }
+            }
+            @keyframes radarPing {
+              0% { transform: scale(0.5); opacity: 0.8; }
+              100% { transform: scale(2.5); opacity: 0; }
+            }
+            @keyframes dashFlow {
+              to { stroke-dashoffset: -50; }
+            }
+            @keyframes rotatingBracket {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
             .animate-route-dash {
               animation: dashEffect 0.6s linear infinite;
+            }
+            .animate-draw-route {
+              animation: drawRoute 10s linear infinite;
+            }
+            .animate-truck-fade {
+              animation: truckFade 10s linear infinite;
+            }
+            .animate-radar-ping {
+              animation: radarPing 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+            }
+            .animate-dash-flow {
+              animation: dashFlow 2s linear infinite;
+            }
+            .animate-radar-sweep {
+              animation: radarRotation 4s linear infinite;
+              transform-origin: center;
+            }
+            .animate-rotating-bracket {
+              animation: rotatingBracket 10s linear infinite;
             }
             .animate-headlight-flicker {
               animation: headlightPulse 0.12s ease-in-out infinite alternate;
@@ -237,9 +319,23 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
               animation: radarRotation 8s linear infinite;
               transform-origin: 200px 75px;
             }
+            @keyframes truckVibe {
+              0% { transform: translate3d(0px, 0px, 0); }
+              25% { transform: translate3d(0.12px, 0.08px, 0); }
+              50% { transform: translate3d(-0.08px, -0.12px, 0); }
+              75% { transform: translate3d(0.08px, -0.08px, 0); }
+              100% { transform: translate3d(0px, 0px, 0); }
+            }
+            .animate-truck-vibe {
+              animation: truckVibe 0.18s linear infinite;
+              transform-origin: center;
+            }
             .gpu-accelerated {
               transform: translate3d(0,0,0);
+              backface-visibility: hidden;
+              perspective: 1000px;
               will-change: transform, opacity;
+              touch-action: manipulation;
             }
           `}</style>
 
@@ -251,6 +347,7 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
         <svg
           viewBox="0 0 400 150"
           className="w-full h-full text-slate-800/50 gpu-accelerated"
+          style={{ touchAction: 'manipulation' }}
           fill="none"
           stroke="currentColor"
           strokeWidth="1"
@@ -307,9 +404,42 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
 
             {/* Sweep radar lines */}
             <radialGradient id="radarSweepGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.1" />
-              <stop offset="100%" stopColor="#000" stopOpacity="0" />
+              <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
             </radialGradient>
+            
+            <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+            </radialGradient>
+
+            {/* Cab gradient (Deep Crimson Red to Sleek Scarlet for high-end truck design) */}
+            <linearGradient id="cabGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#ef4444" />
+              <stop offset="50%" stopColor="#b91c1c" />
+              <stop offset="100%" stopColor="#7f1d1d" />
+            </linearGradient>
+
+            {/* Trailer gradient (Brushed Silver Aluminum container body) */}
+            <linearGradient id="trailerGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#f8fafc" />
+              <stop offset="25%" stopColor="#cbd5e1" />
+              <stop offset="75%" stopColor="#94a3b8" />
+              <stop offset="100%" stopColor="#475569" />
+            </linearGradient>
+
+            {/* Exhaust Stack chrome shine */}
+            <linearGradient id="chromeGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#94a3b8" />
+              <stop offset="50%" stopColor="#ffffff" />
+              <stop offset="100%" stopColor="#334155" />
+            </linearGradient>
+
+            {/* Cyan Window Glass */}
+            <linearGradient id="windowGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.65" />
+            </linearGradient>
           </defs>
 
           {/* Full Realistic Altitude Relief background */}
@@ -334,40 +464,8 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
             strokeOpacity="0.12" 
           />
 
-          {/* Tactical grid background overlay */}
-          <g stroke="#0ea5e9" strokeWidth="0.15" strokeOpacity="0.15">
-            {[25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350, 375].map(x => (
-              <line key={`v-${x}`} x1={x} y1="0" x2={x} y2="150" strokeDasharray="1,6" />
-            ))}
-            {[15, 30, 45, 60, 75, 90, 105, 120, 135].map(y => (
-              <line key={`h-${y}`} x1="0" y1={y} x2={400} y2={y} strokeDasharray="1,6" />
-            ))}
-          </g>
-
-          {/* Topographical Height Contours (Futuristic concentric lines around highlands) */}
-          <g stroke="#0ea5e9" strokeWidth="0.2" strokeOpacity="0.15" fill="none">
-            {/* La Paz (High Mountain) contours */}
-            <circle cx="60" cy="36" r="18" strokeDasharray="2,3" />
-            <circle cx="60" cy="36" r="32" strokeDasharray="2,5" />
-            {/* Potosí (Extremely High Mountain) contours */}
-            <circle cx="120" cy="96" r="15" strokeDasharray="2,3" />
-            <circle cx="120" cy="96" r="28" strokeDasharray="2,5" />
-          </g>
-
-          {/* BACKGROUND ROAD NETWORK CONNECTIONS (Sleek dark curved highways for 100% realism) */}
-          <g stroke="#1e293b" strokeWidth="3" strokeLinecap="round" strokeOpacity="0.6" fill="none">
-            {/* LP ➔ OR */}
-            <path d="M 60,36 C 65,42 70,45 74,52 C 78,59 78,62 80,66" />
-            {/* OR ➔ PT */}
-            <path d="M 80,66 C 90,76 100,82 105,86 C 110,90 115,93 120,96" />
-            {/* OR ➔ CB */}
-            <path d="M 80,66 C 105,62 130,70 145,64 C 160,58 170,55 180,54" />
-            {/* CB ➔ SC */}
-            <path d="M 180,54 C 210,65 220,45 240,58 C 260,70 280,60 300,66" />
-            {/* CB ➔ PT */}
-            <path d="M 180,54 C 160,70 145,80 135,88 C 128,92 124,94 120,96" />
-          </g>
-          <g stroke="#071126" strokeWidth="1" strokeLinecap="round" strokeOpacity="0.8" fill="none">
+          {/* BACKGROUND ROAD NETWORK CONNECTIONS (Sleek delicate curved highways for realistic background detail) */}
+          <g stroke="#101a2e" strokeWidth="1.2" strokeLinecap="round" strokeOpacity="0.5" fill="none">
             {/* LP ➔ OR */}
             <path d="M 60,36 C 65,42 70,45 74,52 C 78,59 78,62 80,66" />
             {/* OR ➔ PT */}
@@ -428,34 +526,54 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
 
               <path
                 d={highwayPath}
-                stroke="#0284c7"
-                strokeWidth="2.5"
-                strokeOpacity="0.4"
+                stroke="#ffffff"
+                strokeWidth="3.5"
+                strokeOpacity="0.45"
                 strokeLinecap="round"
-                fill="none"
-              />
-
-              {/* Glowing Neon Vector Path Overlay */}
-              <path
-                d={highwayPath}
-                stroke="#0ea5e9"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeOpacity="0.6"
                 filter="url(#neonGlow)"
                 fill="none"
               />
-              
-              {/* Dynamic highway dash indicators crawling along curve */}
+
+              {/* Glowing Neon Vector Path Overlay (Progressive Draw in brilliant white) */}
               <path
                 d={highwayPath}
-                stroke="#38bdf8"
+                stroke="#ffffff"
+                strokeWidth="4"
+                strokeLinecap="round"
+                filter="url(#neonGlow)"
+                fill="none"
+                pathLength="100"
+                strokeDasharray="100 100"
+                className="animate-draw-route"
+              />
+              
+              <path
+                d={highwayPath}
+                stroke="#ffffff"
+                strokeWidth="2"
+                strokeLinecap="round"
+                fill="none"
+                pathLength="100"
+                strokeDasharray="100 100"
+                className="animate-draw-route"
+              />
+
+              {/* Moving white dash indicators on route */}
+              <path
+                d={highwayPath}
+                stroke="#ffffff"
                 strokeWidth="1.2"
                 strokeLinecap="round"
-                strokeDasharray="6,6"
-                className="animate-route-dash"
+                strokeDasharray="4, 12"
+                className="animate-dash-flow"
                 fill="none"
+                opacity="0.95"
               />
+
+              {/* Render Path Waypoints (Puntos de Camino) as elegant minimalist white dots */}
+              {activeWaypoints.map((pt, idx) => (
+                <circle key={`waypoint-${idx}`} cx={pt.x} cy={pt.y} r="1.5" fill="#ffffff" opacity="0.85" />
+              ))}
 
               {/* Invisible path wrapper for precise vehicle curve follow */}
               <path
@@ -466,21 +584,38 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
               />
 
               {/* HEAVY CARGO TRUCK: Ultimate detailed vector design & organic easing motion */}
-              <g className="gpu-accelerated">
+              {/* Truck Ghost Trails */}
+              {variant === 'saul' && [1, 2, 3].map((ghostIndex) => (
+                 <g key={`ghost-${ghostIndex}`} className="gpu-accelerated animate-truck-fade" opacity={0.15 - (ghostIndex * 0.04)}>
+                   <animateMotion 
+                     dur="10s" 
+                     repeatCount="indefinite" 
+                     rotate="auto"
+                     calcMode="linear"
+                     keyTimes="0;0.05;0.95;1"
+                     keyPoints="0;0;1;1"
+                     begin={`-${ghostIndex * 0.2}s`}
+                   >
+                     <mpath href={`#route-path-${idViaje || 'demo'}`} />
+                   </animateMotion>
+                   <g transform="translate(0, 0) scale(0.6)">
+                     <rect x="-23" y="-5.5" width="22" height="11" rx="1" fill="#38bdf8" />
+                     <path d="M 0,-4.5 L 9,-4 L 10.5,-2 L 10.5,2 L 9,4 L 0,4.5 Z" fill="#38bdf8" />
+                   </g>
+                 </g>
+              ))}
+
+              <g className="gpu-accelerated animate-truck-fade">
                 <animateMotion 
-                  dur="11s" 
+                  dur="10s" 
                   repeatCount="indefinite" 
                   rotate="auto"
-                  calcMode="spline"
-                  keyTimes="0;0.12;0.88;1"
-                  keyPoints="0;0.05;0.95;1"
-                  keySplines="0.4 0 0.2 1; 0.4 0 0.2 1; 0.4 0 0.2 1"
+                  calcMode="linear"
+                  keyTimes="0;0.05;0.95;1"
+                  keyPoints="0;0;1;1"
                 >
                   <mpath href={`#route-path-${idViaje || 'demo'}`} />
                 </animateMotion>
-                
-                {/* Real-time radar range circle surrounding the vehicle */}
-                <circle cx="0" cy="0" r="14" fill="#38bdf8" fillOpacity="0.15" className="animate-pulse" />
                 
                 {/* 🌟 PREMIUM DYNAMIC LIGHTS (Movable headlights, Taillights, lasers) */}
                 {/* Wide golden fog lights fan */}
@@ -503,126 +638,155 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
                 
                 {/* Red warning taillights reflection fans */}
                 <polygon 
-                  points="-16,0 -45,-12 -45,12" 
+                  points="-18,0 -45,-12 -45,12" 
                   fill="url(#taillightGlow)" 
                   pointerEvents="none" 
                   className="animate-taillight-flicker"
                   style={{ mixBlendMode: 'screen' }}
                 />
 
-                {/* 🚛 ULTRA HIGH-FIDELITY DETAILED CUSTOM TRUCK VECTOR (TOP-DOWN VIEW) */}
-                <g transform="translate(-4, 0)">
-                  {/* Ground shadow underneath */}
-                  <rect x="-19" y="-6" width="31" height="12" rx="2" fill="#000000" opacity="0.65" />
+                {/* Holographic HUD trip overlay directly above the moving vehicle */}
+                {variant === 'saul' && (
+                  <g transform="translate(0, -18)" className="pointer-events-none">
+                    {/* Glowing Location Pin Marker */}
+                    <g transform="translate(0, 5)">
+                      {/* Pulsing base */}
+                      <ellipse cx="0" cy="8" rx="8" ry="4" fill="#38bdf8" fillOpacity="0.3">
+                        <animate attributeName="rx" values="4;16;4" dur="2s" repeatCount="indefinite" />
+                        <animate attributeName="ry" values="2;8;2" dur="2s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
+                      </ellipse>
+                      
+                      {/* Secondary sonar ping for the base */}
+                      <circle cx="0" cy="8" r="4" fill="none" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6">
+                         <animate attributeName="r" values="4;24" dur="2s" repeatCount="indefinite" />
+                         <animate attributeName="opacity" values="0.6;0" dur="2s" repeatCount="indefinite" />
+                      </circle>
 
-                  {/* Neon underglow */}
-                  <rect x="-18" y="-5.5" width="29" height="11" rx="1.5" stroke="#38bdf8" strokeWidth="0.8" fill="none" opacity="0.4" filter="url(#neonGlow)" />
+                      {/* Floating Pin */}
+                      <g className="animate-bounce" style={{ animationDuration: '2s' }}>
+                        <path d="M0,0 C-5,-5 -8,-10 -8,-14 C-8,-18.4 4,-22 0,-22 C4,-22 8,-18.4 8,-14 C8,-10 5,-5 0,0 Z" fill="url(#laserBeam)" stroke="#38bdf8" strokeWidth="0.8" filter="url(#neonGlow)" />
+                        <circle cx="0" cy="-14" r="4" fill="#020817" stroke="#38bdf8" strokeWidth="1" />
+                        {/* Inner dot */}
+                        <circle cx="0" cy="-14" r="2" fill="#10b981" className="animate-pulse" />
+                        {/* Scanner beam from pin */}
+                        <polygon points="0,-14 -15,5 15,5" fill="url(#laserBeam)" opacity="0.4">
+                           <animate attributeName="opacity" values="0.1;0.4;0.1" dur="1s" repeatCount="indefinite" />
+                        </polygon>
+                      </g>
+                    </g>
 
-                  {/* Left side wheels visible from above */}
-                  <rect x="-16" y="-5.6" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
-                  <rect x="-12" y="-5.6" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
-                  <rect x="-3" y="-5.1" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
-                  <rect x="5" y="-4.6" width="3" height="1.0" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
+                    {/* Holographic background border with glassmorphism */}
+                    <rect x="-38" y="-32.5" width="76" height="13.5" rx="4" fill="#020817" fillOpacity="0.88" stroke="#0ea5e9" strokeWidth="1" filter="url(#neonGlow)" />
+                    {/* Outer border cyan glow */}
+                    <rect x="-38" y="-32.5" width="76" height="13.5" rx="4" fill="none" stroke="#38bdf8" strokeWidth="0.5" strokeOpacity="0.7" />
+                    
+                    {/* HUD Text: Destination Indicator */}
+                    <text x="0" y="-23.5" textAnchor="middle" fill="#38bdf8" fontSize="5.5" fontWeight="900" fontFamily="sans-serif" letterSpacing="0.8">
+                      {origen.toUpperCase()} ➔ {destino.toUpperCase()}
+                    </text>
+                    
+                    {/* Bottom neon HUD line */}
+                    <line x1="-30" y1="-21.5" x2="30" y2="-21.5" stroke="#38bdf8" strokeWidth="0.4" strokeOpacity="0.6" />
+                    
+                    {/* Dynamic tracking status */}
+                    <text x="0" y="-14" textAnchor="middle" fill="#10b981" fontSize="4.5" fontWeight="900" fontFamily="monospace" letterSpacing="0.5" className="animate-pulse">
+                      🛰️ EN RUTA ACTIVA
+                    </text>
+                  </g>
+                )}
 
-                  {/* Right side wheels visible from above */}
-                  <rect x="-16" y="4.4" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
-                  <rect x="-12" y="4.4" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
-                  <rect x="-3" y="3.9" width="3" height="1.2" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
-                  <rect x="5" y="3.6" width="3" height="1.0" rx="0.4" fill="#020617" stroke="#475569" strokeWidth="0.4" />
+                {/* 🚛 HIGH-FIDELITY TOP-DOWN TRUCK (Accurate 3D Depth View) WITH DIESEL ENGINE VIBRATION */}
+                <g className="animate-truck-vibe" transform="translate(0, 0) scale(0.6)">
+                  {/* Cyber Underglow (Cyan/Blue Neon) */}
+                  <rect x="-24" y="-7.5" width="38" height="15" rx="2" stroke="#38bdf8" strokeWidth="1.2" fill="none" opacity="0.65" filter="url(#neonGlow)" />
+                  <rect x="-22" y="-5.5" width="34" height="11" rx="1.5" fill="#00f2ff" opacity="0.32" filter="url(#neonGlow)" />
 
-                  {/* Connection Coupler (Fifth Wheel) */}
-                  <rect x="-4" y="-1.5" width="4" height="3" fill="#1e293b" stroke="#475569" strokeWidth="0.5" />
+                  {/* --- HEAVY CARGO TRAILER --- */}
+                  {/* Base chassis shadow */}
+                  <rect x="-23" y="-5.5" width="22" height="11" rx="1" fill="#020617" />
+                  {/* Textured Brushed Aluminum container box */}
+                  <rect x="-23" y="-5.5" width="22" height="11" rx="1" fill="url(#trailerGrad)" stroke="#475569" strokeWidth="0.8" />
+                  {/* Center shiny roof crown line */}
+                  <line x1="-22" y1="0" x2="-2" y2="0" stroke="#ffffff" strokeWidth="0.8" strokeOpacity="0.5" />
+                  {/* Structural Ribs on Roof */}
+                  {[-21, -18, -15, -12, -9, -6, -3].map((rx, idx) => (
+                     <line key={`roof-rib-${idx}`} x1={rx} y1="-5.5" x2={rx} y2="5.5" stroke="#334155" strokeWidth="0.5" opacity="0.7" />
+                  ))}
 
-                  {/* Cargo Container Trailer Box */}
-                  <rect x="-18" y="-5" width="14" height="10" rx="1" fill="#032b45" stroke="#38bdf8" strokeWidth="0.9" />
-                  {/* Center roof line */}
-                  <line x1="-18" y1="0" x2="-4" y2="0" stroke="#0ea5e9" strokeWidth="0.5" opacity="0.6" />
-                  {/* Rib panels on roof */}
-                  <line x1="-16" y1="-5" x2="-16" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
-                  <line x1="-14" y1="-5" x2="-14" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
-                  <line x1="-12" y1="-5" x2="-12" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
-                  <line x1="-10" y1="-5" x2="-10" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
-                  <line x1="-8" y1="-5" x2="-8" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
-                  <line x1="-6" y1="-5" x2="-6" y2="5" stroke="#38bdf8" strokeWidth="0.4" opacity="0.3" />
+                  {/* Connection Coupler (Fifth Wheel area) */}
+                  <rect x="-2" y="-2" width="5" height="4" fill="#0f172a" stroke="#334155" strokeWidth="0.5" rx="0.5" />
+                  <circle cx="1" cy="0" r="1.5" fill="url(#chromeGrad)" />
 
-                  {/* Rear security Chevron decals */}
-                  <path d="M -18,-4.5 L -18.5,-3.5 L -18.5,-2.5 L -18,-3.5 Z" fill="#f59e0b" />
-                  <path d="M -18,4.5 L -18.5,3.5 L -18.5,2.5 L -18,3.5 Z" fill="#f59e0b" />
+                  {/* --- CABIN BODY --- */}
+                  {/* Cabin Chassis Base */}
+                  <path d="M 0,-4.5 L 9,-4 L 11,-2.5 L 11,2.5 L 9,4 L 0,4.5 Z" fill="#0f172a" />
+                  
+                  {/* Cabin Shell using Red cabGrad */}
+                  <path d="M 0,-4.5 L 9,-4 L 10.5,-2 L 10.5,2 L 9,4 L 0,4.5 Z" fill="url(#cabGrad)" stroke="#ef4444" strokeWidth="0.6" />
+                  
+                  {/* Glossy Curved Windshield */}
+                  <path d="M 7,-3.5 C 9.5,-3 10,-1 10,0 C 10,1 9.5,3 7,3.5 C 7.5,1.5 7.5,-1.5 7,-3.5 Z" fill="url(#windowGrad)" stroke="#1e293b" strokeWidth="0.4" />
+                  {/* Skylight on Roof */}
+                  <rect x="2" y="-1.5" width="3" height="3" rx="0.5" fill="url(#windowGrad)" stroke="#1e293b" strokeWidth="0.4" opacity="0.9" />
 
-                  {/* Cabin body */}
-                  <path d="M 0,-4 L 7,-3.5 C 9,-3 10,-2 10,0 C 10,2 9,3 7,3.5 L 0,4 Z" fill="#0c4a6e" stroke="#38bdf8" strokeWidth="0.8" />
-                  {/* Wind Deflector */}
-                  <path d="M -0.5,-3 L 4.5,-2.5 L 4.5,2.5 L -0.5,3 Z" fill="#0284c7" opacity="0.9" stroke="#38bdf8" strokeWidth="0.4" />
-                  {/* Front cyber windshield */}
-                  <path d="M 5.5,-2.5 C 7.5,-2 8.5,-1 8.5,0 C 8.5,1 7.5,2 5.5,2.5 Z" fill="#38bdf8" fillOpacity="0.85" stroke="#e0f2fe" strokeWidth="0.4" />
+                  {/* Left Side Mirror */}
+                  <path d="M 8,-4.2 L 6.5,-6 L 4.5,-6 L 6,-4" fill="url(#chromeGrad)" stroke="#334155" strokeWidth="0.4" />
+                  {/* Right Side Mirror */}
+                  <path d="M 8,4.2 L 6.5,6 L 4.5,6 L 6,4" fill="url(#chromeGrad)" stroke="#334155" strokeWidth="0.4" />
 
-                  {/* Left Mirror */}
-                  <path d="M 4.5,-4 L 3.5,-5.5 L 2,-5.5 L 3,-4" fill="#0369a1" stroke="#38bdf8" strokeWidth="0.4" />
-                  {/* Right Mirror */}
-                  <path d="M 4.5,4 L 3.5,5.5 L 2,5.5 L 3,4" fill="#0369a1" stroke="#38bdf8" strokeWidth="0.4" />
+                  {/* Chrome Exhaust Stack Tips */}
+                  <rect x="-1" y="-5.5" width="2" height="1.2" rx="0.3" fill="url(#chromeGrad)" stroke="#475569" strokeWidth="0.4" />
+                  <rect x="-1" y="4.3" width="2" height="1.2" rx="0.3" fill="url(#chromeGrad)" stroke="#475569" strokeWidth="0.4" />
 
-                  {/* Exhaust stack tips */}
-                  <rect x="-1" y="-4.6" width="1.5" height="0.8" rx="0.2" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="0.3" />
-                  <rect x="-1" y="3.8" width="1.5" height="0.8" rx="0.2" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="0.3" />
+                  {/* 💨 DUAL LIVE EXHAUST SMOKE PUFFS (Drifting and fading dynamically behind) */}
+                  <g>
+                    <circle cx="-1" cy="-5" r="1.5" fill="#38bdf8" fillOpacity="0.4">
+                      <animate attributeName="r" values="1.5;4;6" dur="1s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.8;0.3;0" dur="1s" repeatCount="indefinite" />
+                      <animate attributeName="cx" values="-1;-8;-16" dur="1s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="-1" cy="5" r="1.5" fill="#38bdf8" fillOpacity="0.4">
+                      <animate attributeName="r" values="1.5;4;6" dur="1s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.8;0.3;0" dur="1s" repeatCount="indefinite" />
+                      <animate attributeName="cx" values="-1;-8;-16" dur="1s" repeatCount="indefinite" />
+                    </circle>
+                  </g>
 
-                  {/* Dual live exhaust smoke puffs */}
-                  <circle cx="-1" cy="-4.2" r="0.8" fill="#38bdf8" fillOpacity="0.35">
-                    <animate attributeName="r" values="0.8;2.5;4" dur="1.8s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.8;0.3;0" dur="1.8s" repeatCount="indefinite" />
-                    <animate attributeName="cx" values="-1;-4;-7" dur="1.8s" repeatCount="indefinite" />
-                    <animate attributeName="cy" values="-4.2;-4.8;-5.4" dur="1.8s" repeatCount="indefinite" />
-                  </circle>
-                  <circle cx="-1" cy="4.0" r="0.8" fill="#38bdf8" fillOpacity="0.35">
-                    <animate attributeName="r" values="0.8;2.5;4" dur="1.8s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.8;0.3;0" dur="1.8s" repeatCount="indefinite" />
-                    <animate attributeName="cx" values="-1;-4;-7" dur="1.8s" repeatCount="indefinite" />
-                    <animate attributeName="cy" values="4.0;4.6;5.2" dur="1.8s" repeatCount="indefinite" />
-                  </circle>
+                  {/* Symmetrical Wheels (visible from above) */}
+                  <g fill="#020617" stroke="#475569" strokeWidth="0.5">
+                    {/* Trailer Left Wheels */}
+                    <rect x="-21" y="-6.5" width="3.5" height="2" rx="0.5" />
+                    <rect x="-16" y="-6.5" width="3.5" height="2" rx="0.5" />
+                    <rect x="-11" y="-6.5" width="3.5" height="2" rx="0.5" />
+                    {/* Trailer Right Wheels */}
+                    <rect x="-21" y="4.5" width="3.5" height="2" rx="0.5" />
+                    <rect x="-16" y="4.5" width="3.5" height="2" rx="0.5" />
+                    <rect x="-11" y="4.5" width="3.5" height="2" rx="0.5" />
+                    
+                    {/* Cabin Left Wheels */}
+                    <rect x="-3" y="-5.5" width="3.5" height="1.8" rx="0.5" />
+                    <rect x="6" y="-5" width="3" height="1.5" rx="0.5" />
+                    {/* Cabin Right Wheels */}
+                    <rect x="-3" y="3.7" width="3.5" height="1.8" rx="0.5" />
+                    <rect x="6" y="3.5" width="3" height="1.5" rx="0.5" />
+                  </g>
 
-                  {/* Dynamic Sand/Dust Trails spinning from the heavy rear tires (Altiplano Dust Storm effect) */}
-                  <circle cx="-16" cy="-5" r="0.5" fill="#e2b95b" fillOpacity="0.45">
-                    <animate attributeName="r" values="0.5;4;7.5" dur="1.1s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.7;0.25;0" dur="1.1s" repeatCount="indefinite" />
-                    <animate attributeName="cx" values="-16;-25;-38" dur="1.1s" repeatCount="indefinite" />
-                    <animate attributeName="cy" values="-5;-6.5;-8" dur="1.1s" repeatCount="indefinite" />
-                  </circle>
-                  <circle cx="-16" cy="5" r="0.5" fill="#e2b95b" fillOpacity="0.45">
-                    <animate attributeName="r" values="0.5;4;7.5" dur="1.1s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.7;0.25;0" dur="1.1s" repeatCount="indefinite" />
-                    <animate attributeName="cx" values="-16;-25;-38" dur="1.1s" repeatCount="indefinite" />
-                    <animate attributeName="cy" values="5;6.5;8" dur="1.1s" repeatCount="indefinite" />
-                  </circle>
+                  {/* Amber safety side LED dot markers */}
+                  {[-22, -15, -8, -1].map((cx, idx) => (
+                    <g key={`marker-amber-${idx}`}>
+                       <circle cx={cx} cy="-5.5" r="0.6" fill="#f59e0b" className="animate-pulse" />
+                       <circle cx={cx} cy="5.5" r="0.6" fill="#f59e0b" className="animate-pulse" />
+                    </g>
+                  ))}
 
-                  {/* Amber safety side LED dots */}
-                  <circle cx="-15" cy="-5" r="0.5" fill="#f59e0b" className="animate-pulse" />
-                  <circle cx="-10" cy="-5" r="0.5" fill="#f59e0b" className="animate-pulse" />
-                  <circle cx="-5" cy="-5" r="0.5" fill="#f59e0b" className="animate-pulse" />
-                  <circle cx="-15" cy="5" r="0.5" fill="#f59e0b" className="animate-pulse" />
-                  <circle cx="-10" cy="5" r="0.5" fill="#f59e0b" className="animate-pulse" />
-                  <circle cx="-5" cy="5" r="0.5" fill="#f59e0b" className="animate-pulse" />
-
-                  {/* Rear security red LED indicators */}
-                  <circle cx="-18.5" cy="-4.5" r="0.6" fill="#ef4444" className="animate-pulse" />
-                  <circle cx="-18.5" cy="4.5" r="0.6" fill="#ef4444" className="animate-pulse" />
+                  {/* Rear security red LED indicator taillights */}
+                  <circle cx="-23" cy="-4.5" r="0.8" fill="#ef4444" className="animate-pulse" />
+                  <circle cx="-23" cy="4.5" r="0.8" fill="#ef4444" className="animate-pulse" />
                 </g>
               </g>
             </g>
           )}
-
-          {/* HIGH-TECH RADAR SWEEP LINE (Sweeps across the tactical map continuously) */}
-          <g className="gpu-accelerated" style={{ pointerEvents: 'none' }}>
-            <line 
-              x1="200" 
-              y1="75" 
-              x2="400" 
-              y2="150" 
-              stroke="#0ea5e9" 
-              strokeWidth="0.8" 
-              strokeOpacity="0.2" 
-              className="animate-radar-sweep"
-            />
-            <circle cx="200" cy="75" r="140" fill="url(#radarSweepGrad)" pointerEvents="none" />
-          </g>
 
           {/* Render Bolivia Network Hubs */}
           {BOLIVIA_CITIES.map((city) => {
@@ -641,41 +805,41 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
                   fill="transparent"
                   className="cursor-pointer"
                   onClick={() => setSelectedCity(city)}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    setSelectedCity(city);
+                  }}
                 />
 
-                {/* Pulsing warning aura for current destination */}
+                {/* Clean, static highlighted ring for current destination */}
                 {isDest && (
-                  <circle
-                    cx={city.x}
-                    cy={city.y}
-                    r="15"
-                    fill="#38bdf8"
-                    fillOpacity="0.18"
-                    className="animate-ping"
-                  />
+                  <circle cx={city.x} cy={city.y} r="11" fill="none" stroke="#38bdf8" strokeWidth="0.8" opacity="0.4" />
                 )}
 
                 {/* City node outer ring with high-contrast tactical design */}
                 <circle
                   cx={city.x}
                   cy={city.y}
-                  r={isSelected ? 7 : isActive ? 5.5 : 4}
-                  fill={isSelected ? '#0284c7' : isActive ? '#034a75' : '#04122b'}
-                  stroke={isSelected ? '#38bdf8' : isActive ? '#0ea5e9' : '#1e3a8a'}
-                  strokeWidth={isSelected ? 2.5 : isActive ? 1.8 : 1.2}
+                  r={isSelected ? 6.5 : isActive ? 5 : 3.5}
+                  fill={isSelected ? '#ffffff' : isActive ? '#0ea5e9' : '#1e293b'}
+                  stroke={isSelected ? '#38bdf8' : isActive ? '#38bdf8' : '#475569'}
+                  strokeWidth={isSelected ? 2 : isActive ? 1.5 : 1}
                   className="transition-all duration-300 cursor-pointer hover:stroke-sky-300"
                   onClick={() => setSelectedCity(city)}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    setSelectedCity(city);
+                  }}
                 />
 
-                {/* Glowing Core center dot */}
-                {isSelected && (
-                  <circle
-                    cx={city.x}
-                    cy={city.y}
-                    r="2.2"
-                    fill="#ffffff"
-                    className="animate-pulse"
-                  />
+                {/* Rotating Cyber Brackets for Active Points */}
+                {(isOrigin || isDest) && (
+                  <g transform={`translate(${city.x}, ${city.y})`} className="animate-rotating-bracket pointer-events-none">
+                    <path d="M -9 -5 L -9 -9 L -5 -9" fill="none" stroke="#38bdf8" strokeWidth="0.8" opacity="0.8" />
+                    <path d="M 9 -5 L 9 -9 L 5 -9" fill="none" stroke="#38bdf8" strokeWidth="0.8" opacity="0.8" />
+                    <path d="M 9 5 L 9 9 L 5 9" fill="none" stroke="#38bdf8" strokeWidth="0.8" opacity="0.8" />
+                    <path d="M -9 5 L -9 9 L -5 9" fill="none" stroke="#38bdf8" strokeWidth="0.8" opacity="0.8" />
+                  </g>
                 )}
 
                 {/* Tech Label HUD under the city */}
@@ -697,49 +861,202 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
         </svg>
 
         {/* Top Left Floating GPS HUD */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col gap-0.5 pointer-events-none">
-          <span className="backdrop-blur-md bg-slate-950/85 text-[#38bdf8] text-[8.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-[#0ea5e9]/30 shadow-lg leading-none flex items-center gap-1.5">
-            <Compass className="w-2.5 h-2.5 animate-spin-slow text-[#38bdf8]" />
-            SATELLITE TRUCK LOCK • {metadata.dist}
-          </span>
-          <span className="text-[8px] text-slate-300 font-bold uppercase tracking-wide pl-0.5 leading-none mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,1)]">
-            {metadata.msg}
-          </span>
-        </div>
+        {(variant === 'saul' || variant === 'chofer') && (
+          <div className="absolute top-2.5 left-2.5 flex flex-col gap-0.5 pointer-events-none">
+            <span className="backdrop-blur-md bg-slate-950/85 text-[#38bdf8] text-[8.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-[#0ea5e9]/30 shadow-lg leading-none flex items-center gap-1.5">
+              <Compass className="w-2.5 h-2.5 animate-spin-slow text-[#38bdf8]" />
+              SATELLITE TRUCK LOCK • {metadata.dist}
+            </span>
+            <span className="text-[8px] text-slate-300 font-bold uppercase tracking-wide pl-0.5 leading-none mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,1)]">
+              {metadata.msg}
+            </span>
+          </div>
+        )}
 
         {/* Alert box warning indicators in upper right */}
-        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 pointer-events-none">
-          <span className="backdrop-blur-md bg-rose-950/40 text-rose-300 border border-rose-500/20 px-2 py-0.5 rounded text-[7.5px] font-black uppercase tracking-wider flex items-center gap-1">
-            <AlertCircle className="w-2 h-2 text-rose-400" />
-            {metadata.alert}
-          </span>
-        </div>
+        {(variant === 'saul' || variant === 'chofer') && (
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 pointer-events-none">
+            <span className="backdrop-blur-md bg-rose-950/40 text-rose-300 border border-rose-500/20 px-2 py-0.5 rounded text-[7.5px] font-black uppercase tracking-wider flex items-center gap-1">
+              <AlertCircle className="w-2 h-2 text-rose-400" />
+              {metadata.alert}
+            </span>
+          </div>
+        )}
 
         {/* Real-time telemetry connection status indicators (Bottom Right) */}
-        <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5 backdrop-blur-md bg-slate-950/90 px-2.5 py-0.5 rounded-md border border-slate-800/90 shadow-xl">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0ea5e9] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0ea5e9]"></span>
-          </span>
-          <span className="text-[8px] font-mono font-black text-slate-300 uppercase tracking-widest">
-            {isRouteConnected ? 'RT_FEED_ACTIVE' : 'FEED_WAIT'}
-          </span>
-        </div>
+        {(variant === 'saul' || variant === 'chofer') && (
+          <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5 backdrop-blur-md bg-slate-950/90 px-2.5 py-0.5 rounded-md border border-slate-800/90 shadow-xl">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0ea5e9] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0ea5e9]"></span>
+            </span>
+            <span className="text-[8px] font-mono font-black text-slate-300 uppercase tracking-widest">
+              {isRouteConnected ? 'RT_FEED_ACTIVE' : 'FEED_WAIT'}
+            </span>
+          </div>
+        )}
         </div>
       </div>
 
-      {/* Dynamic Cabin Telemetry & Weather Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Left Side: Real-time Live Truck Cockpit Telemetry */}
-        <div className="bg-slate-950/80 backdrop-blur-md border border-slate-800/90 p-4 rounded-2xl flex flex-col justify-between shadow-xl">
-          <div className="flex items-center justify-between border-b border-slate-800/60 pb-2 mb-2">
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span className="text-[9px] text-cyan-400 font-extrabold uppercase tracking-wider font-mono">
-                🛰️ Telemetría de Cabina (En Vivo)
-              </span>
+      {/* Route Warnings & Dispatches for the driver */}
+      {variant === 'chofer' && (
+        <div className="bg-amber-950/30 backdrop-blur-md rounded-2xl p-3 border border-amber-500/20 flex items-start gap-3 mb-4 shadow-lg animate-pulse" style={{ animationDuration: '4s' }}>
+          <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+          <div className="text-left">
+            <h6 className="text-[9.5px] text-amber-400 font-extrabold uppercase tracking-wider font-mono">⚠️ DESPACHO DE ALERTA RUTA</h6>
+            <p className="text-xs text-amber-100/90 leading-relaxed font-medium mt-0.5">
+              Mantén precaución. Se ha reportado <strong className="text-amber-400">{metadata.alert}</strong> en la vía. Distancia estimada: <strong className="text-white">{metadata.dist}</strong>.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {(variant === 'saul' || variant === 'chofer') && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Left Side: Real-time Live Truck Cockpit Telemetry */}
+          <div className="bg-slate-950/80 backdrop-blur-md border border-slate-800/90 p-4 rounded-2xl flex flex-col justify-between shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800/60 pb-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span className="text-[9px] text-cyan-400 font-extrabold uppercase tracking-wider font-mono">
+                  🛰️ Telemetría de Cabina (En Vivo)
+                </span>
+              </div>
+              <span className="text-[8px] text-slate-400 font-mono font-bold">SCANIA R500 OPTICRUISE</span>
             </div>
-            <span className="text-[8px] text-slate-400 font-mono font-bold">SCANIA R500 OPTICRUISE</span>
+
+          {/* 🚛 LIVE SIDE-PROFILE DRIVING CONTROLS & PARALLAX TRACKER */}
+          <div className="h-16 w-full bg-gradient-to-r from-slate-950/70 to-slate-900/40 border border-slate-800/80 rounded-xl overflow-hidden relative mb-2 flex items-center justify-between px-3">
+            {/* Parallax Moving Landscape (animated lines to simulate speed) */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-25">
+              {/* Mountain ridge outline sliding right-to-left */}
+              <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="absolute bottom-1.5 left-0 w-[200%] h-6 text-slate-700">
+                <path d="M 0,20 L 15,10 L 30,17 L 45,5 L 60,15 L 75,8 L 90,18 L 100,20 L 115,10 L 130,17 L 145,5 L 160,15 L 175,8 L 190,18 L 200,20" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                <animateTransform 
+                  attributeName="transform" 
+                  type="translate" 
+                  from="0 0" 
+                  to="-100 0" 
+                  dur="8s" 
+                  repeatCount="indefinite" 
+                />
+              </svg>
+              {/* Road dashes sliding left-to-right (truck moving forward) */}
+              <svg viewBox="0 0 100 2" preserveAspectRatio="none" className="absolute bottom-0.5 left-0 w-[200%] h-1 text-slate-500">
+                <line x1="0" y1="1" x2="200" y2="1" stroke="currentColor" strokeWidth="0.5" strokeDasharray="3,6" />
+                <animateTransform 
+                  attributeName="transform" 
+                  type="translate" 
+                  from="0 0" 
+                  to="-50 0" 
+                  dur="0.8s" 
+                  repeatCount="indefinite" 
+                />
+              </svg>
+            </div>
+
+            {/* Scale-down Profile Truck SVG container */}
+            <div className="w-24 h-12 relative z-10 select-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+              <svg viewBox="-20 -15 38 23" className="w-full h-full" fill="none">
+                {/* Underglow */}
+                <rect x="-17" y="2" width="28" height="2" rx="1" fill="#00f2ff" opacity="0.45" filter="url(#neonGlow)" />
+                {/* Frame */}
+                <rect x="-16.5" y="1" width="26.5" height="1.8" fill="#1e293b" stroke="#334155" strokeWidth="0.5" />
+                {/* Trailer */}
+                <rect x="-17" y="-9.5" width="16" height="10.5" rx="0.5" fill="url(#trailerGrad)" stroke="#475569" strokeWidth="0.8" />
+                {[-15.2, -11.8, -8.4, -5.0, -1.6].map((rx, idx) => (
+                  <line key={`p-rib-${idx}`} x1={rx} y1="-9" x2={rx} y2="0.5" stroke="#ffffff" strokeWidth="0.4" strokeOpacity="0.4" />
+                ))}
+                {[-15.0, -11.6, -8.2, -4.8, -1.4].map((rx, idx) => (
+                  <line key={`p-rib-sh-${idx}`} x1={rx} y1="-9" x2={rx} y2="0.5" stroke="#334155" strokeWidth="0.4" strokeOpacity="0.5" />
+                ))}
+                {/* Branding */}
+                <rect x="-17" y="-5.5" width="16" height="1.6" fill="#0284c7" fillOpacity="0.9" />
+                <rect x="-17" y="-4.2" width="16" height="0.4" fill="#f59e0b" fillOpacity="0.9" />
+                <text x="-9" y="-6.5" textAnchor="middle" fill="#0f172a" fontSize="1.8" fontWeight="900" fontFamily="sans-serif" letterSpacing="0.3">DON SAÚL</text>
+                <text x="-9" y="-2.5" textAnchor="middle" fill="#ffffff" fontSize="1.3" fontWeight="800" fontFamily="sans-serif" letterSpacing="0.2">EXPRESO</text>
+                
+                {/* Deflector */}
+                <path d="M -0.5,-9.5 C 1,-10.8 3,-10.8 4.2,-9.5 L 4.5,-8 L -0.5,-8 Z" fill="#7f1d1d" stroke="#ef4444" strokeWidth="0.5" />
+                {/* Cabin */}
+                <path d="M -1,-8 L 4.5,-8 C 6.5,-8 8.5,-4 10.5,-2 L 11.2,1.5 L 11.2,3 L -1,3 Z" fill="url(#cabGrad)" stroke="#ef4444" strokeWidth="0.6" />
+                {/* Side Window */}
+                <path d="M 3.8,-7.2 L 6.8,-7.2 L 8.3,-4.2 L 3.8,-4.2 Z" fill="url(#windowGrad)" stroke="#1e293b" strokeWidth="0.5" />
+                <line x1="4.8" y1="-6.8" x2="6.2" y2="-4.6" stroke="#ffffff" strokeWidth="0.6" strokeOpacity="0.6" />
+                {/* Fuel Tank */}
+                <rect x="0.8" y="1.5" width="5.2" height="1.6" rx="0.8" fill="url(#chromeGrad)" stroke="#475569" strokeWidth="0.3" />
+                {/* Bumper */}
+                <path d="M 11,1.5 L 11.5,1.5 C 11.8,1.5 11.8,3 11.5,3 L 11,3 Z" fill="url(#chromeGrad)" stroke="#475569" strokeWidth="0.3" />
+
+                {/* Chimney Stack */}
+                <rect x="-0.8" y="-12.5" width="0.8" height="9" rx="0.2" fill="url(#chromeGrad)" stroke="#475569" strokeWidth="0.3" />
+                
+                {/* Exhaust puffs */}
+                <circle cx="-0.4" cy="-13" r="0.8" fill="#38bdf8" fillOpacity="0.4">
+                  <animate attributeName="r" values="0.8;3;4.5" dur="1.2s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.9;0.35;0" dur="1.2s" repeatCount="indefinite" />
+                  <animate attributeName="cx" values="-0.4;-3;-6" dur="1.2s" repeatCount="indefinite" />
+                  <animate attributeName="cy" values="-13;-15;-16.5" dur="1.2s" repeatCount="indefinite" />
+                </circle>
+
+                {/* Steer wheel */}
+                <g transform="translate(8, 3.5)">
+                  <circle cx="0" cy="0" r="2.4" fill="#0f172a" stroke="#334155" strokeWidth="0.4" />
+                  <circle cx="0" cy="0" r="1.1" fill="url(#chromeGrad)" />
+                  <g>
+                    <line x1="-1.1" y1="0" x2="1.1" y2="0" stroke="#334155" strokeWidth="0.3" />
+                    <line x1="0" y1="-1.1" x2="0" y2="1.1" stroke="#334155" strokeWidth="0.3" />
+                    <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.4s" repeatCount="indefinite" />
+                  </g>
+                </g>
+                {/* Rear Wheels */}
+                <g transform="translate(4, 3.5)">
+                  <circle cx="0" cy="0" r="2.4" fill="#0f172a" stroke="#334155" strokeWidth="0.4" />
+                  <circle cx="0" cy="0" r="1.1" fill="url(#chromeGrad)" />
+                  <g>
+                    <line x1="-1.1" y1="0" x2="1.1" y2="0" stroke="#334155" strokeWidth="0.3" />
+                    <line x1="0" y1="-1.1" x2="0" y2="1.1" stroke="#334155" strokeWidth="0.3" />
+                    <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.4s" repeatCount="indefinite" />
+                  </g>
+                </g>
+                <g transform="translate(0.5, 3.5)">
+                  <circle cx="0" cy="0" r="2.4" fill="#0f172a" stroke="#334155" strokeWidth="0.4" />
+                  <circle cx="0" cy="0" r="1.1" fill="url(#chromeGrad)" />
+                  <g>
+                    <line x1="-1.1" y1="0" x2="1.1" y2="0" stroke="#334155" strokeWidth="0.3" />
+                    <line x1="0" y1="-1.1" x2="0" y2="1.1" stroke="#334155" strokeWidth="0.3" />
+                    <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.4s" repeatCount="indefinite" />
+                  </g>
+                </g>
+                <g transform="translate(-10.5, 3.5)">
+                  <circle cx="0" cy="0" r="2.4" fill="#0f172a" stroke="#334155" strokeWidth="0.4" />
+                  <circle cx="0" cy="0" r="1.1" fill="url(#chromeGrad)" />
+                  <g>
+                    <line x1="-1.1" y1="0" x2="1.1" y2="0" stroke="#334155" strokeWidth="0.3" />
+                    <line x1="0" y1="-1.1" x2="0" y2="1.1" stroke="#334155" strokeWidth="0.3" />
+                    <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.4s" repeatCount="indefinite" />
+                  </g>
+                </g>
+                <g transform="translate(-14, 3.5)">
+                  <circle cx="0" cy="0" r="2.4" fill="#0f172a" stroke="#334155" strokeWidth="0.4" />
+                  <circle cx="0" cy="0" r="1.1" fill="url(#chromeGrad)" />
+                  <g>
+                    <line x1="-1.1" y1="0" x2="1.1" y2="0" stroke="#334155" strokeWidth="0.3" />
+                    <line x1="0" y1="-1.1" x2="0" y2="1.1" stroke="#334155" strokeWidth="0.3" />
+                    <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="0.4s" repeatCount="indefinite" />
+                  </g>
+                </g>
+              </svg>
+            </div>
+
+            {/* Beautiful digital HUD telemetry indicator */}
+            <div className="flex flex-col items-end text-right border-l border-slate-800/60 pl-3 py-1 relative z-10">
+              <span className="text-[7.5px] text-emerald-400 font-black uppercase tracking-widest font-mono">SCANIA_CRUISE</span>
+              <span className="text-sm font-black text-cyan-400 font-mono tracking-tighter leading-none mt-0.5">
+                OPTIMAL_RIDE
+              </span>
+              <span className="text-[7px] text-slate-500 font-mono font-bold mt-0.5">EFFICIENCY: 94.8%</span>
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 py-1">
@@ -845,6 +1162,8 @@ export default function RouteMiniMap({ origen, destino, idViaje }: RouteMiniMapP
           </div>
         )}
       </div>
+      )}
+
     </div>
   );
 }
