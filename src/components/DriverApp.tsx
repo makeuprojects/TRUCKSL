@@ -459,7 +459,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
       const resJson = await res.json();
       if (resJson.success) {
-        setMessage({ text: `Compra de ${montoGasto} BOB registrada. El saldo se descontó con éxito.`, type: 'success' });
+        setMessage({ text: `Compra de ${montoGasto} Bs. registrada. El saldo se descontó con éxito.`, type: 'success' });
         setIsGastoModalOpen(false);
         setMontoGasto('');
         setDescGasto('');
@@ -1292,7 +1292,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
                       {toneladasExtras > 0 && (
                         <div className="p-3 bg-indigo-950/30 text-blue-400 border border-indigo-900/40 rounded-xl text-xs leading-relaxed font-semibold">
-                          <strong>Ganancia Estimada Extras (40% Chofer):</strong> Un estimado de <strong>{((toneladasExtras * (500 / 45)) * 0.40).toFixed(1)} BOB</strong> se acumulará como bono personal.
+                          <strong>Ganancia Estimada Extras (40% Chofer):</strong> Un estimado de <strong>{((toneladasExtras * (500 / 45)) * 0.40).toFixed(1)} Bs.</strong> se acumulará como bono personal.
                         </div>
                       )}
                     </div>
@@ -1415,7 +1415,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                     return (
                       <div className="text-right">
                         <span className="text-xl font-black text-white font-mono">{statSaldoActual.toLocaleString('es-BO')}</span>
-                        <span className="text-xs text-slate-500 font-mono"> / {statPresupuesto.toLocaleString('es-BO')} BOB</span>
+                        <span className="text-xs text-slate-500 font-mono"> / {statPresupuesto.toLocaleString('es-BO')} Bs.</span>
                       </div>
                     );
                   })()}
@@ -1455,7 +1455,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
               <div className="bg-orange-500/5 border border-emerald-500/10 p-4 rounded-3xl space-y-1 text-emerald-400">
                 <span className="text-[9px] text-emerald-500 font-extrabold uppercase block tracking-wider leading-none">BONOS DE EXTRAS (40%)</span>
-                <div className="text-xl font-black text-emerald-400 font-mono mt-1">{totalBonus.toFixed(1)} BOB</div>
+                <div className="text-xl font-black text-emerald-400 font-mono mt-1">{totalBonus.toFixed(1)} Bs.</div>
               </div>
 
               {activeViaje && (
@@ -1543,7 +1543,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 setAuthenticatedDriver(updatedDriver);
                 localStorage.setItem('driver_session_user', JSON.stringify(updatedDriver));
               }
-              setMessage({ text: `Gasto de ${amount} BOB registrado con éxito.`, type: 'success' });
+              setMessage({ text: `Gasto de ${amount} Bs. registrado con éxito.`, type: 'success' });
               loadDriverData(true);
             }}
             onClose={() => setIsGastoModalOpen(false)}
@@ -1583,7 +1583,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 </div>
                 <div className="flex justify-between text-xs font-semibold border-t border-slate-850 pt-2">
                   <span className="text-orange-500">TARIFA BASE:</span>
-                  <span className="text-orange-400 font-bold font-mono">{selectedRutaToStart.tarifa_base} BOB</span>
+                  <span className="text-orange-400 font-bold font-mono">{selectedRutaToStart.tarifa_base} Bs.</span>
                 </div>
               </div>
 
@@ -1684,7 +1684,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 <div className="flex justify-between items-center text-xs font-semibold border-b border-slate-850/50 pb-2.5">
                   <span className="text-slate-200 uppercase">Total Pago Extra:</span>
                   <span className="text-white font-extrabold text-base font-mono">
-                    {tripSummaryData.valor_extra_total.toFixed(2)} BOB
+                    {tripSummaryData.valor_extra_total.toFixed(2)} Bs.
                   </span>
                 </div>
                 
@@ -1695,7 +1695,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                       <span className="text-emerald-400 font-bold uppercase tracking-wide text-[10px]">Tu Comisión (40% Chofer):</span>
                     </div>
                     <span className="text-white font-extrabold font-mono text-sm">
-                      {tripSummaryData.bono_chofer.toFixed(2)} BOB
+                      {tripSummaryData.bono_chofer.toFixed(2)} Bs.
                     </span>
                   </div>
                   
@@ -1705,7 +1705,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                       <span className="text-blue-400 font-bold uppercase tracking-wide text-[10px]">Don Saúl (60% Admin):</span>
                     </div>
                     <span className="text-slate-100 font-extrabold font-mono text-xs">
-                      {tripSummaryData.bono_administrador.toFixed(2)} BOB
+                      {tripSummaryData.bono_administrador.toFixed(2)} Bs.
                     </span>
                   </div>
                 </div>

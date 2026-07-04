@@ -601,7 +601,7 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
           <div className="bg-[#1E293B]/30 hover:bg-[#1E293B]/40 border border-white/[0.04] p-5 rounded-2xl shadow-xl transition">
             <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider font-sans">Ingresos Brutos Fletados</span>
             <div className="flex items-baseline space-x-1 mt-2">
-              <span className="text-xs font-mono font-bold text-slate-450">BOB</span>
+              <span className="text-xs font-mono font-bold text-slate-450">Bs.</span>
               <span className="text-xl sm:text-2xl font-black font-mono tracking-tight text-white animate-fade-in">
                 {ingresosValue.toLocaleString('es-BO', { minimumFractionDigits: 1 })}
               </span>
@@ -612,7 +612,7 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
           <div className="bg-[#1E293B]/30 hover:bg-[#1E293B]/40 border border-white/[0.04] p-5 rounded-2xl shadow-xl transition">
             <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider font-sans">Gastos de Ruta Operativos</span>
             <div className="flex items-baseline space-x-1 mt-2">
-              <span className="text-xs font-mono font-bold text-rose-500 animate-pulse">BOB</span>
+              <span className="text-xs font-mono font-bold text-rose-500 animate-pulse">Bs.</span>
               <span className="text-xl sm:text-2xl font-black font-mono tracking-tight text-rose-400">
                 {totalEarningsThisMonth.toLocaleString('es-BO', { minimumFractionDigits: 1 })}
               </span>
@@ -623,7 +623,7 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
           <div className="bg-[#1E293B]/30 hover:bg-[#1E293B]/40 border border-white/[0.04] p-5 rounded-2xl shadow-xl transition">
             <span className="text-[10px] text-slate-500 font-bold block uppercase tracking-wider font-sans">Margen Utilidad Bruta</span>
             <div className="flex items-baseline space-x-1 mt-2">
-              <span className="text-xs font-mono font-bold text-indigo-400">BOB</span>
+              <span className="text-xs font-mono font-bold text-indigo-400">Bs.</span>
               <span className={`text-xl sm:text-2xl font-black font-mono tracking-tight ${isMargenNegative ? 'text-rose-500' : 'text-emerald-400'}`}>
                 {margenValue.toLocaleString('es-BO', { minimumFractionDigits: 1 })}
               </span>

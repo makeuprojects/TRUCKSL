@@ -95,12 +95,12 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
           '',
           '',
           'TOTAL GASTADO:',
-          `${totalGastado.toLocaleString('es-BO', { minimumFractionDigits: 2 })} BOB`
+          `${totalGastado.toLocaleString('es-BO', { minimumFractionDigits: 2 })} Bs.`
         ]);
 
         autoTable(doc, {
           startY: 65,
-          head: [['Fecha', 'Categoría', 'Descripción', 'Monto (BOB)']],
+          head: [['Fecha', 'Categoría', 'Descripción', 'Monto (Bs.)']],
           body: tableData,
           theme: 'grid',
           headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
@@ -145,9 +145,9 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
           "Destino",
           "Toneladas Base",
           "Toneladas Extras",
-          "Tarifa Base (BOB)",
-          "Tarifa Extra (BOB)",
-          "Gastos Totales (BOB)",
+          "Tarifa Base (Bs.)",
+          "Tarifa Extra (Bs.)",
+          "Gastos Totales (Bs.)",
           "Estado"
         ];
 

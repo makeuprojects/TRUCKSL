@@ -782,7 +782,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             ) : (
               <div className="mt-2 text-left">
                 <div className="flex items-baseline space-x-1">
-                  <span className="text-xs font-mono font-bold text-slate-300">BOB</span>
+                  <span className="text-xs font-mono font-bold text-slate-300">Bs.</span>
                   <span className="text-2xl font-black font-mono tracking-tight text-emerald-400">
                     {ingresosValue.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -807,7 +807,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             ) : (
               <div className="mt-2 text-left">
                 <div className="flex items-baseline space-x-1">
-                  <span className="text-xs font-mono font-bold text-rose-300">BOB</span>
+                  <span className="text-xs font-mono font-bold text-rose-300">Bs.</span>
                   <span className="text-2xl font-black font-mono tracking-tight text-rose-400">
                     {totalExpensesThisMonth.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -832,7 +832,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             ) : (
               <div className="mt-2 text-left">
                 <div className="flex items-baseline space-x-1">
-                  <span className="text-xs font-mono font-bold text-slate-300">BOB</span>
+                  <span className="text-xs font-mono font-bold text-slate-300">Bs.</span>
                   <span className={`text-2xl font-black font-mono tracking-tight ${isMargenNegative ? 'text-rose-400' : 'text-emerald-400'}`}>
                     {margenValue.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>

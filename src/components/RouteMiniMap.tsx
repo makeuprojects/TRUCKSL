@@ -898,18 +898,7 @@ export default function RouteMiniMap({ origen, destino, idViaje, variant = 'saul
         </div>
       </div>
 
-      {/* Route Warnings & Dispatches for the driver */}
-      {variant === 'chofer' && (
-        <div className="bg-amber-950/30 backdrop-blur-md rounded-2xl p-3 border border-amber-500/20 flex items-start gap-3 mb-4 shadow-lg animate-pulse" style={{ animationDuration: '4s' }}>
-          <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-          <div className="text-left">
-            <h6 className="text-[9.5px] text-amber-400 font-extrabold uppercase tracking-wider font-mono">⚠️ DESPACHO DE ALERTA RUTA</h6>
-            <p className="text-xs text-amber-100/90 leading-relaxed font-medium mt-0.5">
-              Mantén precaución. Se ha reportado <strong className="text-amber-400">{metadata.alert}</strong> en la vía. Distancia estimada: <strong className="text-white">{metadata.dist}</strong>.
-            </p>
-          </div>
-        </div>
-      )}
+
 
       {(variant === 'saul' || variant === 'chofer') && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

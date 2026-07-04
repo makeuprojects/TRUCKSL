@@ -199,14 +199,14 @@ export default function DashboardBentoGrid({
               <div className="space-y-0.5">
                 <p className="text-[10px] text-slate-400 uppercase font-semibold">Utilidades de Flota (D.S.)</p>
                 <h2 className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white glow-text">
-                  {summary ? `${summary.utilidades.toLocaleString()} BOB` : '--- BOB'}
+                  {summary ? `${summary.utilidades.toLocaleString()} Bs.` : '--- Bs.'}
                 </h2>
               </div>
               
               <div className="space-y-0.5 text-right">
                 <p className="text-[10px] text-emerald-400 font-semibold uppercase">Fletes Facturados</p>
                 <h4 className="text-lg sm:text-xl font-bold font-mono tracking-tight text-emerald-400">
-                  {summary ? `${summary.ingresos_totales.toLocaleString()} BOB` : '--- BOB'}
+                  {summary ? `${summary.ingresos_totales.toLocaleString()} Bs.` : '--- Bs.'}
                 </h4>
               </div>
             </div>
@@ -247,7 +247,7 @@ export default function DashboardBentoGrid({
           <div className="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/50 pt-3">
             <span className="flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5 text-rose-400 rotate-180" strokeWidth={1.5} />
-              Gasto en Ruta: <strong className="text-slate-250 font-mono">{summary ? summary.gastos_totales.toLocaleString() : '---'} BOB</strong>
+              Gasto en Ruta: <strong className="text-slate-250 font-mono">{summary ? summary.gastos_totales.toLocaleString() : '---'} Bs.</strong>
             </span>
             <span className="text-[10px] font-semibold text-slate-500">PRODUCCIÓN NETA TOTAL (40% CHOFER / 60% ADMIN)</span>
           </div>
@@ -463,7 +463,7 @@ export default function DashboardBentoGrid({
                 <div className="border-t border-slate-800/60 pt-3 flex items-center justify-between text-[11px]">
                   <div>
                     <span className="text-slate-450 block text-[9px] uppercase font-semibold">Bono Colectado</span>
-                    <strong className="text-emerald-400 font-mono text-xs">{totalBonoChofer.toLocaleString()} BOB</strong>
+                    <strong className="text-emerald-400 font-mono text-xs">{totalBonoChofer.toLocaleString()} Bs.</strong>
                   </div>
 
                   <div className="text-right">
@@ -493,7 +493,7 @@ export default function DashboardBentoGrid({
                       <div className="flex justify-between text-[10px] items-baseline font-mono">
                         <span className="text-slate-550 text-[8px] uppercase font-semibold">Monto Gastado</span>
                         <span className="text-rose-400 font-black text-xs">
-                          BOB {totalSpentThisLoad.toLocaleString('es-BO')}
+                          Bs. {totalSpentThisLoad.toLocaleString('es-BO')}
                         </span>
                       </div>
                     </div>
@@ -676,7 +676,7 @@ export default function DashboardBentoGrid({
               </div>
 
               <div className="space-y-1">
-                <label className="text-slate-400 font-semibold block">Tarifa Base (BOB)</label>
+                <label className="text-slate-400 font-semibold block">Tarifa Base (Bs.)</label>
                 <input
                   type="number"
                   required
@@ -847,7 +847,7 @@ export default function DashboardBentoGrid({
               </div>
 
               <p className="text-[10px] text-slate-500 leading-normal border border-slate-800 bg-slate-950 p-3 rounded-xl">
-                ℹ️ <strong>Mando:</strong> Al inicializar la patente en Sheets, Don Saúl le asigna automáticamente un saldo presupuestario de <strong>10,000 BOB</strong>.
+                ℹ️ <strong>Mando:</strong> Al inicializar la patente en Sheets, Don Saúl le asigna automáticamente un saldo presupuestario de <strong>10,000 Bs.</strong>.
               </p>
 
               <motion.button
@@ -1049,7 +1049,7 @@ export default function DashboardBentoGrid({
                       <div className="grid grid-cols-2 gap-4">
                         <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-1.5 shadow">
                           <span className="text-[9px] text-indigo-400 uppercase tracking-widest font-bold block">Total Bonos Extras (40%)</span>
-                          <strong className="text-xl font-bold font-mono text-emerald-400">{totalBonoAcumulado.toLocaleString()} BOB</strong>
+                          <strong className="text-xl font-bold font-mono text-emerald-400">{totalBonoAcumulado.toLocaleString()} Bs.</strong>
                         </div>
                         
                         <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-1.5 shadow">
@@ -1067,7 +1067,7 @@ export default function DashboardBentoGrid({
                         <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-1.5 shadow">
                           <span className="text-[9px] text-indigo-400 uppercase tracking-widest font-bold block">Rendición de Gastos</span>
                           <strong className="text-base font-extrabold font-mono text-rose-455">
-                            {totalGastoGenerado.toLocaleString()} BOB
+                            {totalGastoGenerado.toLocaleString()} Bs.
                           </strong>
                         </div>
                       </div>
@@ -1095,7 +1095,7 @@ export default function DashboardBentoGrid({
                                   <p className="text-slate-450 text-[10px] italic truncate">{expense.descripcion || 'Sin descripción de ruta'}</p>
                                 </div>
                                 <div className="font-extrabold text-rose-400 font-mono shrink-0">
-                                  -{safeParse(expense.monto).toLocaleString()} BOB
+                                  -{safeParse(expense.monto).toLocaleString()} Bs.
                                 </div>
                               </div>
                             ))}

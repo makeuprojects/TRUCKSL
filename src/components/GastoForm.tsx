@@ -30,9 +30,26 @@ export default function GastoForm({
   onClose
 }: GastoFormProps) {
   // Input fields state
-  const [tipoGasto, setTipoGasto] = useState('Combustible ⛽');
+  const [tipoGasto, setTipoGasto] = useState('Combustible Subvencionado (5.72 Bs/L) ⛽');
   const [montoGasto, setMontoGasto] = useState('');
   const [descGasto, setDescGasto] = useState('');
+  const [litrosCombustible, setLitrosCombustible] = useState('');
+
+  const handleTipoGastoChange = (val: string) => {
+    setTipoGasto(val);
+    setLitrosCombustible('');
+    setMontoGasto('');
+  };
+
+  const handleLitrosChange = (val: string) => {
+    setLitrosCombustible(val);
+    if (val && !isNaN(Number(val))) {
+      const calculated = (Number(val) * 5.72).toFixed(2);
+      setMontoGasto(calculated);
+    } else {
+      setMontoGasto('');
+    }
+  };
 
   // Files uploader states
   const [gastoFiles, setGastoFiles] = useState<File[]>([]);
@@ -123,6 +140,17 @@ export default function GastoForm({
       const eventUuid = crypto.randomUUID();
       const currentTimestamp = new Date().toISOString();
 
+      let finalDescripcion = descGasto;
+      if (tipoGasto === 'Combustible Subvencionado (5.72 Bs/L) ⛽') {
+        const litrosInfo = `Carga Subvencionada: ${litrosCombustible} Litros @ 5.72 Bs/L.`;
+        finalDescripcion = finalDescripcion ? `${litrosInfo} ${finalDescripcion}` : litrosInfo;
+      } else if (tipoGasto === 'Combustible No Subvencionado (Facturado) ⛽') {
+        const facturadoInfo = `Carga No Subvencionada (Facturada).`;
+        finalDescripcion = finalDescripcion ? `${facturadoInfo} ${finalDescripcion}` : facturadoInfo;
+      } else if (!finalDescripcion) {
+        finalDescripcion = `Compra registrada por conductor ${driver.nombre_completo}`;
+      }
+
       // 2. Submit Gasto payload
       const expensePayload = {
         id_viaje: activeViaje?.id_viaje || '',
@@ -130,7 +158,7 @@ export default function GastoForm({
         id_chofer: driver.id_chofer,
         tipo_gasto: tipoGasto,
         monto: Number(montoGasto),
-        descripcion: descGasto || `Compra registrada por conductor ${driver.nombre_completo}`,
+        descripcion: finalDescripcion,
         foto_url: uploadedUrls.join(','),
         id_evento_uuid: eventUuid,
         timestamp_registro: currentTimestamp
@@ -190,13 +218,13 @@ export default function GastoForm({
         <div className="text-left space-y-0.5">
           <span className="text-[9px] text-emerald-400 font-mono font-bold block uppercase tracking-wider">Caja Chica Disponible</span>
           <span className="text-lg font-black text-[#00ff9d] font-mono tracking-tight leading-none block drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">
-            {balanceActual.toLocaleString('es-BO', { minimumFractionDigits: 2 })} BOB
+            {balanceActual.toLocaleString('es-BO', { minimumFractionDigits: 2 })} Bs.
           </span>
         </div>
         <div className="text-right shrink-0">
           <span className="text-[9px] text-slate-400 font-bold block uppercase tracking-wider">Límite Permitido</span>
           <span className="text-xs font-black text-slate-200 font-mono mt-0.5 block">
-            {limitePermitido.toLocaleString('es-BO')} BOB
+            {limitePermitido.toLocaleString('es-BO')} Bs.
           </span>
         </div>
       </div>
@@ -206,7 +234,7 @@ export default function GastoForm({
         <div className="flex justify-between items-center text-[10px] font-mono font-bold">
           <span className="text-slate-400 uppercase tracking-widest">Consumo Acumulado</span>
           <span className={porcentaje > 85 ? 'text-rose-500 font-black' : 'text-slate-300'}>
-            {(gastoHistorico + montoActual).toLocaleString('es-BO')} BOB ({porcentaje.toFixed(1)}%)
+            {(gastoHistorico + montoActual).toLocaleString('es-BO')} Bs. ({porcentaje.toFixed(1)}%)
           </span>
         </div>
         
@@ -222,7 +250,7 @@ export default function GastoForm({
 
         {montoActual > 0 && !isExceeded && (
           <p className="text-[9px] text-emerald-400 font-medium leading-normal animate-pulse">
-            ⚡ Consumo estimado posterior a esta compra: {(gastoHistorico + montoActual).toLocaleString('es-BO')} BOB ({porcentaje.toFixed(1)}%)
+            ⚡ Consumo estimado posterior a esta compra: {(gastoHistorico + montoActual).toLocaleString('es-BO')} Bs. ({porcentaje.toFixed(1)}%)
           </p>
         )}
       </div>
@@ -235,11 +263,12 @@ export default function GastoForm({
           <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Tipo de Gasto</label>
           <select
             value={tipoGasto}
-            onChange={(e) => setTipoGasto(e.target.value)}
+            onChange={(e) => handleTipoGastoChange(e.target.value)}
             className="w-full bg-slate-950 border border-[#112240] p-3.5 rounded-2xl focus:ring-1 focus:ring-emerald-500 text-sm font-semibold text-white outline-none"
           >
+            <option value="Combustible Subvencionado (5.72 Bs/L) ⛽">Combustible Subvencionado (5.72 Bs/L) ⛽</option>
+            <option value="Combustible No Subvencionado (Facturado) ⛽">Combustible No Subvencionado (Facturado) ⛽</option>
             <option value="Alimentación 🍲">Alimentación 🍲</option>
-            <option value="Combustible ⛽">Combustible ⛽</option>
             <option value="Servicio de Taller 🔧">Servicio de Taller 🔧</option>
             <option value="Llantas 🜔">Llantas 🜔</option>
             <option value="Mantenimiento de Aceite 🛢️">Mantenimiento de Aceite 🛢️</option>
@@ -248,17 +277,47 @@ export default function GastoForm({
           </select>
         </div>
 
-        {/* Amount in BOB */}
+        {/* Input extra for Subsidized Fuel */}
+        {tipoGasto === 'Combustible Subvencionado (5.72 Bs/L) ⛽' && (
+          <div className="space-y-1 p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl animate-fade-in">
+            <div className="flex justify-between items-center">
+              <label className="text-xs text-emerald-400 font-bold uppercase tracking-wider block">Litros Cargados</label>
+              <span className="text-[10px] text-emerald-500 font-mono font-bold">Precio Fijo: 5.72 Bs/L</span>
+            </div>
+            <input
+              type="number"
+              required
+              step="0.01"
+              min="0.1"
+              value={litrosCombustible}
+              onChange={(e) => handleLitrosChange(e.target.value)}
+              placeholder="Ej. 150 litros"
+              className="w-full bg-slate-950 border border-emerald-500/30 p-3 rounded-xl text-white outline-none font-bold text-sm focus:border-emerald-500 font-mono"
+            />
+          </div>
+        )}
+
+        {/* Amount in BOB / Bs */}
         <div className="space-y-1">
-          <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Monto total (BOB)</label>
+          <div className="flex justify-between items-center">
+            <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Monto total (Bs.)</label>
+            {tipoGasto === 'Combustible Subvencionado (5.72 Bs/L) ⛽' && (
+              <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-widest bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-500/20">Auto-calculado</span>
+            )}
+          </div>
           <input
             type="number"
             required
             min="1"
+            readOnly={tipoGasto === 'Combustible Subvencionado (5.72 Bs/L) ⛽'}
             value={montoGasto}
             onChange={(e) => setMontoGasto(e.target.value)}
-            placeholder="Ingrese saldo gastado..."
-            className="w-full bg-slate-950 border border-[#112240] p-3.5 rounded-2xl text-white outline-none font-bold text-lg focus:border-emerald-500 font-mono"
+            placeholder={tipoGasto === 'Combustible Subvencionado (5.72 Bs/L) ⛽' ? "Se calculará con los litros..." : "Ingrese saldo gastado..."}
+            className={`w-full bg-slate-950 border p-3.5 rounded-2xl text-white outline-none font-bold text-lg font-mono focus:border-emerald-500 ${
+              tipoGasto === 'Combustible Subvencionado (5.72 Bs/L) ⛽' 
+                ? 'border-emerald-500/30 text-emerald-400 cursor-not-allowed bg-slate-950/80' 
+                : 'border-[#112240]'
+            }`}
             id="gasto-monto-input"
           />
         </div>
