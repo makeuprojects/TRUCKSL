@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   DollarSign, 
   Image, 
@@ -278,24 +278,32 @@ export default function GastoForm({
         </div>
 
         {/* Input extra for Subsidized Fuel */}
-        {tipoGasto === 'Combustible Subvencionado (5.72 Bs/L) ⛽' && (
-          <div className="space-y-1 p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl animate-fade-in">
-            <div className="flex justify-between items-center">
-              <label className="text-xs text-emerald-400 font-bold uppercase tracking-wider block">Litros Cargados</label>
-              <span className="text-[10px] text-emerald-500 font-mono font-bold">Precio Fijo: 5.72 Bs/L</span>
-            </div>
-            <input
-              type="number"
-              required
-              step="0.01"
-              min="0.1"
-              value={litrosCombustible}
-              onChange={(e) => handleLitrosChange(e.target.value)}
-              placeholder="Ej. 150 litros"
-              className="w-full bg-slate-950 border border-emerald-500/30 p-3 rounded-xl text-white outline-none font-bold text-sm focus:border-emerald-500 font-mono"
-            />
-          </div>
-        )}
+        <AnimatePresence initial={false}>
+          {tipoGasto === 'Combustible Subvencionado (5.72 Bs/L) ⛽' && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0, scale: 0.95 }}
+              animate={{ height: "auto", opacity: 1, scale: 1 }}
+              exit={{ height: 0, opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="overflow-hidden space-y-1 p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl"
+            >
+              <div className="flex justify-between items-center">
+                <label className="text-xs text-emerald-400 font-bold uppercase tracking-wider block">Litros Cargados</label>
+                <span className="text-[10px] text-emerald-500 font-mono font-bold">Precio Fijo: 5.72 Bs/L</span>
+              </div>
+              <input
+                type="number"
+                required
+                step="0.01"
+                min="0.1"
+                value={litrosCombustible}
+                onChange={(e) => handleLitrosChange(e.target.value)}
+                placeholder="Ej. 150 litros"
+                className="w-full bg-slate-950 border border-emerald-500/30 p-3 rounded-xl text-white outline-none font-bold text-sm focus:border-emerald-500 font-mono"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Amount in BOB / Bs */}
         <div className="space-y-1">

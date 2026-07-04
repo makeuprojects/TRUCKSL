@@ -225,20 +225,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           }
         }
         
-        // Default driver in offline sandbox mode to maintain mock capability
-        if (pin === '1234') {
-          const mockDriver: Chofer = {
-            id_chofer: 'mock-off-1',
-            nombre_completo: 'Chofer Offline Alternativo',
-            telefono: '77712345',
-            pin_acceso: '1234',
-            estado: 'Activo'
-          };
-          setAuthenticatedDriver(mockDriver);
-          localStorage.setItem('driver_session_user', JSON.stringify(mockDriver));
-          return;
-        }
-        setAuthError('Modo offline: Usa PIN 1234 para fines de demostración sin conexión.');
+        setAuthError('Modo sin conexión: Solo se permite ingresar con PINs guardados tras haber iniciado sesión anteriormente en línea.');
         setIsLoading(false);
         return;
       }
@@ -651,85 +638,95 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
   // Auth Screen if not logged in using PIN
   if (!authenticatedDriver) {
     return (
-      <div className="max-w-md w-full bg-slate-900 rounded-3xl border border-slate-800 p-8 space-y-6 mx-auto animate-fade-in shadow-2xl">
-        <div className="flex flex-col items-center justify-center space-y-3">
-          <div className="p-4 bg-orange-500/10 text-emerald-400 rounded-full border border-slate-800/80 shadow-md">
-            <Truck className="w-12 h-12" />
-          </div>
-          <h1 className="text-2xl font-bold text-white text-center">Choferes de Ruta</h1>
-          <p className="text-xs text-slate-200 text-center uppercase tracking-wider font-semibold">SL ROAD TRUCKING</p>
-        </div>
+      <div className="min-h-[100dvh] bg-transparent flex items-center justify-center p-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="max-w-md w-full backdrop-blur-[12px] bg-[#112240]/80 border border-[#233554]/50 rounded-[32px] p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden"
+        >
+          {/* Glowing Top Gradient Line */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-500"></div>
 
-        {/* Network Stager warning */}
-        <div className="flex items-center justify-between bg-slate-950 px-4 py-2.5 rounded-xl border border-slate-800/60 text-xs">
-          <div className="flex items-center space-x-2">
-            {currentNetworkActive ? (
-              <>
-                <Wifi className="w-4 h-4 text-emerald-400" />
-                <span className="text-slate-100 font-medium">Bases Disponibles en Línea</span>
-              </>
-            ) : (
-              <>
-                <WifiOff className="w-4 h-4 text-red-400 animate-pulse" />
-                <span className="text-red-400 font-semibold">Modo Offline Activado</span>
-              </>
+          <div className="flex flex-col items-center justify-center space-y-3">
+            <div className="p-4 bg-orange-500/10 text-orange-400 rounded-full border border-orange-500/20 shadow-md">
+              <Truck className="w-10 h-10 animate-[pulse_3s_infinite]" />
+            </div>
+            <h1 className="text-2xl font-extrabold text-white text-center tracking-tight">Portal de Conductores</h1>
+            <p className="text-[10px] text-orange-400 uppercase tracking-widest font-bold font-mono">SL ROAD TRUCKING</p>
+          </div>
+
+          {/* Network Stager warning */}
+          <div className="flex items-center justify-between bg-[#0a192f] px-4 py-2.5 rounded-xl border border-[#233554]/60 text-xs">
+            <div className="flex items-center space-x-2">
+              {currentNetworkActive ? (
+                <>
+                  <Wifi className="w-4 h-4 text-emerald-400" />
+                  <span className="text-slate-200 font-medium font-mono text-[11px]">En Línea (Sincronizado)</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="w-4 h-4 text-red-400 animate-pulse" />
+                  <span className="text-red-400 font-semibold font-mono text-[11px]">Modo Local / Offline</span>
+                </>
+              )}
+            </div>
+            {/* Debug connection layout modifier */}
+            <button
+              onClick={() => setSimulateOffline(!simulateOffline)}
+              className={`px-2 py-0.5 rounded text-[10px] font-mono leading-none border transition-colors cursor-pointer ${
+                simulateOffline 
+                  ? 'bg-orange-950/40 text-orange-400 border-amber-800' 
+                  : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-750'
+              }`}
+            >
+              {simulateOffline ? 'SIM: OFFLINE' : 'PROBAR OFFLINE'}
+            </button>
+          </div>
+
+          <form onSubmit={handlePinSubmit} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[10px] text-slate-300 font-bold uppercase tracking-wider font-mono">PIN de Conductor</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                  <KeyRound className="w-5 h-5" />
+                </span>
+                <input
+                  type="password"
+                  maxLength={4}
+                  pattern="[0-9]*"
+                  inputMode="numeric"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  placeholder="••••"
+                  className="w-full bg-[#0A192F] border border-[#233554] text-white font-mono text-center tracking-widest text-2xl py-3 pl-10 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400 text-center mt-1 font-mono">
+                Ingresa tu código PIN de 4 dígitos asignado.
+              </p>
+            </div>
+
+            {authError && (
+              <div className="p-3 bg-red-950/40 text-red-400 border border-red-800/60 rounded-xl text-xs text-center flex items-center justify-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{authError}</span>
+              </div>
             )}
-          </div>
-          {/* Debug connection layout modifier */}
-          <button
-            onClick={() => setSimulateOffline(!simulateOffline)}
-            className={`px-2 py-0.5 rounded text-[10px] font-mono leading-none border transition-colors cursor-pointer ${
-              simulateOffline 
-                ? 'bg-orange-950/40 text-orange-400 border-amber-800' 
-                : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-750'
-            }`}
-          >
-            {simulateOffline ? 'SIM: OFFLINE' : 'PROBAR OFFLINE'}
-          </button>
-        </div>
 
-        <form onSubmit={handlePinSubmit} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-xs text-slate-200 font-semibold uppercase tracking-wider">PIN de Conductor</label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                <KeyRound className="w-5 h-5" />
-              </span>
-              <input
-                type="password"
-                maxLength={4}
-                pattern="[0-9]*"
-                inputMode="numeric"
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                placeholder="••••"
-                className="w-full bg-slate-950 border border-slate-800 text-white font-mono text-center tracking-widest text-2xl py-3 pl-10 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition"
-              />
-            </div>
-            <p className="text-[10px] text-slate-200 text-center mt-1">
-              Ingresa tu código PIN de 4 dígitos. Para pruebas usa: <strong className="text-emerald-400">1234</strong>
-            </p>
-          </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 active:scale-[0.98] text-slate-950 font-extrabold py-3.5 px-4 rounded-xl shadow-lg transition cursor-pointer text-xs uppercase tracking-wider font-sans"
+            >
+              {isLoading ? 'Comprobando acceso...' : 'INGRESAR AL PORTAL'}
+            </button>
+          </form>
 
-          {authError && (
-            <div className="p-3 bg-red-950/40 text-red-400 border border-red-800/60 rounded-xl text-xs text-center flex items-center justify-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span>{authError}</span>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-orange-500 hover:bg-emerald-600 active:bg-emerald-700 text-slate-950 font-bold py-3.5 px-4 rounded-2xl shadow-lg transform active:scale-98 transition cursor-pointer"
-          >
-            {isLoading ? 'Comprobando acceso...' : 'INGRESAR'}
-          </button>
-        </form>
-
-        <p className="text-center text-xs text-slate-400">
-          ¿No tienes PIN? Solicítalo a <strong>Don Saúl</strong>.
-        </p>
+          <p className="text-center text-[11px] text-slate-400 font-mono">
+            ¿No tienes PIN? Solicítalo a <strong>Don Saúl</strong>.
+          </p>
+        </motion.div>
       </div>
     );
   }

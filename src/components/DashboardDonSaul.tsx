@@ -897,7 +897,12 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
         {/* CONDITIONALLY RENDER MAIN CONTENT BASED ON TABS */}
         <div className="w-full">
           {activeTab === 'dashboard' && (
-            <div className="max-w-5xl mx-auto animate-fade-in">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-5xl mx-auto"
+            >
               <SaulDashboardOverview 
                 viajes={viajes}
                 choferes={choferes}
@@ -908,11 +913,16 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 totalExpensesValue={totalExpensesThisMonth}
                 margenValue={margenValue}
               />
-            </div>
+            </motion.div>
           )}
 
           {activeTab === 'monitoreo' && (
-            <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-5xl mx-auto space-y-8"
+            >
               {/* MONITOREO DE RUTAS EN TIEMPO REAL */}
             <div id="live-route-container" className="bg-slate-900/80 backdrop-blur-md border border-slate-800 p-6 rounded-2xl space-y-5 shadow-2xl">
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -1109,11 +1119,16 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 </div>
               )}
             </div>
-            </div>
+            </motion.div>
           )}
 
           {activeTab === 'personal' && (
-            <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-start animate-fade-in">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-start"
+            >
               <div className="space-y-8">
                 {/* DRIVERS / CHOFERES BOARD */}
                 <div className="bg-slate-900/80 hover:bg-slate-900/95 backdrop-blur-md border border-white/[0.08] p-6 rounded-2xl space-y-4 shadow-2xl relative transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]">
@@ -1453,11 +1468,16 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
               </form>
             </div>
             </div>
-          </div>
+          </motion.div>
           )}
 
           {activeTab === 'historial' && (
-            <div className="max-w-5xl mx-auto animate-fade-in">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className="max-w-5xl mx-auto"
+            >
               {/* BÓVEDA DE VIAJES (Historial) */}
               <TripHistoryArchive 
                 viajes={viajes}
@@ -1469,7 +1489,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                   setIsRouteDetailOpen(true);
                 }}
               />
-            </div>
+            </motion.div>
           )}
         </div>
 

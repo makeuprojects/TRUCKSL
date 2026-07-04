@@ -99,7 +99,7 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
         ]);
 
         autoTable(doc, {
-          startY: 65,
+          startY: 72,
           head: [['Fecha', 'Categoría', 'Descripción', 'Monto (Bs.)']],
           body: tableData,
           theme: 'grid',

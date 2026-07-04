@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { User } from 'firebase/auth';
+import { motion, AnimatePresence } from 'motion/react';
 import { initAuth, googleSignIn, logout } from './auth';
 import DriverApp from './components/DriverApp';
 import AdminDashboard from './components/AdminDashboard';
+import TireTrackParticlesBg from './components/TireTrackParticlesBg';
 import {
   Truck,
   Database,
@@ -19,9 +21,22 @@ import {
   LogOut,
   ChevronRight,
   UserCheck as UserIcon,
-  Lock
+  Lock,
+  ChevronDown
 } from 'lucide-react';
 import { Chofer } from './types';
+
+function AppBackground({ googleToken, localDriver, localDriverToken }: { googleToken: string | null; localDriver: Chofer | null; localDriverToken: string | null }) {
+  const location = useLocation();
+  const showBackground =
+    location.pathname === '/' ||
+    location.pathname === '/chofer-login' ||
+    (location.pathname === '/admin' && !googleToken) ||
+    (location.pathname === '/chofer' && (!localDriver || !localDriverToken));
+
+  if (!showBackground) return null;
+  return <TireTrackParticlesBg />;
+}
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -105,7 +120,8 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-[100dvh] bg-gradient-to-br from-[#0284c7] via-[#0b1b3d] to-[#020617] text-white font-sans selection:bg-emerald-500/30 selection:text-white overflow-x-hidden">
+      <div className="min-h-[100dvh] bg-gradient-to-br from-[#0284c7] via-[#0b1b3d] to-[#020617] text-white font-sans selection:bg-emerald-500/30 selection:text-white overflow-x-hidden relative">
+        <AppBackground googleToken={googleToken} localDriver={localDriver} localDriverToken={localDriverToken} />
         <Routes>
           {/* Main Select Portal Page */}
           <Route
@@ -192,12 +208,17 @@ function PortalSelector({ currentUser, googleToken, onSignOut, localDriver }: Po
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-[100dvh] bg-transparent flex flex-col items-center justify-center p-4 relative overflow-y-auto">
       {/* Visual background ambient glow elements */}
       <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-blue-900/20 rounded-full blur-[80px] pointer-events-none"></div>
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none"></div>
 
-      <div className="max-w-2xl w-full backdrop-blur-[12px] bg-[#112240]/80 border border-[#233554]/50 rounded-[32px] p-8 md:p-12 space-y-8 text-center relative shadow-2xl">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 260, damping: 25 }}
+        className="max-w-2xl w-full backdrop-blur-[12px] bg-[#112240]/80 border border-[#233554]/50 rounded-[32px] p-6 sm:p-10 md:p-12 space-y-8 text-center relative shadow-2xl"
+      >
         {/* Colorful top border highlight */}
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 via-blue-500 to-orange-500 rounded-t-[32px]"></div>
 
@@ -215,7 +236,7 @@ function PortalSelector({ currentUser, googleToken, onSignOut, localDriver }: Po
               </span>
               <button
                 onClick={onSignOut}
-                className="text-slate-100 hover:text-red-400 text-[11px] font-medium flex items-center gap-1 transition"
+                className="text-slate-100 hover:text-red-400 text-[11px] font-medium flex items-center gap-1 transition cursor-pointer"
               >
                 <LogOut className="w-3 h-3" />
                 Desconectar
@@ -346,46 +367,114 @@ function PortalSelector({ currentUser, googleToken, onSignOut, localDriver }: Po
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 text-left">
           {/* DRIVERS ENTRY PANEL */}
-          <button
+          <motion.button
+            whileHover={{ y: -4, scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
             onClick={() => navigate(localDriver ? '/chofer' : '/chofer-login')}
-            className="group backdrop-blur-[6px] bg-[#0A192F]/60 hover:bg-[#0A192F]/90 border border-[#233554]/50 hover:border-orange-500/30 rounded-2xl p-6 space-y-4 transition-all duration-300 transform hover:-translate-y-1 shadow-lg text-left cursor-pointer focus:ring-2 focus:ring-orange-500"
+            className="group backdrop-blur-[6px] bg-[#0A192F]/70 hover:bg-[#0A192F]/95 border border-[#233554]/50 hover:border-orange-500/40 rounded-2xl p-6 space-y-4 shadow-xl text-left cursor-pointer focus:ring-2 focus:ring-orange-500 outline-none relative overflow-hidden"
           >
-            <div className="p-3 bg-orange-500/10 text-orange-500 rounded-xl border border-orange-500/20 inline-block">
-              <Smartphone className="w-6 h-6" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-base text-white group-hover:text-orange-500 transition">
-                  {localDriver ? `Volver como ${localDriver.nombre_completo}` : 'Portal Choferes'}
-                </h3>
-                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-orange-500 transition transform group-hover:translate-x-1" />
+            {/* Ambient Background Glow Accent */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl group-hover:bg-orange-500/10 transition duration-500" />
+            
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-orange-500/10 text-orange-500 rounded-xl border border-orange-500/25 inline-block relative">
+                <Truck className="w-6 h-6 animate-[pulse_3s_infinite]" />
+                <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500"></span>
+                </span>
               </div>
-              <p className="text-xs text-slate-200 leading-relaxed">
-                Ingreso rápido para conductores usando Nombre y PIN de 4 dígitos. Reportes de combustible, pesaje y alertas sin conexión.
-              </p>
+              <div className="px-2 py-0.5 bg-orange-500/10 border border-orange-500/20 text-[9px] text-orange-400 font-bold uppercase tracking-wider rounded">
+                Ruta & Pesaje
+              </div>
             </div>
-          </button>
+
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-extrabold text-base text-white group-hover:text-orange-400 transition">
+                    {localDriver ? `Volver como ${localDriver.nombre_completo}` : 'Portal Conductores'}
+                  </h3>
+                  <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-orange-400 transition transform group-hover:translate-x-1.5" />
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Ingreso rápido de conductores para registrar bitácoras, consumo de combustible, pesajes de carga y alertas de viaje.
+                </p>
+              </div>
+
+              {/* Micro actions preview for realistic application purpose */}
+              <div className="pt-2 border-t border-[#233554]/40 flex flex-wrap gap-2 text-[9px] font-mono text-slate-400">
+                <span className="flex items-center gap-1 bg-[#112240]/60 px-2 py-1 rounded border border-[#233554]/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                  Combustible
+                </span>
+                <span className="flex items-center gap-1 bg-[#112240]/60 px-2 py-1 rounded border border-[#233554]/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                  Pesajes
+                </span>
+                <span className="flex items-center gap-1 bg-[#112240]/60 px-2 py-1 rounded border border-[#233554]/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+                  Alertas Offline
+                </span>
+              </div>
+            </div>
+          </motion.button>
 
           {/* ADMIN ENTRY PANEL */}
-          <button
+          <motion.button
+            whileHover={{ y: -4, scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
             onClick={() => navigate('/admin')}
-            className="group backdrop-blur-[6px] bg-[#0A192F]/60 hover:bg-[#0A192F]/90 border border-[#233554]/50 hover:border-blue-500/30 rounded-2xl p-6 space-y-4 transition-all duration-300 transform hover:-translate-y-1 shadow-lg text-left cursor-pointer focus:ring-2 focus:ring-blue-500"
+            className="group backdrop-blur-[6px] bg-[#0A192F]/70 hover:bg-[#0A192F]/95 border border-[#233554]/50 hover:border-blue-500/40 rounded-2xl p-6 space-y-4 shadow-xl text-left cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none relative overflow-hidden"
           >
-            <div className="p-3 bg-blue-900/20 text-blue-500 rounded-xl border border-blue-900/30 inline-block">
-              <Layout className="w-6 h-6" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-base text-white group-hover:text-blue-400 transition">
-                  Administración
-                </h3>
-                <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-blue-400 transition transform group-hover:translate-x-1" />
+            {/* Ambient Background Glow Accent */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition duration-500" />
+
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/25 inline-block relative">
+                <Building className="w-6 h-6" />
+                <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-400"></span>
+                </span>
               </div>
-              <p className="text-xs text-slate-200 leading-relaxed">
-                Tablero analítico financiero, aprobaciones, control de inventario de repuestos y cambio de aceite de los vehículos.
-              </p>
+              <div className="px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 text-[9px] text-blue-400 font-bold uppercase tracking-wider rounded">
+                Torre de Control
+              </div>
             </div>
-          </button>
+
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-base text-white group-hover:text-blue-400 transition">
+                    Administración
+                  </h3>
+                  <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-blue-400 transition transform group-hover:translate-x-1.5" />
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Consola centralizada para el control de la flota, aprobaciones de depósitos, inventario de repuestos y analíticas en tiempo real.
+                </p>
+              </div>
+
+              {/* Micro actions preview for realistic application purpose */}
+              <div className="pt-2 border-t border-[#233554]/40 flex flex-wrap gap-2 text-[9px] font-mono text-slate-400">
+                <span className="flex items-center gap-1 bg-[#112240]/60 px-2 py-1 rounded border border-[#233554]/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                  Inventarios
+                </span>
+                <span className="flex items-center gap-1 bg-[#112240]/60 px-2 py-1 rounded border border-[#233554]/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                  Presupuestos
+                </span>
+                <span className="flex items-center gap-1 bg-[#112240]/60 px-2 py-1 rounded border border-[#233554]/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                  Sincronización
+                </span>
+              </div>
+            </div>
+          </motion.button>
         </div>
 
         <div className="pt-2 flex flex-col items-center justify-center space-y-1 text-slate-100 text-[10px] font-mono">
@@ -394,7 +483,7 @@ function PortalSelector({ currentUser, googleToken, onSignOut, localDriver }: Po
             <span>Proxy de Caching con Node-Cache & Colas Síncronos</span>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -517,8 +606,14 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
   };
 
   return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
-      <div className="max-w-md w-full backdrop-blur-[12px] bg-[#112240]/80 border border-[#233554]/50 rounded-[24px] p-8 space-y-6 shadow-2xl relative">
+    <div className="min-h-[100dvh] bg-transparent flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="max-w-md w-full backdrop-blur-[12px] bg-[#112240]/80 border border-[#233554]/50 rounded-[32px] p-6 sm:p-8 space-y-6 shadow-2xl relative"
+      >
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 via-blue-500 to-orange-500 rounded-t-[32px]"></div>
         
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="p-3.5 bg-orange-500/10 text-orange-500 rounded-full border border-orange-500/20 shadow-md">
@@ -531,7 +626,7 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
         </div>
 
         {errorStatus && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-2.5 text-xs text-rose-450 font-medium">
+          <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-start gap-2.5 text-xs text-rose-450 font-medium animate-bounce">
             <ShieldAlert className="w-4 h-4 shrink-0" />
             <span>{errorStatus}</span>
           </div>
@@ -544,33 +639,38 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
               Selecciona tu Nombre
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-200">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-200 z-10 pointer-events-none">
                 <UserIcon className="w-4.5 h-4.5" />
               </span>
               
               {choferList.length > 0 ? (
-                <select
-                  value={selectedDriverName}
-                  onChange={(e) => setSelectedDriverName(e.target.value)}
-                  className="w-full bg-[#0A192F] border border-[#233554] rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 cursor-pointer appearance-none"
-                >
-                  <option value="">-- Elige tu Nombre de la Lista --</option>
-                  {choferList
-                    .filter((driver) => driver.nombre_completo !== 'Don Saúl')
-                    .map((driver, index) => (
-                      <option key={`${driver.id_chofer || driver.nombre_completo}-${index}`} value={driver.nombre_completo}>
-                        {driver.nombre_completo}
-                      </option>
-                    ))}
-                  <option value="Don Saúl">Don Saúl</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={selectedDriverName}
+                    onChange={(e) => setSelectedDriverName(e.target.value)}
+                    className="w-full bg-[#0A192F] border border-[#233554] rounded-xl pl-10 pr-10 py-3.5 text-sm text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 cursor-pointer appearance-none transition"
+                  >
+                    <option value="">-- Elige tu Nombre de la Lista --</option>
+                    {choferList
+                      .filter((driver) => driver.nombre_completo !== 'Don Saúl')
+                      .map((driver, index) => (
+                        <option key={`${driver.id_chofer || driver.nombre_completo}-${index}`} value={driver.nombre_completo}>
+                          {driver.nombre_completo}
+                        </option>
+                      ))}
+                    <option value="Don Saúl">Don Saúl</option>
+                  </select>
+                  <span className="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-slate-400">
+                    <ChevronDown className="w-4 h-4" />
+                  </span>
+                </div>
               ) : (
                 <input
                   type="text"
                   placeholder="Escribe tu Nombre Completo..."
                   value={selectedDriverName}
                   onChange={(e) => setSelectedDriverName(e.target.value)}
-                  className="w-full bg-[#0A192F] border border-[#233554] rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                  className="w-full bg-[#0A192F] border border-[#233554] rounded-xl pl-10 pr-4 py-3.5 text-sm text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition"
                 />
               )}
             </div>
@@ -582,7 +682,7 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
               PIN Secreto de Acceso (4 dígitos)
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-200">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-200 pointer-events-none">
                 <Lock className="w-4.5 h-4.5" />
               </span>
               <input
@@ -593,23 +693,25 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
                 placeholder="••••"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                className="w-full bg-[#0A192F] border border-[#233554] rounded-xl pl-10 pr-4 py-3 text-sm text-center text-slate-100 font-mono tracking-[0.5em] text-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                className="w-full bg-[#0A192F] border border-[#233554] rounded-xl pl-10 pr-4 py-3.5 text-sm text-center text-slate-100 font-mono tracking-[0.5em] text-lg focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition"
               />
             </div>
           </div>
 
           <div className="pt-2 flex gap-3">
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/')}
-              className="flex-1 bg-[#112240] border border-[#233554] hover:bg-[#233554] text-slate-100 font-extrabold text-xs py-3 rounded-xl transition cursor-pointer"
+              className="flex-1 bg-[#112240] border border-[#233554] hover:bg-[#233554] text-slate-100 font-extrabold text-xs py-3.5 rounded-xl transition cursor-pointer outline-none"
             >
               VOLVER
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               type="submit"
+              whileTap={{ scale: 0.95 }}
               disabled={isLogging}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 active:bg-amber-700 text-slate-950 font-extrabold text-xs py-3 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="flex-1 bg-orange-500 hover:bg-orange-600 active:bg-amber-700 text-slate-950 font-extrabold text-xs py-3.5 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 outline-none"
             >
               {isLogging ? (
                 <>
@@ -619,14 +721,14 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
               ) : (
                 <span>INGRESAR</span>
               )}
-            </button>
+            </motion.button>
           </div>
         </form>
 
         <div className="text-center text-[10px] text-slate-100 font-mono leading-normal">
-          ¿No apareces en la lista? Ingresa tu nombre manualmente o usa tu PIN asignado por Don Saúl (PIN por defecto: 1234).
+          ¿No apareces en la lista? Ingresa tu nombre manualmente o usa tu PIN asignado por Don Saúl.
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -654,23 +756,27 @@ function AdminGoogleLoginGate({ isLoggingIn, onLogin, onBypass }: AdminGoogleLog
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white border border-slate-200 rounded-[24px] p-8 space-y-6 shadow-xl relative text-center">
-        
-        <div className="absolute top-0 left-0 right-0 h-1 bg-blue-900 rounded-t-[24px]"></div>
+    <div className="min-h-[100dvh] bg-transparent flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        className="max-w-md w-full backdrop-blur-[12px] bg-[#112240]/80 border border-[#233554]/50 rounded-[32px] p-6 sm:p-8 space-y-6 shadow-2xl relative text-center"
+      >
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 via-blue-500 to-orange-500 rounded-t-[32px]"></div>
 
-        <div className="mx-auto w-16 h-16 bg-blue-900/10 text-blue-900 rounded-full border border-blue-900/20 flex items-center justify-center shadow-sm">
+        <div className="mx-auto w-16 h-16 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20 flex items-center justify-center shadow-md">
           <Layout className="w-8 h-8" />
         </div>
 
         <div className="space-y-1.5">
-          <h2 className="text-xl font-bold text-slate-800 tracking-tight">Consola Administrativa</h2>
-          <p className="text-[10px] text-blue-900 uppercase tracking-widest font-semibold font-mono">
+          <h2 className="text-xl font-bold text-white tracking-tight">Consola Administrativa</h2>
+          <p className="text-[10px] text-blue-400 uppercase tracking-widest font-bold font-mono">
             Acceso Restringido
           </p>
         </div>
 
-        <p className="text-xs text-slate-400 leading-relaxed max-w-sm px-2 mx-auto">
+        <p className="text-xs text-slate-300 leading-relaxed max-w-sm px-2 mx-auto">
           Ingrese la contraseña de administrador para acceder a la consola centralizada de la flota.
         </p>
 
@@ -684,35 +790,41 @@ function AdminGoogleLoginGate({ isLoggingIn, onLogin, onBypass }: AdminGoogleLog
                 setPassword(e.target.value);
                 if (error) setError(false);
               }}
-              className={`w-full bg-slate-50 border ${error ? 'border-red-500 text-red-600 placeholder-red-400' : 'border-slate-300 text-slate-800 placeholder-slate-400'} rounded-xl py-3.5 px-4 text-center focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
+              className={`w-full bg-[#0A192F] border ${
+                error
+                  ? 'border-red-500 text-red-400 placeholder-red-350'
+                  : 'border-[#233554] text-white placeholder-slate-400'
+              } rounded-xl py-3.5 px-4 text-center font-bold tracking-wider focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition`}
             />
             {error && (
-              <p className="text-[10px] text-red-500 mt-2 font-mono">Contraseña incorrecta</p>
+              <p className="text-[10px] text-red-400 mt-2 font-mono">Contraseña incorrecta</p>
             )}
           </div>
 
-          <button
+          <motion.button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white font-extrabold py-3.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition cursor-pointer transform font-sans text-xs tracking-wider uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+            whileTap={{ scale: 0.97 }}
+            className="w-full bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-extrabold py-3.5 px-4 rounded-xl shadow-md flex items-center justify-center gap-2 transition cursor-pointer transform font-sans text-xs tracking-wider uppercase disabled:opacity-50 disabled:cursor-not-allowed outline-none"
             disabled={!password.trim()}
           >
             <span>INGRESAR ADMINISTRACIÓN</span>
             <ChevronRight className="w-4 h-4 text-white" />
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/')}
-            className="w-full bg-transparent hover:bg-slate-100 text-slate-400 font-bold py-2 px-4 rounded-xl transition text-[10px] uppercase tracking-wider mt-2 cursor-pointer"
+            className="w-full bg-[#112240] border border-[#233554] hover:bg-[#233554] text-slate-100 font-extrabold py-3 px-4 rounded-xl transition text-[10px] uppercase tracking-wider mt-2 cursor-pointer outline-none"
           >
             VOLVER AL PORTAL
-          </button>
+          </motion.button>
         </form>
 
-        <div className="pt-2 text-[9px] text-slate-200 font-mono leading-relaxed">
-          Google Sheets ID: <span className="text-blue-500 block break-all">1ZNuFluKQi3lFP5qF-eQtfvDCcIDotu4v8jV89GwRgsQ</span>
+        <div className="pt-2 text-[9px] text-slate-400 font-mono leading-relaxed">
+          Google Sheets ID: <span className="text-blue-400 block break-all">1ZNuFluKQi3lFP5qF-eQtfvDCcIDotu4v8jV89GwRgsQ</span>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   BarChart, 
   Bar, 
@@ -625,91 +626,101 @@ export default function SaulDashboardOverview({
                     </div>
 
                     {/* Collapsible Body with expense lists and income formula detail */}
-                    {isExpanded && (
-                      <div className="border-t border-slate-800/80 bg-slate-950/40 p-4 space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          
-                          {/* Left: How Saul manages Income (Flete Formula) */}
-                          <div className="space-y-2 bg-slate-900/40 border border-slate-800/80 p-3.5 rounded-xl">
-                            <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider block">
-                              ⚙️ Gestión de Ingresos (Fórmula Don Saúl)
-                            </span>
-                            <p className="text-[10px] text-slate-400 leading-normal">
-                              Don Saúl determina los ingresos del flete directamente configurando la <strong>Tarifa Base</strong> de la ruta en la pestaña de configuración. Si hay sobrepeso (más de 45 toneladas), se añade el flete de extras:
-                            </p>
-                            <div className="space-y-1.5 pt-1.5 border-t border-slate-800 text-[10px] font-mono">
-                              <div className="flex justify-between">
-                                <span className="text-slate-400">Tarifa de Ruta Base (Hasta 45 t):</span>
-                                <span className="text-slate-200 font-black">Bs. {basePrice.toLocaleString('es-BO')}</span>
+                    <AnimatePresence initial={false}>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: 'easeInOut' }}
+                          className="overflow-hidden border-t border-slate-800/80 bg-slate-950/30"
+                        >
+                          <div className="p-4 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              
+                              {/* Left: How Saul manages Income (Flete Formula) */}
+                              <div className="space-y-2 bg-slate-900/40 border border-slate-800/80 p-3.5 rounded-xl">
+                                <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wider block">
+                                  ⚙️ Gestión de Ingresos (Fórmula Don Saúl)
+                                </span>
+                                <p className="text-[10px] text-slate-400 leading-normal">
+                                  Don Saúl determina los ingresos del flete directamente configurando la <strong>Tarifa Base</strong> de la ruta en la pestaña de configuración. Si hay sobrepeso (más de 45 toneladas), se añade el flete de extras:
+                                </p>
+                                <div className="space-y-1.5 pt-1.5 border-t border-slate-800 text-[10px] font-mono">
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-400">Tarifa de Ruta Base (Hasta 45 t):</span>
+                                    <span className="text-slate-200 font-black">Bs. {basePrice.toLocaleString('es-BO')}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-400">Toneladas Extras Transportadas:</span>
+                                    <span className="text-blue-400 font-black">{extraTons} t</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-400">Bono por Sobrepeso:</span>
+                                    <span className="text-emerald-400 font-black">+Bs. {extraRateValue.toFixed(2)}</span>
+                                  </div>
+                                  <div className="flex justify-between pt-1.5 border-t border-slate-800 font-black text-xs text-slate-100">
+                                    <span className="uppercase font-sans">Total Ingreso Cobrado:</span>
+                                    <span>Bs. {totalIncome.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-slate-400">Toneladas Extras Transportadas:</span>
-                                <span className="text-blue-400 font-black">{extraTons} t</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-slate-400">Bono por Sobrepeso:</span>
-                                <span className="text-emerald-400 font-black">+Bs. {extraRateValue.toFixed(2)}</span>
-                              </div>
-                              <div className="flex justify-between pt-1.5 border-t border-slate-800 font-black text-xs text-slate-100">
-                                <span className="uppercase font-sans">Total Ingreso Cobrado:</span>
-                                <span>Bs. {totalIncome.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
-                              </div>
-                            </div>
-                          </div>
 
-                          {/* Right: Itemized Expenses on the Route */}
-                          <div className="space-y-2 bg-slate-900/40 border border-slate-800/80 p-3.5 rounded-xl">
-                            <div className="flex justify-between items-center">
-                              <span className="text-[10px] text-rose-400 font-extrabold uppercase tracking-wider block">
-                                ⛽ Comprobantes y Gastos en Ruta
-                              </span>
-                              <span className="text-[9px] text-slate-450 font-mono font-bold">Total: {tripExpensesList.length} registros</span>
-                            </div>
-                            
-                            {tripExpensesList.length === 0 ? (
-                              <div className="text-center py-6 text-[10px] text-slate-500 italic">
-                                El conductor aún no ha subido comprobantes de gastos en esta ruta.
-                              </div>
-                            ) : (
-                              <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1 font-sans">
-                                {tripExpensesList.map((g, idx) => (
-                                  <div 
-                                    key={`${g.id_gasto}-${idx}`}
-                                    className="flex items-center justify-between gap-3 bg-slate-950 p-2.5 rounded-lg border border-slate-800"
-                                  >
-                                    <div className="min-w-0">
-                                      <div className="flex items-center gap-1.5">
-                                        <span className="text-[8px] bg-slate-800 text-slate-300 font-black font-mono px-1.5 py-0.5 rounded uppercase">
-                                          {g.tipo_gasto.replace(/⛽|🍲|🔧|🜔|🛢️|🎫/g, '').trim()}
-                                        </span>
-                                        <span className="text-[9px] text-slate-500 font-mono">
-                                          {g.timestamp_registro ? new Date(g.timestamp_registro).toLocaleDateString('es-BO') : ''}
+                              {/* Right: Itemized Expenses on the Route */}
+                              <div className="space-y-2 bg-slate-900/40 border border-slate-800/80 p-3.5 rounded-xl">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[10px] text-rose-400 font-extrabold uppercase tracking-wider block">
+                                    ⛽ Comprobantes y Gastos en Ruta
+                                  </span>
+                                  <span className="text-[9px] text-slate-450 font-mono font-bold">Total: {tripExpensesList.length} registros</span>
+                                </div>
+                                
+                                {tripExpensesList.length === 0 ? (
+                                  <div className="text-center py-6 text-[10px] text-slate-500 italic">
+                                    El conductor aún no ha subido comprobantes de gastos en esta ruta.
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1 font-sans">
+                                    {tripExpensesList.map((g, idx) => (
+                                      <div 
+                                        key={`${g.id_gasto}-${idx}`}
+                                        className="flex items-center justify-between gap-3 bg-slate-950 p-2.5 rounded-lg border border-slate-800"
+                                      >
+                                        <div className="min-w-0">
+                                          <div className="flex items-center gap-1.5">
+                                            <span className="text-[8px] bg-slate-800 text-slate-300 font-black font-mono px-1.5 py-0.5 rounded uppercase">
+                                              {g.tipo_gasto.replace(/⛽|🍲|🔧|🜔|🛢️|🎫/g, '').trim()}
+                                            </span>
+                                            <span className="text-[9px] text-slate-500 font-mono">
+                                              {g.timestamp_registro ? new Date(g.timestamp_registro).toLocaleDateString('es-BO') : ''}
+                                            </span>
+                                          </div>
+                                          <p className="text-[10px] text-slate-300 mt-1 leading-normal truncate">{g.descripcion || 'Sin descripción'}</p>
+                                        </div>
+                                        <span className="text-xs font-black text-rose-400 font-mono shrink-0">
+                                          -Bs. {safeParse(g.monto).toLocaleString('es-BO', { minimumFractionDigits: 2 })}
                                         </span>
                                       </div>
-                                      <p className="text-[10px] text-slate-300 mt-1 leading-normal truncate">{g.descripcion || 'Sin descripción'}</p>
-                                    </div>
-                                    <span className="text-xs font-black text-rose-400 font-mono shrink-0">
-                                      -Bs. {safeParse(g.monto).toLocaleString('es-BO', { minimumFractionDigits: 2 })}
-                                    </span>
+                                    ))}
                                   </div>
-                                ))}
+                                )}
                               </div>
-                            )}
+
+                            </div>
+
+                            {/* Summary of margin explanation */}
+                            <div className={`p-3 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10.5px] font-sans ${borderBgColor}`}>
+                              <p className="text-slate-200 leading-normal">
+                                ℹ️ <strong>Margen de Utilidad del Viaje:</strong> En esta ruta, Don Saúl retiene el <strong>{marginPct.toFixed(1)}%</strong> del flete cobrado después de liquidar los gastos operativos autodeclarados del chofer.
+                              </p>
+                              <span className={`font-black uppercase shrink-0 ${textColor}`}>
+                                Retorno Neto: Bs. {netProfit.toLocaleString('es-BO', { minimumFractionDigits: 2 })}
+                              </span>
+                            </div>
                           </div>
-
-                        </div>
-
-                        {/* Summary of margin explanation */}
-                        <div className={`p-3 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10.5px] font-sans ${borderBgColor}`}>
-                          <p className="text-slate-200 leading-normal">
-                            ℹ️ <strong>Margen de Utilidad del Viaje:</strong> En esta ruta, Don Saúl retiene el <strong>{marginPct.toFixed(1)}%</strong> del flete cobrado después de liquidar los gastos operativos autodeclarados del chofer.
-                          </p>
-                          <span className={`font-black uppercase shrink-0 ${textColor}`}>
-                            Retorno Neto: Bs. {netProfit.toLocaleString('es-BO', { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                      </div>
-                    )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 );
               })

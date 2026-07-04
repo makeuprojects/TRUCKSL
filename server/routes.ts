@@ -162,17 +162,6 @@ apiRouter.post('/auth/login', async (req, res) => {
            String(c.estado || '').toLowerCase() === 'activo'
     );
 
-    // Fallback: PIN 1234
-    if (!match && String(pin) === '1234') {
-      match = {
-        id_chofer: 'demo-1234',
-        nombre_completo: nombre_completo,
-        telefono: '77742345',
-        pin_acceso: '1234',
-        estado: 'Activo'
-      };
-    }
-
     if (match) {
       const mockToken = `local-auth-chofer-${match.id_chofer}-${Date.now()}`;
       res.json({
@@ -200,16 +189,6 @@ apiRouter.post('/choferes/login', async (req, res) => {
 
     const choferes = await getChoferesWithCalculatedBalance(authHeader);
     let match = choferes.find(c => String(c.pin_acceso || '') === String(pin) && String(c.estado || '').toLowerCase() === 'activo');
-
-    if (!match && String(pin) === '1234') {
-      match = {
-        id_chofer: 'demo-1234',
-        nombre_completo: 'Chofer de Prueba 1234',
-        telefono: '77712345',
-        pin_acceso: '1234',
-        estado: 'Activo'
-      };
-    }
 
     if (match) {
       res.json({ success: true, chofer: match });
