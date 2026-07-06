@@ -1,113 +1,83 @@
 import React, { useEffect, useState } from 'react';
 
-interface Particle {
-  id: number;
-  left: number; // percentage
-  top: number; // percentage
-  size: number; // px
-  color: 'orange' | 'blue' | 'emerald';
-  duration: number; // seconds
-  delay: number; // seconds
-  drift: number; // px
-}
-
 export default function TireTrackParticlesBg() {
-  const [particles, setParticles] = useState<Particle[]>([]);
+  const [isMobile, setIsMobile] = useState<boolean>(true);
+  const [particles, setParticles] = useState<{ id: number; left: number; top: number; size: number; color: string }[]>([]);
 
   useEffect(() => {
-    // Generate simple particle metadata on client-mount to avoid server hydration mismatches
-    const colors: ('orange' | 'blue' | 'emerald')[] = ['orange', 'blue', 'emerald'];
-    const count = window.innerWidth < 768 ? 6 : 12; // Fewer particles on mobile for extreme performance
+    // Determine screen size on client-mount
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      return mobile;
+    };
 
-    const generated: Particle[] = Array.from({ length: count }).map((_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      top: Math.random() * 80 + 10,
-      size: Math.random() * 4 + 3, // 3px to 7px
-      color: colors[i % colors.length],
-      duration: Math.random() * 8 + 6, // 6s to 14s
-      delay: Math.random() * -12, // negative delay so they are instantly visible
-      drift: Math.random() * 30 - 15, // horizontal drift
-    }));
-    setParticles(generated);
+    const mobile = checkMobile();
+
+    // Only generate particles if NOT on mobile to maximize phone rendering performance
+    if (!mobile) {
+      const colors = ['orange', 'blue', 'emerald'];
+      const generated = Array.from({ length: 8 }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        top: Math.random() * 80 + 10,
+        size: Math.random() * 4 + 3,
+        color: colors[i % colors.length],
+      }));
+      setParticles(generated);
+    }
+
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // On Mobile, return a completely static background with zero overhead
+  if (isMobile) {
+    return (
+      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0 bg-[#0b1b3d]/90">
+        {/* Subtle, non-animated gradient spots for depth */}
+        <div className="absolute top-1/4 left-10 w-[150px] h-[150px] bg-orange-600/5 rounded-full blur-[60px]" />
+        <div className="absolute bottom-1/4 right-10 w-[150px] h-[150px] bg-blue-600/5 rounded-full blur-[60px]" />
+      </div>
+    );
+  }
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-      {/* 
-        HIGH PERFORMANCE GPU-ACCELERATED CSS ANIMATIONS 
-        We use translate3d instead of background-position-y so the GPU can handle the layer directly without causing layout repaints.
-      */}
       <style>{`
         @keyframes scrollTreadDown {
-          0% {
-            transform: translate3d(0, -60px, 0);
-          }
-          100% {
-            transform: translate3d(0, 0, 0);
-          }
+          0% { transform: translate3d(0, -60px, 0); }
+          100% { transform: translate3d(0, 0, 0); }
         }
         @keyframes scrollTreadUp {
-          0% {
-            transform: translate3d(0, 0, 0);
-          }
-          100% {
-            transform: translate3d(0, -60px, 0);
-          }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(0, -60px, 0); }
         }
-        @keyframes pulseTrackOpacity {
-          0%, 100% { opacity: 0.04; }
-          50% { opacity: 0.12; }
-        }
-        @keyframes pulseTrackOpacitySubtle {
-          0%, 100% { opacity: 0.01; }
-          50% { opacity: 0.04; }
-        }
-        @keyframes floatUpCSS {
-          0% {
-            transform: translate3d(0, 0, 0) scale(0.8);
-            opacity: 0;
-          }
-          15% {
-            opacity: 0.7;
-          }
-          85% {
-            opacity: 0.7;
-          }
-          100% {
-            transform: translate3d(var(--drift), -120px, 0) scale(1);
-            opacity: 0;
-          }
+        @keyframes floatUp {
+          0% { transform: translate3d(0, 0, 0) scale(0.8); opacity: 0; }
+          15% { opacity: 0.6; }
+          85% { opacity: 0.6; }
+          100% { transform: translate3d(0, -100px, 0) scale(1.1); opacity: 0; }
         }
         .animate-tread-down {
-          animation: scrollTreadDown 5s linear infinite;
+          animation: scrollTreadDown 8s linear infinite;
           will-change: transform;
         }
         .animate-tread-up {
-          animation: scrollTreadUp 6s linear infinite;
+          animation: scrollTreadUp 9s linear infinite;
           will-change: transform;
         }
-        .animate-pulse-track-1 {
-          animation: pulseTrackOpacity 12s ease-in-out infinite;
-        }
-        .animate-pulse-track-2 {
-          animation: pulseTrackOpacity 9s ease-in-out infinite;
-        }
-        .animate-pulse-track-3 {
-          animation: pulseTrackOpacitySubtle 15s ease-in-out infinite;
-        }
-        .gpu-particle {
-          animation: floatUpCSS var(--duration) linear infinite;
-          animation-delay: var(--delay);
+        .desktop-particle {
+          animation: floatUp 12s linear infinite;
           will-change: transform, opacity;
         }
       `}</style>
 
-      {/* Tire Track Left (Orange, rotating parent, translating child to separate concerns) */}
+      {/* Tire Track Left (Desktop Only) */}
       <div 
-        className="absolute top-[-15%] bottom-[-15%] left-[6%] md:left-[12%] w-[50px] overflow-hidden animate-pulse-track-1"
+        className="absolute top-[-10%] bottom-[-10%] left-[12%] w-[45px] overflow-hidden opacity-[0.05]"
         style={{
-          transform: 'rotate(11deg)',
+          transform: 'rotate(10deg)',
           maskImage: 'linear-gradient(to bottom, transparent, white 20%, white 80%, transparent)',
           WebkitMaskImage: 'linear-gradient(to bottom, transparent, white 20%, white 80%, transparent)',
         }}
@@ -122,13 +92,13 @@ export default function TireTrackParticlesBg() {
         />
       </div>
 
-      {/* Tire Track Right (Blue, rotating parent, translating child) */}
+      {/* Tire Track Right (Desktop Only) */}
       <div 
-        className="absolute top-[-15%] bottom-[-15%] right-[5%] md:right-[15%] w-[50px] overflow-hidden animate-pulse-track-2"
+        className="absolute top-[-10%] bottom-[-10%] right-[15%] w-[45px] overflow-hidden opacity-[0.04]"
         style={{
-          transform: 'rotate(-14deg)',
-          maskImage: 'linear-gradient(to bottom, transparent, white 15%, white 85%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent, white 15%, white 85%, transparent)',
+          transform: 'rotate(-12deg)',
+          maskImage: 'linear-gradient(to bottom, transparent, white 20%, white 80%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent, white 20%, white 80%, transparent)',
         }}
       >
         <div 
@@ -141,48 +111,28 @@ export default function TireTrackParticlesBg() {
         />
       </div>
 
-      {/* Subtle dirt tire imprint dust track (alternating phase 3) */}
-      <div 
-        className="absolute top-[-15%] bottom-[-15%] left-[26%] w-[40px] overflow-hidden animate-pulse-track-3 hidden sm:block"
-        style={{
-          transform: 'rotate(4deg)',
-        }}
-      >
-        <div 
-          className="absolute inset-x-0 top-[-100px] bottom-[-100px] animate-tread-down"
-          style={{
-            backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'60\'><path d=\'M 4,5 L 14,12 L 14,20 L 4,13 Z M 36,15 L 26,22 L 26,30 L 36,23 Z\' fill=\'%23ffffff\' /></svg>")',
-            backgroundSize: '40px 60px',
-            backgroundRepeat: 'repeat-y',
-          }}
-        />
-      </div>
+      {/* Static ambient background glow points */}
+      <div className="absolute top-1/4 left-1/3 w-[350px] h-[350px] bg-orange-600/5 rounded-full blur-[110px] pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-blue-600/5 rounded-full blur-[130px] pointer-events-none" />
 
-      {/* Ambient background glow points to blend everything nicely */}
-      <div className="absolute top-1/4 left-1/3 w-[260px] md:w-[350px] h-[260px] md:h-[350px] bg-orange-600/5 rounded-full blur-[90px] md:blur-[110px] pointer-events-none"></div>
-      <div className="absolute bottom-1/3 right-1/4 w-[300px] md:w-[400px] h-[300px] md:h-[400px] bg-blue-600/5 rounded-full blur-[100px] md:blur-[130px] pointer-events-none"></div>
-
-      {/* Floating logistics particles (Pure CSS animated, fully composite-accelerated) */}
+      {/* High-performance desktop particles */}
       {particles.map((p) => {
-        const colorClasses = {
-          orange: 'bg-orange-500/25 border-orange-400/30 shadow-[0_0_6px_rgba(249,115,22,0.2)]',
-          blue: 'bg-blue-500/25 border-blue-400/30 shadow-[0_0_6px_rgba(59,130,246,0.2)]',
-          emerald: 'bg-emerald-500/25 border-emerald-400/30 shadow-[0_0_6px_rgba(16,185,129,0.2)]',
+        const colorClasses: Record<string, string> = {
+          orange: 'bg-orange-500/20 border-orange-400/30',
+          blue: 'bg-blue-500/20 border-blue-400/30',
+          emerald: 'bg-emerald-500/20 border-emerald-400/30',
         };
 
         return (
           <div
             key={p.id}
-            className={`absolute rounded-full border gpu-particle ${colorClasses[p.color]}`}
+            className={`absolute rounded-full border desktop-particle ${colorClasses[p.color]}`}
             style={{
               left: `${p.left}%`,
               top: `${p.top}%`,
               width: `${p.size}px`,
               height: `${p.size}px`,
-              // Pass values to CSS custom properties
-              ['--duration' as any]: `${p.duration}s`,
-              ['--delay' as any]: `${p.delay}s`,
-              ['--drift' as any]: `${p.drift}px`,
+              animationDelay: `${p.id * -1.5}s`,
             }}
           />
         );
