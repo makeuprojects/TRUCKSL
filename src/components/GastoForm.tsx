@@ -34,6 +34,7 @@ export default function GastoForm({
   const [montoGasto, setMontoGasto] = useState('');
   const [descGasto, setDescGasto] = useState('');
   const [litrosCombustible, setLitrosCombustible] = useState('');
+  const [piezaCambiada, setPiezaCambiada] = useState('');
 
   const handleTipoGastoChange = (val: string) => {
     setTipoGasto(val);
@@ -110,6 +111,17 @@ export default function GastoForm({
       return;
     }
 
+    if (tipoGasto === 'Repuestos ⚙️') {
+      if (!piezaCambiada || piezaCambiada.trim() === '') {
+        setErrorLocal('Por favor describe el repuesto cambiado en el campo correspondiente.');
+        return;
+      }
+      if (gastoFiles.length === 0) {
+        setErrorLocal('Para la categoría de Repuestos, es obligatorio añadir y subir una foto de la pieza reemplazada.');
+        return;
+      }
+    }
+
     setIsUploading(true);
     let uploadedUrls: string[] = [];
 
@@ -177,6 +189,23 @@ export default function GastoForm({
 
       const resJson = await res.json();
       if (resJson.success) {
+        if (tipoGasto === 'Repuestos ⚙️') {
+          const repuestoPayload = {
+            id_gasto: resJson.data?.id_gasto || '',
+            pieza_cambiada: piezaCambiada,
+            destino_pieza_vieja: 'Pendiente'
+          };
+          
+          await fetch('/api/control-repuestos', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(repuestoPayload)
+          }).catch(e => console.error('[Error] Fallback registering repuesto:', e));
+        }
+
         onSuccess(Number(montoGasto));
         onClose();
       } else {
@@ -270,12 +299,42 @@ export default function GastoForm({
             <option value="Combustible No Subvencionado (Facturado) ⛽">Combustible No Subvencionado (Facturado) ⛽</option>
             <option value="Alimentación 🍲">Alimentación 🍲</option>
             <option value="Servicio de Taller 🔧">Servicio de Taller 🔧</option>
+            <option value="Repuestos ⚙️">Repuestos ⚙️</option>
             <option value="Llantas 🜔">Llantas 🜔</option>
             <option value="Mantenimiento de Aceite 🛢️">Mantenimiento de Aceite 🛢️</option>
             <option value="Vías públicas / Peajes 🛣️">Vías públicas / Peajes 🛣️</option>
             <option value="Otros ⚙️">Otros ⚙️</option>
           </select>
         </div>
+
+        {/* Input extra for Spare Parts (Repuestos) */}
+        <AnimatePresence initial={false}>
+          {tipoGasto === 'Repuestos ⚙️' && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0, scale: 0.95 }}
+              animate={{ height: "auto", opacity: 1, scale: 1 }}
+              exit={{ height: 0, opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="overflow-hidden space-y-2 p-3.5 bg-[#0A192F]/60 border border-orange-500/25 rounded-2xl text-left"
+            >
+              <div className="flex justify-between items-center">
+                <label className="text-xs text-orange-400 font-bold uppercase tracking-wider block">⚠️ Detalle del Repuesto Adquirido</label>
+                <span className="text-[10px] text-orange-500 font-mono font-bold">Requerido</span>
+              </div>
+              <input
+                type="text"
+                required
+                value={piezaCambiada}
+                onChange={(e) => setPiezaCambiada(e.target.value)}
+                placeholder="Ej. Disco de embrague, Filtro de aceite, Pastillas..."
+                className="w-full bg-slate-950 border border-orange-500/30 p-3 rounded-xl text-white outline-none font-bold text-xs focus:border-orange-500"
+              />
+              <p className="text-[9px] text-slate-400 font-medium font-mono leading-tight">
+                * Describe exactamente qué pieza o repuesto se está adquiriendo o cambiando. Esto se registrará para la decisión de reciclaje y control de piezas de Don Saúl.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Input extra for Subsidized Fuel */}
         <AnimatePresence initial={false}>

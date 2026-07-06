@@ -716,6 +716,29 @@ apiRouter.post('/control-repuestos', async (req, res) => {
   }
 });
 
+apiRouter.post('/control-repuestos/update-destino', async (req, res) => {
+  try {
+    const authHeader = getAuthHeader(req);
+    const { id_repuesto_historial, destino_pieza_vieja } = req.body;
+    
+    if (!id_repuesto_historial) {
+      return res.status(400).json({ success: false, message: 'Falta id_repuesto_historial' });
+    }
+
+    const result = await sheetsQueue.enqueue(async () => {
+      await updateSheetRow(authHeader, 'Control_Repuestos', 'id_repuesto_historial', id_repuesto_historial, {
+        destino_pieza_vieja
+      });
+      invalidateSheetCache('Control_Repuestos');
+      return { id_repuesto_historial, destino_pieza_vieja };
+    });
+
+    res.json({ success: true, data: result });
+  } catch (error: any) {
+    return handleApiError(res, error);
+  }
+});
+
 apiRouter.get('/control-llantas', async (req, res) => {
   try {
     const authHeader = getAuthHeader(req);

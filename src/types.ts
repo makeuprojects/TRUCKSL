@@ -60,7 +60,7 @@ export interface ControlRepuesto {
   id_repuesto_historial: string;
   id_gasto: string;
   pieza_cambiada: string;
-  destino_pieza_vieja: 'Desecho' | 'Reutilizar' | 'Reparar';
+  destino_pieza_vieja: 'Pendiente' | 'Desecho' | 'Reutilizar' | 'Reparar';
 }
 
 export interface ControlLlanta {

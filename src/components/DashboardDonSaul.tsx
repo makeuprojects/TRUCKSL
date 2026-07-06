@@ -95,6 +95,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   const [gastos, setGastos] = useState<Gasto[]>([]);
   const [repuestos, setRepuestos] = useState<ControlRepuesto[]>([]);
   const [choferes, setChoferes] = useState<Chofer[]>([]);
+  const [selectedRepuestoPhoto, setSelectedRepuestoPhoto] = useState<string | null>(null);
 
   // Filtering states for the Bento Grid lists
   const [driverSearchQuery, setDriverSearchQuery] = useState('');
@@ -1083,37 +1084,99 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-900/80 text-slate-300 font-bold uppercase text-[9px] tracking-wider border-b border-slate-800">
                       <tr>
-                        <th className="p-3">Refacción Cambiada</th>
-                        <th className="p-3">ID Recibo</th>
-                        <th className="p-3 text-center">Formato de Reciclaje (Dictamen)</th>
+                        <th className="p-3">Refacción Cambiada / Detalle</th>
+                        <th className="p-3">Camión y Chofer</th>
+                        <th className="p-3 text-center">Foto Pieza</th>
+                        <th className="p-3 text-center">Dictamen de Reciclaje (Decisión de Saúl)</th>
                       </tr>
                     </thead>
                     <tbody ref={sparePartsTableRef} className="divide-y divide-slate-800/50">
-                      {repuestos.map((row, index) => (
-                        <tr key={`${row.id_repuesto_historial}-${row.id_gasto}-${index}`} className="hover:bg-slate-800/40 text-slate-200 transition duration-150">
-                          <td className="p-3 font-extrabold text-slate-100">{row.pieza_cambiada}</td>
-                          <td className="p-3 font-mono text-sky-400 uppercase">{row.id_gasto}</td>
-                          <td className="p-3 flex items-center justify-center gap-1.5">
-                            {(['Desecho', 'Reutilizar', 'Reparar'] as const).map((option) => (
-                              <button
-                                key={option}
-                                onClick={() => handleWorkshopDestinationChange(row.id_repuesto_historial, option)}
-                                className={`px-2 py-1 text-[9px] uppercase font-black tracking-wider rounded-md transition-all cursor-pointer ${
-                                  row.destino_pieza_vieja === option
-                                    ? option === 'Reparar'
-                                      ? 'bg-orange-500 text-slate-950 font-extrabold'
-                                      : option === 'Reutilizar'
-                                        ? 'bg-emerald-500 text-slate-950 font-extrabold'
-                                        : 'bg-slate-600 text-slate-900'
-                                    : 'bg-slate-900/80 border border-slate-800/80 text-slate-400 hover:text-slate-100 hover:bg-slate-800'
-                                }`}
-                              >
-                                {option}
-                              </button>
-                            ))}
-                          </td>
-                        </tr>
-                      ))}
+                      {repuestos.map((row, index) => {
+                        const matchingGasto = gastos.find(g => g.id_gasto === row.id_gasto);
+                        const matchingChofer = matchingGasto ? choferes.find(c => c.id_chofer === matchingGasto.id_chofer) : null;
+                        const driverName = matchingChofer ? matchingChofer.nombre_completo : (matchingGasto?.id_chofer || 'Conductor');
+                        
+                        const matchingCamion = matchingGasto ? camiones.find(c => c.id_camion === matchingGasto.id_camion) : null;
+                        const camionInfo = matchingCamion ? `${matchingCamion.modelo} (${matchingCamion.placa || matchingCamion.id_camion})` : (matchingGasto?.id_camion || 'Vehículo');
+                        
+                        const photoUrls = matchingGasto && matchingGasto.foto_url ? matchingGasto.foto_url.split(',') : [];
+                        const firstPhoto = photoUrls[0] || null;
+                        
+                        const isPending = !row.destino_pieza_vieja || row.destino_pieza_vieja === 'Pendiente';
+
+                        return (
+                          <tr 
+                            key={`${row.id_repuesto_historial}-${row.id_gasto}-${index}`} 
+                            className={`hover:bg-slate-800/40 text-slate-200 transition duration-150 ${
+                              isPending ? 'border-l-2 border-l-amber-500 bg-amber-500/[0.01]' : 'border-l-2 border-l-transparent'
+                            }`}
+                          >
+                            <td className="p-3">
+                              <div className="space-y-0.5">
+                                <span className="font-extrabold text-slate-100 block text-xs">{row.pieza_cambiada}</span>
+                                {matchingGasto && (
+                                  <span className="text-[10px] text-slate-400 block font-mono">
+                                    Fecha: {matchingGasto.fecha} • Monto: {Number(matchingGasto.monto).toLocaleString('es-BO')} Bs.
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="p-3">
+                              <div className="space-y-0.5">
+                                <span className="text-slate-300 block text-xs font-semibold">{driverName}</span>
+                                <span className="text-[10px] text-sky-400 block font-mono">{camionInfo}</span>
+                              </div>
+                            </td>
+                            <td className="p-3 text-center">
+                              {firstPhoto ? (
+                                <div className="flex items-center justify-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedRepuestoPhoto(firstPhoto)}
+                                    className="relative group cursor-pointer w-10 h-10 rounded-lg overflow-hidden border border-slate-700/80 hover:border-sky-500/50 transition-all flex items-center justify-center bg-slate-950"
+                                    title="Ver foto del repuesto"
+                                  >
+                                    <img src={firstPhoto} alt="Repuesto" className="w-full h-full object-cover group-hover:scale-110 transition duration-350" />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-[10px] text-white">
+                                      🔍
+                                    </div>
+                                  </button>
+                                </div>
+                              ) : (
+                                <span className="text-[10px] text-slate-500 font-mono italic">Sin Foto</span>
+                              )}
+                            </td>
+                            <td className="p-3 text-center">
+                              <div className="flex flex-col items-center gap-1.5 justify-center">
+                                {isPending && (
+                                  <span className="text-[8px] uppercase tracking-wider text-amber-400 bg-amber-950/40 border border-amber-500/20 px-1.5 py-0.5 rounded-md font-bold animate-pulse leading-none">
+                                    ● Pendiente de Dictamen
+                                  </span>
+                                )}
+                                <div className="flex items-center gap-1 flex-wrap justify-center">
+                                  {(['Desecho', 'Reutilizar', 'Reparar'] as const).map((option) => (
+                                    <button
+                                      key={option}
+                                      onClick={() => handleWorkshopDestinationChange(row.id_repuesto_historial, option)}
+                                      className={`px-2 py-1 text-[9px] uppercase font-black tracking-wider rounded-md transition-all cursor-pointer ${
+                                        row.destino_pieza_vieja === option
+                                          ? option === 'Reparar'
+                                            ? 'bg-amber-500 text-slate-950 font-extrabold shadow-sm shadow-amber-500/30'
+                                            : option === 'Reutilizar'
+                                              ? 'bg-emerald-500 text-slate-950 font-extrabold shadow-sm shadow-emerald-500/30'
+                                              : 'bg-rose-500 text-slate-950 font-extrabold shadow-sm shadow-rose-500/30'
+                                          : 'bg-slate-950/80 border border-slate-800 text-slate-400 hover:text-slate-100 hover:bg-slate-800'
+                                      }`}
+                                    >
+                                      {option === 'Desecho' ? '🗑️ Desecho' : option === 'Reutilizar' ? '♻️ Reutilizar' : '🛠️ Reparar'}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -1649,6 +1712,55 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 </button>
               </div>
             </motion.form>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* SPARE PART HIGH RESOLUTION PICTURE VIEWER */}
+      <AnimatePresence>
+        {selectedRepuestoPhoto && (
+          <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="relative max-w-4xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-4 flex flex-col items-center justify-center shadow-2xl"
+            >
+              <div className="flex justify-between items-center w-full px-3 py-1.5 border-b border-slate-800 mb-3">
+                <span className="text-xs font-bold text-sky-400 font-mono">Control de Repuestos • Foto Evidencia</span>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = selectedRepuestoPhoto;
+                      link.download = `repuesto_${Date.now()}.jpg`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    className="flex items-center gap-1.5 text-orange-400 hover:text-orange-350 px-3 py-1.5 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-lg cursor-pointer transition text-xs font-bold"
+                  >
+                    <span>Descargar Foto</span>
+                  </button>
+                  <button 
+                    onClick={() => setSelectedRepuestoPhoto(null)}
+                    className="text-slate-300 hover:text-white p-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-lg cursor-pointer transition"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="w-full h-[60vh] max-h-[500px] rounded-2xl overflow-hidden flex items-center justify-center bg-slate-950 border border-slate-800/60 p-2">
+                <img 
+                  src={selectedRepuestoPhoto} 
+                  alt="Foto del Repuesto" 
+                  className="max-h-full max-w-full object-contain rounded-xl select-none"
+                />
+              </div>
+              <p className="text-[10px] text-slate-400 font-mono text-center mt-3 leading-relaxed">
+                Esta fotografía sirve como registro de control físico para verificar que la refacción realmente fue sustituida y evitar fugas de stock.
+              </p>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>
