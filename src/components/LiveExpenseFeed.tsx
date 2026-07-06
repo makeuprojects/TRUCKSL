@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Gasto, Chofer, Camion } from '../types';
-import { Maximize2, X, ImageIcon, Calendar, CreditCard, ChevronRight } from 'lucide-react';
+import { Maximize2, X, ImageIcon, Calendar, CreditCard, ChevronRight, Download } from 'lucide-react';
 
 interface LiveExpenseFeedProps {
   gastos: Gasto[];
@@ -75,6 +75,24 @@ export default function LiveExpenseFeed({ gastos, choferes, camiones }: LiveExpe
     const timeB = new Date(b.fecha).getTime() || 0;
     return timeB - timeA;
   });
+
+  const handleDownload = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `comprobante_${Date.now()}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      console.error(e);
+      window.open(url, '_blank');
+    }
+  };
 
   return (
     <div id="live-expense-feed" className="bg-slate-900/80 hover:bg-slate-900/95 backdrop-blur-md border border-white/[0.08] hover:border-white/[0.18] p-6 transition-all duration-300 flex flex-col h-[400px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]">
@@ -196,15 +214,25 @@ export default function LiveExpenseFeed({ gastos, choferes, camiones }: LiveExpe
                     </p>
                   )}
                 </div>
-                <button
-                  onClick={() => {
-                    setSelectedImage(null);
-                    setSelectedGasto(null);
-                  }}
-                  className="text-slate-300 hover:text-white p-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-lg cursor-pointer transition"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => selectedImage && handleDownload(selectedImage)}
+                    className="flex items-center gap-1.5 text-orange-400 hover:text-orange-350 px-2.5 py-1.5 bg-orange-550/10 hover:bg-orange-550/20 border border-orange-550/30 rounded-lg cursor-pointer transition text-xs font-bold"
+                    title="Descargar Comprobante"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Descargar</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedImage(null);
+                      setSelectedGasto(null);
+                    }}
+                    className="text-slate-300 hover:text-white p-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-lg cursor-pointer transition"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Box Containing High Res Image */}

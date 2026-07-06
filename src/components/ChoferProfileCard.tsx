@@ -13,7 +13,8 @@ import {
   TrendingDown,
   Calendar,
   Layers,
-  FileText
+  FileText,
+  Download
 } from 'lucide-react';
 import { Chofer, Gasto } from '../types';
 
@@ -45,6 +46,24 @@ export default function ChoferProfileCard({
   layoutId
 }: ChoferProfileCardProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const handleDownload = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `comprobante_${Date.now()}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      console.error(e);
+      window.open(url, '_blank');
+    }
+  };
   const [isResetting, setIsResetting] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
@@ -306,12 +325,22 @@ export default function ChoferProfileCard({
             >
               <div className="flex justify-between items-center px-3 py-1.5 border-b border-slate-850">
                 <span className="text-xs font-bold text-slate-300">Verificador de Factura Digital</span>
-                <button 
-                  onClick={() => setSelectedImage(null)}
-                  className="text-slate-300 hover:text-white p-1 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer transition"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleDownload(selectedImage)}
+                    className="flex items-center gap-1 text-orange-400 hover:text-orange-350 px-2 py-1 bg-orange-550/10 hover:bg-orange-550/20 border border-orange-550/30 rounded-lg cursor-pointer transition text-[11px] font-bold"
+                    title="Descargar Comprobante"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Descargar</span>
+                  </button>
+                  <button 
+                    onClick={() => setSelectedImage(null)}
+                    className="text-slate-300 hover:text-white p-1 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer transition"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               <div className="h-[450px] w-full mt-2.5 bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center">
                 <img 

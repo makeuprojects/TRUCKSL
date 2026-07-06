@@ -8,7 +8,8 @@ import {
   Ticket,
   MoreHorizontal,
   ZoomIn,
-  ZoomOut
+  ZoomOut,
+  Download
 } from 'lucide-react';
 import { Viaje, Gasto, Chofer, Camion, Ruta } from '../types';
 
@@ -61,6 +62,24 @@ export default function RouteDetailDrawer({
 }: RouteDetailDrawerProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [zoomScale, setZoomScale] = useState(1);
+
+  const handleDownload = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `comprobante_${Date.now()}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      console.error(e);
+      window.open(url, '_blank');
+    }
+  };
 
   if (!isOpen || !viaje) return null;
 
@@ -261,9 +280,13 @@ export default function RouteDetailDrawer({
           >
             <button onClick={() => setSelectedPhoto(null)} className="absolute top-5 right-5 p-2 bg-slate-800 border border-slate-700 rounded-lg text-white hover:text-red-400 transition cursor-pointer"><X /></button>
             <img src={selectedPhoto} alt="Comprobante" style={{ transform: `scale(${zoomScale})` }} className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl" />
-            <div className="mt-4 flex gap-2">
-              <button onClick={() => setZoomScale(Math.max(0.5, zoomScale - 0.25))} className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded cursor-pointer transition"><ZoomOut /></button>
-              <button onClick={() => setZoomScale(Math.min(3.0, zoomScale + 0.25))} className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded cursor-pointer transition"><ZoomIn /></button>
+            <div className="mt-4 flex gap-2 items-center flex-wrap justify-center">
+              <button onClick={() => setZoomScale(Math.max(0.5, zoomScale - 0.25))} className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded cursor-pointer transition" title="Reducir Zoom"><ZoomOut /></button>
+              <button onClick={() => setZoomScale(Math.min(3.0, zoomScale + 0.25))} className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded cursor-pointer transition" title="Aumentar Zoom"><ZoomIn /></button>
+              <button onClick={() => handleDownload(selectedPhoto)} className="flex items-center gap-1.5 px-4 py-2 bg-orange-550/10 hover:bg-orange-550/20 border border-orange-550/30 text-orange-400 font-bold rounded cursor-pointer transition text-xs">
+                <Download className="w-4 h-4" />
+                <span>Descargar Comprobante</span>
+              </button>
             </div>
           </motion.div>
         )}
