@@ -447,7 +447,13 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
     window.location.reload();
   };
 
-  const ingresosValue = safeParse(summary?.ingresos_totales || 75000);
+  const ingresosValue = viajes.reduce((sum, v) => {
+    const route = rutas.find((r) => r.id_ruta === v.id_ruta);
+    const basePrice = Number(route?.tarifa_base || 5000);
+    const extraTons = Number(v.toneladas_extras) || 0;
+    const extraRateValue = (basePrice / 45) * extraTons;
+    return sum + basePrice + extraRateValue;
+  }, 0) || safeParse(summary?.ingresos_totales || 75000);
   const margenValue = ingresosValue - totalEarningsThisMonth;
   const isMargenNegative = margenValue < 0;
 

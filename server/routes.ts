@@ -849,14 +849,12 @@ apiRouter.get('/dashboard-summary', async (req, res) => {
     // 1. INCOMES & ACCOUNTS
     let totalIncomes = 0;
     uniqueViajes.forEach((viaje) => {
-      if (viaje.estado_viaje === 'Finalizado') {
-        const matchingRuta = rutas.find(r => r.id_ruta === viaje.id_ruta);
-        const basePrice = Number(matchingRuta?.tarifa_base || 500);
-        const extraTons = Number(viaje.toneladas_extras) || 0;
-        
-        const extraRateValue = (basePrice / 45) * extraTons;
-        totalIncomes += basePrice + extraRateValue;
-      }
+      const matchingRuta = rutas.find(r => r.id_ruta === viaje.id_ruta);
+      const basePrice = Number(matchingRuta?.tarifa_base || 5000);
+      const extraTons = Number(viaje.toneladas_extras) || 0;
+      
+      const extraRateValue = (basePrice / 45) * extraTons;
+      totalIncomes += basePrice + extraRateValue;
     });
 
     // 2. EXPENSES

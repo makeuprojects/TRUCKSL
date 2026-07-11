@@ -633,9 +633,9 @@ export default function SaulDashboardOverview({
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.25, ease: 'easeInOut' }}
-                          className="overflow-hidden border-t border-slate-800/80 bg-slate-950/30"
+                          className="overflow-hidden"
                         >
-                          <div className="p-4 space-y-4">
+                          <div className="p-4 space-y-4 border-t border-slate-800/80 bg-slate-950/30">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               
                               {/* Left: How Saul manages Income (Flete Formula) */}

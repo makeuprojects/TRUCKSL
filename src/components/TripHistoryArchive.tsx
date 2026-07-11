@@ -3,17 +3,18 @@ import { Search, Eye, FileDown, Navigation, Calendar, User, Package } from 'luci
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Viaje, Chofer, Ruta, Gasto } from '../types';
+import { Viaje, Chofer, Ruta, Gasto, Camion } from '../types';
 
 interface TripHistoryArchiveProps {
   viajes: Viaje[];
   choferes: Chofer[];
   rutas: Ruta[];
   gastos: Gasto[];
+  camiones?: Camion[];
   onOpenDetails: (viaje: Viaje) => void;
 }
 
-export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, onOpenDetails }: TripHistoryArchiveProps) {
+export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, camiones, onOpenDetails }: TripHistoryArchiveProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Filtermos los viajes que están Finalizados
@@ -57,66 +58,234 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, on
         const tripExpenses = gastos.filter(g => g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(viaje.id_viaje).trim().toLowerCase());
         const totalGastado = getTripTotalExpenses(viaje.id_viaje);
 
-        // Título corporativo
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        doc.text("LIQUIDACIÓN DE GASTOS", 105, 20, { align: 'center' });
-        doc.setFontSize(12);
-        doc.text("FLOTAS DON SAÚL", 105, 27, { align: 'center' });
-        doc.setLineWidth(0.5);
-        doc.line(14, 30, 196, 30); // Line divider
-        
-        // Metadatos
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text("Datos del Viaje:", 14, 35);
-        doc.setFont('helvetica', 'normal');
-        
-        doc.text(`ID de Viaje: ${viaje.id_viaje}`, 14, 42);
-        doc.text(`Chofer: ${chofer?.nombre_completo || 'N/A'}`, 14, 49);
-        doc.text(`Pesaje Total: ${(Number(viaje.toneladas_base) + Number(viaje.toneladas_extras)).toFixed(2)} t`, 14, 56);
-        
-        doc.text(`Origen: ${ruta?.origen || 'N/A'}`, 110, 42);
-        doc.text(`Destino: ${ruta?.destino || 'N/A'}`, 110, 49);
-        
-        doc.text(`Fecha Inicio: ${viaje.fecha_inicio || 'N/A'}`, 110, 56);
-        doc.text(`Fecha Fin: ${viaje.fecha_fin || 'N/A'}`, 110, 63);
+        // Find assigned Camion
+        const camion = camiones?.find(c => c.id_camion === viaje.id_camion);
+        const camionStr = camion ? `${camion.modelo} (Placa: ${camion.placa || 'N/A'})` : viaje.id_camion || 'N/A';
 
-        // Preparar datos para autoTable
+        // Rates & Settlement calculations matching UI exactly
+        const basePrice = Number(ruta?.tarifa_base || 5000);
+        const extraTons = Number(viaje.toneladas_extras) || 0;
+        const extraRateValue = (basePrice / 45) * extraTons;
+        const totalFlete = basePrice + extraRateValue;
+        const netSettlement = totalFlete - totalGastado;
+
+        // --- 1. HEADER BRAND BANNER ---
+        doc.setFillColor(15, 23, 42); // slate-900
+        doc.rect(14, 12, 182, 26, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.text("FLOTAS DON SAÚL", 20, 22);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(203, 213, 225); // slate-300
+        doc.text("Sistema Integral de Monitoreo de Gastos y Ruteo", 20, 28);
+        doc.text("Reporte de Rendición de Cuentas y Conciliación", 20, 32);
+
+        // Right side of Header Banner
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(245, 158, 11); // amber-500
+        doc.text("LIQUIDACIÓN OFICIAL", 190, 21, { align: 'right' });
+        
+        doc.setFont('helvetica', 'mono');
+        doc.setFontSize(8);
+        doc.setTextColor(248, 250, 252);
+        doc.text(`ID Viaje: ${viaje.id_viaje}`, 190, 27, { align: 'right' });
+        doc.text(`Fecha Emisión: ${new Date().toLocaleDateString('es-BO')}`, 190, 32, { align: 'right' });
+
+        // --- 2. LOGISTICS DETAILS GATHERED ---
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(30, 41, 59); // slate-800
+        doc.text("1. DATOS DE LOGÍSTICA Y PERSONAL", 14, 46);
+        
+        // Horizontal line separation
+        doc.setDrawColor(226, 232, 240); // slate-200
+        doc.setLineWidth(0.5);
+        doc.line(14, 48, 196, 48);
+
+        // Data keys & values
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(100, 116, 139); // slate-500
+        
+        doc.text("CONDUCTOR / CHOFER:", 14, 54);
+        doc.text("ID CHOFER / PIN:", 14, 60);
+        doc.text("VEHÍCULO / CAMIÓN:", 14, 66);
+
+        doc.text("RUTA REGISTRADA:", 110, 54);
+        doc.text("FECHA SALIDA:", 110, 60);
+        doc.text("FECHA LLEGADA:", 110, 66);
+
+        // Values placement
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42); // slate-900
+        doc.text(chofer?.nombre_completo || 'N/A', 52, 54);
+        doc.text(`${chofer?.id_chofer || 'N/A'} (PIN: ****)`, 52, 60);
+        doc.text(camionStr, 52, 66);
+
+        doc.text(ruta ? `${ruta.origen} ➔ ${ruta.destino}` : 'N/A', 145, 54);
+        doc.text(viaje.fecha_inicio || 'N/A', 145, 60);
+        doc.text(viaje.fecha_fin || 'N/A', 145, 66);
+
+        // --- 3. CARGO DETAILS & WEIGHING ---
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(30, 41, 59);
+        doc.text("2. PESAJES DE CARGA REGISTRADOS", 14, 76);
+        doc.line(14, 78, 196, 78);
+
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(100, 116, 139);
+        doc.text("TONELADAS BASE:", 14, 84);
+        doc.text("TONELADAS EXTRAS:", 80, 84);
+        doc.text("TONELAJE TOTAL DE CARGA:", 140, 84);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text(`${Number(viaje.toneladas_base || 0).toFixed(2)} t`, 46, 84);
+        doc.text(`${Number(viaje.toneladas_extras || 0).toFixed(2)} t`, 116, 84);
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(3, 105, 161); // sky-700
+        doc.text(`${(Number(viaje.toneladas_base || 0) + Number(viaje.toneladas_extras || 0)).toFixed(2)} t`, 185, 84, { align: 'right' });
+
+        // --- 4. FINANCIAL SETTLEMENT SUMMARY TABLE ---
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(30, 41, 59);
+        doc.text("3. CONCILIACIÓN DE TARIFA Y SALDO NETO (LIQUIDACIÓN)", 14, 94);
+        doc.line(14, 96, 196, 96);
+
+        const summaryData = [
+          ["Flete Base de Ruta (Tarifa Acordada)", `${ruta?.origen || 'Origen'} a ${ruta?.destino || 'Destino'}`, `${basePrice.toLocaleString('es-BO', { minimumFractionDigits: 2 })} Bs.`],
+          ["Incentivo por Tonelaje Adicional (Extras)", `${extraTons.toFixed(2)} t extras transportadas`, `${extraRateValue.toLocaleString('es-BO', { minimumFractionDigits: 2 })} Bs.`],
+          ["INGRESO BRUTO DEL FLETE (Ingreso)", "Suma total de flete base + exceso", `${totalFlete.toLocaleString('es-BO', { minimumFractionDigits: 2 })} Bs.`],
+          ["(-) GASTOS EN RUTA RESPALDADOS", "Combustible, peajes, viáticos, repuestos", `-${totalGastado.toLocaleString('es-BO', { minimumFractionDigits: 2 })} Bs.`],
+          ["SALDO LÍQUIDO A ENTREGAR (NETO)", "Monto neto final a liquidar al conductor", `${netSettlement.toLocaleString('es-BO', { minimumFractionDigits: 2 })} Bs.`]
+        ];
+
+        autoTable(doc, {
+          startY: 99,
+          head: [['Concepto / Operación', 'Detalle y Base de Cálculo', 'Monto en Bs.']],
+          body: summaryData,
+          theme: 'striped',
+          styles: { fontSize: 8.5, cellPadding: 2.2 },
+          headStyles: { fillColor: [51, 65, 85], textColor: [255, 255, 255], fontStyle: 'bold' },
+          columnStyles: {
+            2: { halign: 'right', fontStyle: 'bold' }
+          },
+          didParseCell: function (data) {
+            // Net settlement highlight
+            if (data.row.index === summaryData.length - 1) {
+              data.cell.styles.fontStyle = 'bold';
+              data.cell.styles.fillColor = [240, 253, 244]; // Soft emerald
+              data.cell.styles.textColor = [21, 128, 61]; // Dark emerald text
+            }
+            // Gross flete row highlight
+            if (data.row.index === 2) {
+              data.cell.styles.fontStyle = 'bold';
+            }
+            // Expenses negative row highlight
+            if (data.row.index === 3) {
+              data.cell.styles.textColor = [220, 38, 38]; // Red
+            }
+          }
+        });
+
+        // --- 5. EXPENSES DETAIL LIST TABLE ---
+        const nextY = (doc as any).lastAutoTable.finalY + 10;
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(30, 41, 59);
+        doc.text("4. HISTORIAL DETALLADO DE COMPROBANTES DE GASTO", 14, nextY);
+        doc.line(14, nextY + 2, 196, nextY + 2);
+
         const tableData = tripExpenses.map(g => [
-          new Date(g.fecha).toLocaleDateString() || '-',
+          new Date(g.fecha).toLocaleDateString('es-BO') || '-',
           g.tipo_gasto || 'Otro',
           g.descripcion || '-',
+          g.foto_url ? 'Sí (Digitalizado)' : 'No (S/C)',
           `${safeParse(g.monto).toLocaleString('es-BO', { minimumFractionDigits: 2 })}`
         ]);
 
-        // Fila final de totales
         tableData.push([
           '',
           '',
-          'TOTAL GASTADO:',
+          'TOTAL DE EGRESOS EN TRÁNSITO:',
+          '',
           `${totalGastado.toLocaleString('es-BO', { minimumFractionDigits: 2 })} Bs.`
         ]);
 
         autoTable(doc, {
-          startY: 72,
-          head: [['Fecha', 'Categoría', 'Descripción', 'Monto (Bs.)']],
+          startY: nextY + 5,
+          head: [['Fecha', 'Categoría de Gasto', 'Descripción / Notas', 'Foto Comprobante', 'Monto (Bs.)']],
           body: tableData,
           theme: 'grid',
-          headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+          styles: { fontSize: 8, cellPadding: 2.8 },
+          headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255], fontStyle: 'bold' },
+          columnStyles: {
+            4: { halign: 'right' }
+          },
           didParseCell: function (data) {
-            // Check if it's the last row for "TOTAL GASTADO" style
             if (data.row.index === tableData.length - 1) {
               data.cell.styles.fontStyle = 'bold';
-              data.cell.styles.textColor = [16, 185, 129]; // Emerald 500
-              if (data.column.index === 3) {
+              data.cell.styles.textColor = [225, 29, 72]; // Soft rose red for total expenses
+              data.cell.styles.fillColor = [255, 241, 242]; // Light red bg
+              if (data.column.index === 4) {
                 data.cell.styles.halign = 'right';
               }
-            } else if (data.column.index === 3) {
+            } else if (data.column.index === 4) {
               data.cell.styles.halign = 'right';
             }
           }
         });
+
+        // --- 6. SIGNATURES & OFFICIAL SEAL STAMP ---
+        let currentY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY : 180;
+        if (currentY > 230) {
+          doc.addPage();
+          currentY = 30;
+        }
+
+        currentY += 20;
+
+        // Subtle signature line dividers
+        doc.setDrawColor(203, 213, 225);
+        doc.setLineWidth(0.5);
+
+        // Driver Signature
+        doc.line(25, currentY, 85, currentY);
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(30, 41, 59);
+        doc.text("FIRMA DEL CONDUCTOR", 55, currentY + 5, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text(chofer?.nombre_completo || 'N/A', 55, currentY + 9, { align: 'center' });
+        doc.text(`C.I.: _________________`, 55, currentY + 13, { align: 'center' });
+
+        // Saul / Administration Signature
+        doc.line(125, currentY, 185, currentY);
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(30, 41, 59);
+        doc.text("AUTORIZADO Y CONCILIADO", 155, currentY + 5, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text("Don Saúl - Flotas Don Saúl", 155, currentY + 9, { align: 'center' });
+        doc.text("Firma y Sello Administrativo", 155, currentY + 13, { align: 'center' });
+
+        // Small audit log footer
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(148, 163, 184); // slate-400
+        doc.text("Este reporte constituye un registro contable oficial emitido por el sistema Flotas Don Saúl. Los saldos conciliados han sido respaldados por comprobantes digitales cargados al servidor.", 105, 282, { align: 'center' });
 
         doc.save(`Liquidacion_${viaje.id_viaje}.pdf`);
         toast.success("PDF Descargado", { duration: 3000 });

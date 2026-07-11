@@ -3,16 +3,222 @@ import crypto from 'crypto';
 
 export const SPREADSHEET_ID = '1ZNuFluKQi3lFP5qF-eQtfvDCcIDotu4v8jV89GwRgsQ';
 
-// Memory storage holding data in-case Google OAuth has not yet been linked/init
+// Memory storage holding data in-case Google OAuth has not yet been linked/init or network is offline
 export const memoryStore: Record<string, any[]> = {
-  Camiones: [],
-  Choferes: [],
-  Rutas: [],
-  Viajes: [],
-  Gastos: [],
-  Control_Repuestos: [],
-  Control_Llantas: [],
-  Historial_Aceite: []
+  Camiones: [
+    {
+      id_camion: 'C01',
+      modelo: 'Volvo FH16 750 Heavy Duty',
+      anio: '2021',
+      kilometraje_actual: '125400',
+      saldo_presupuesto: '15000',
+      estado: 'Activo',
+      placa: '4829-KLA',
+      chasis: 'YV2RT40D9BA123456'
+    },
+    {
+      id_camion: 'C02',
+      modelo: 'Foton Auman EST-A',
+      anio: '2022',
+      kilometraje_actual: '45800',
+      saldo_presupuesto: '18000',
+      estado: 'Activo',
+      placa: '5011-NUX',
+      chasis: 'LZZ6C2D43GA987654'
+    },
+    {
+      id_camion: 'C03',
+      modelo: 'Mercedes-Benz Actros 2645',
+      anio: '2020',
+      kilometraje_actual: '234100',
+      saldo_presupuesto: '8000',
+      estado: 'Mantenimiento',
+      placa: '3912-PDC',
+      chasis: 'WDB9630031L234567'
+    }
+  ],
+  Choferes: [
+    {
+      id_chofer: 'mauricio',
+      nombre_completo: 'Mauricio Siles',
+      telefono: '71234567',
+      pin_acceso: '1234',
+      estado: 'Activo',
+      presupuesto: '10000',
+      saldo_actual: '6200'
+    },
+    {
+      id_chofer: 'juan_carlos',
+      nombre_completo: 'Juan Carlos Apaza',
+      telefono: '68541239',
+      pin_acceso: '4321',
+      estado: 'Activo',
+      presupuesto: '12000',
+      saldo_actual: '9500'
+    },
+    {
+      id_chofer: 'don_saul',
+      nombre_completo: 'Don Saúl',
+      telefono: '70010203',
+      pin_acceso: '0000',
+      estado: 'Activo',
+      presupuesto: '50000',
+      saldo_actual: '50000'
+    },
+    {
+      id_chofer: 'admin',
+      nombre_completo: 'Administrador Principal',
+      telefono: '72233445',
+      pin_acceso: '9999',
+      estado: 'Activo',
+      presupuesto: '100000',
+      saldo_actual: '100000'
+    }
+  ],
+  Rutas: [
+    {
+      id_ruta: 'R01',
+      origen: 'La Paz',
+      destino: 'Oruro',
+      tarifa_base: '4500',
+      estado: 'Activa'
+    },
+    {
+      id_ruta: 'R02',
+      origen: 'Santa Cruz',
+      destino: 'Cochabamba',
+      tarifa_base: '7500',
+      estado: 'Activa'
+    },
+    {
+      id_ruta: 'R03',
+      origen: 'Frontera Pisiga',
+      destino: 'La Paz',
+      tarifa_base: '6200',
+      estado: 'Activa'
+    }
+  ],
+  Viajes: [
+    {
+      id_viaje: 'V01',
+      id_camion: 'C01',
+      id_chofer: 'mauricio',
+      id_ruta: 'R01',
+      fecha_inicio: '2026-07-01',
+      fecha_fin: '2026-07-03',
+      estado_viaje: 'Finalizado',
+      toneladas_base: '45',
+      toneladas_extras: '3.5',
+      foto_pesaje_url: ''
+    },
+    {
+      id_viaje: 'V02',
+      id_camion: 'C02',
+      id_chofer: 'juan_carlos',
+      id_ruta: 'R02',
+      fecha_inicio: '2026-07-04',
+      fecha_fin: '',
+      estado_viaje: 'En Curso',
+      toneladas_base: '45',
+      toneladas_extras: '0',
+      foto_pesaje_url: ''
+    },
+    {
+      id_viaje: 'V03',
+      id_camion: 'C01',
+      id_chofer: 'mauricio',
+      id_ruta: 'R03',
+      fecha_inicio: '2026-07-05',
+      fecha_fin: '',
+      estado_viaje: 'En Curso',
+      toneladas_base: '45',
+      toneladas_extras: '5.2',
+      foto_pesaje_url: ''
+    }
+  ],
+  Gastos: [
+    {
+      id_gasto: 'G01',
+      id_viaje: 'V01',
+      id_camion: 'C01',
+      id_chofer: 'mauricio',
+      tipo_gasto: 'Combustible',
+      monto: '1800',
+      fecha: '2026-07-01',
+      descripcion: 'Carga de diésel estación central',
+      foto_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      id_gasto: 'G02',
+      id_viaje: 'V01',
+      id_camion: 'C01',
+      id_chofer: 'mauricio',
+      tipo_gasto: 'Peajes',
+      monto: '150',
+      fecha: '2026-07-02',
+      descripcion: 'Peajes de tránsito autopista',
+      foto_url: ''
+    },
+    {
+      id_gasto: 'G03',
+      id_viaje: 'V02',
+      id_camion: 'C02',
+      id_chofer: 'juan_carlos',
+      tipo_gasto: 'Repuesto',
+      monto: '2500',
+      fecha: '2026-07-04',
+      descripcion: 'Compra de manguera hidráulica de presión y abrazaderas de cobre',
+      foto_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=300&q=80'
+    }
+  ],
+  Control_Repuestos: [
+    {
+      id_repuesto_historial: 'REP01',
+      id_gasto: 'G03',
+      pieza_cambiada: 'Manguera hidráulica de presión',
+      destino_pieza_vieja: 'Desecho'
+    }
+  ],
+  Control_Llantas: [
+    {
+      id_llanta: 'LL01',
+      id_camion: 'C01',
+      posicion: 'Delantera Izquierda',
+      km_instalacion: '100000',
+      km_actual: '125400',
+      estado: 'Bueno'
+    },
+    {
+      id_llanta: 'LL02',
+      id_camion: 'C01',
+      posicion: 'Delantera Derecha',
+      km_instalacion: '100000',
+      km_actual: '125400',
+      estado: 'Bueno'
+    },
+    {
+      id_llanta: 'LL03',
+      id_camion: 'C02',
+      posicion: 'Trasera Derecha Externa',
+      km_instalacion: '40000',
+      km_actual: '45800',
+      estado: 'Excelente'
+    }
+  ],
+  Historial_Aceite: [
+    {
+      id_cambio: 'OIL01',
+      id_camion: 'C01',
+      km_cambio: '120000',
+      proximo_cambio_km: '135000'
+    },
+    {
+      id_cambio: 'OIL02',
+      id_camion: 'C02',
+      km_cambio: '40000',
+      proximo_cambio_km: '55000'
+    }
+  ]
 };
 
 // Local read and write mutation timing arrays to bypass slow/cached Google CDNs
@@ -479,8 +685,8 @@ export async function fetchPublicSheetRows<T extends Record<string, any>>(
     }
 
     return result as T[];
-  } catch (error) {
-    console.error(`[fetchPublicSheetRows] Error fetching tab ${tabName}:`, error);
+  } catch (error: any) {
+    console.warn(`[fetchPublicSheetRows] Connection unavailable for tab: "${tabName}". Working in local memoryStore/offline fallback mode. Details: ${error.message || error}`);
     throw error;
   }
 }
@@ -587,8 +793,8 @@ export async function getSheetRows<T extends Record<string, any>>(
       memoryStore[tabName] = liveRows;
       lastFetchTime[tabName] = Date.now();
       return liveRows;
-    } catch (err) {
-      console.warn(`[Public Sheets Feed Error] Failed to read ${tabName} without auth, fallback to memoryStore:`, err);
+    } catch (err: any) {
+      console.warn(`[Public Sheets Feed Fallback] Note: Could not query Google Sheets live feed for tab "${tabName}" (offline or network restricted). Successfully fell back to memory storage fallback schema. Error: ${err.message || err}`);
     }
     return (memoryStore[tabName] || []) as T[];
   }

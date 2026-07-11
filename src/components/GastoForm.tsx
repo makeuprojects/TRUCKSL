@@ -311,27 +311,29 @@ export default function GastoForm({
         <AnimatePresence initial={false}>
           {tipoGasto === 'Repuestos ⚙️' && (
             <motion.div 
-              initial={{ height: 0, opacity: 0, scale: 0.95 }}
-              animate={{ height: "auto", opacity: 1, scale: 1 }}
-              exit={{ height: 0, opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="overflow-hidden space-y-2 p-3.5 bg-[#0A192F]/60 border border-orange-500/25 rounded-2xl text-left"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="overflow-hidden"
             >
-              <div className="flex justify-between items-center">
-                <label className="text-xs text-orange-400 font-bold uppercase tracking-wider block">⚠️ Detalle del Repuesto Adquirido</label>
-                <span className="text-[10px] text-orange-500 font-mono font-bold">Requerido</span>
+              <div className="space-y-2 p-3.5 bg-[#0A192F]/60 border border-orange-500/25 rounded-2xl text-left my-1">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs text-orange-400 font-bold uppercase tracking-wider block">⚠️ Detalle del Repuesto Adquirido</label>
+                  <span className="text-[10px] text-orange-500 font-mono font-bold">Requerido</span>
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={piezaCambiada}
+                  onChange={(e) => setPiezaCambiada(e.target.value)}
+                  placeholder="Ej. Disco de embrague, Filtro de aceite, Pastillas..."
+                  className="w-full bg-slate-950 border border-orange-500/30 p-3 rounded-xl text-white outline-none font-bold text-xs focus:border-orange-500"
+                />
+                <p className="text-[9px] text-slate-400 font-medium font-mono leading-tight">
+                  * Describe exactamente qué pieza o repuesto se está adquiriendo o cambiando. Esto se registrará para la decisión de reciclaje y control de piezas de Don Saúl.
+                </p>
               </div>
-              <input
-                type="text"
-                required
-                value={piezaCambiada}
-                onChange={(e) => setPiezaCambiada(e.target.value)}
-                placeholder="Ej. Disco de embrague, Filtro de aceite, Pastillas..."
-                className="w-full bg-slate-950 border border-orange-500/30 p-3 rounded-xl text-white outline-none font-bold text-xs focus:border-orange-500"
-              />
-              <p className="text-[9px] text-slate-400 font-medium font-mono leading-tight">
-                * Describe exactamente qué pieza o repuesto se está adquiriendo o cambiando. Esto se registrará para la decisión de reciclaje y control de piezas de Don Saúl.
-              </p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -340,26 +342,28 @@ export default function GastoForm({
         <AnimatePresence initial={false}>
           {tipoGasto === 'Combustible Subvencionado (5.72 Bs/L) ⛽' && (
             <motion.div 
-              initial={{ height: 0, opacity: 0, scale: 0.95 }}
-              animate={{ height: "auto", opacity: 1, scale: 1 }}
-              exit={{ height: 0, opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="overflow-hidden space-y-1 p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="overflow-hidden"
             >
-              <div className="flex justify-between items-center">
-                <label className="text-xs text-emerald-400 font-bold uppercase tracking-wider block">Litros Cargados</label>
-                <span className="text-[10px] text-emerald-500 font-mono font-bold">Precio Fijo: 5.72 Bs/L</span>
+              <div className="space-y-1 p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-2xl my-1">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs text-emerald-400 font-bold uppercase tracking-wider block">Litros Cargados</label>
+                  <span className="text-[10px] text-emerald-500 font-mono font-bold">Precio Fijo: 5.72 Bs/L</span>
+                </div>
+                <input
+                  type="number"
+                  required
+                  step="0.01"
+                  min="0.1"
+                  value={litrosCombustible}
+                  onChange={(e) => handleLitrosChange(e.target.value)}
+                  placeholder="Ej. 150 litros"
+                  className="w-full bg-slate-950 border border-emerald-500/30 p-3 rounded-xl text-white outline-none font-bold text-sm focus:border-emerald-500 font-mono"
+                />
               </div>
-              <input
-                type="number"
-                required
-                step="0.01"
-                min="0.1"
-                value={litrosCombustible}
-                onChange={(e) => handleLitrosChange(e.target.value)}
-                placeholder="Ej. 150 litros"
-                className="w-full bg-slate-950 border border-emerald-500/30 p-3 rounded-xl text-white outline-none font-bold text-sm focus:border-emerald-500 font-mono"
-              />
             </motion.div>
           )}
         </AnimatePresence>

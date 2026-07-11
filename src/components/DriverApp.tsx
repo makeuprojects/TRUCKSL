@@ -1524,35 +1524,49 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
       )}
 
       {/* QUICK EXPENSE DISPATCHER MODAL */}
-      {isGastoModalOpen && authenticatedDriver && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-          <GastoForm
-            driver={authenticatedDriver}
-            activeViaje={activeViaje}
-            selectedCamionId={selectedCamionId || 'CAM-01'}
-            token={token}
-            onSuccess={(amount: number) => {
-              if (authenticatedDriver) {
-                const updatedDriver = {
-                  ...authenticatedDriver,
-                  saldo_actual: (Number(authenticatedDriver.saldo_actual || 10000) - amount).toString()
-                };
-                setAuthenticatedDriver(updatedDriver);
-                localStorage.setItem('driver_session_user', JSON.stringify(updatedDriver));
-              }
-              setMessage({ text: `Gasto de ${amount} Bs. registrado con éxito.`, type: 'success' });
-              loadDriverData(true);
-            }}
-            onClose={() => setIsGastoModalOpen(false)}
-          />
-        </div>
-      )}
+      <AnimatePresence>
+        {isGastoModalOpen && authenticatedDriver && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <GastoForm
+              driver={authenticatedDriver}
+              activeViaje={activeViaje}
+              selectedCamionId={selectedCamionId || 'CAM-01'}
+              token={token}
+              onSuccess={(amount: number) => {
+                if (authenticatedDriver) {
+                  const updatedDriver = {
+                    ...authenticatedDriver,
+                    saldo_actual: (Number(authenticatedDriver.saldo_actual || 10000) - amount).toString()
+                  };
+                  setAuthenticatedDriver(updatedDriver);
+                  localStorage.setItem('driver_session_user', JSON.stringify(updatedDriver));
+                }
+                setMessage({ text: `Gasto de ${amount} Bs. registrado con éxito.`, type: 'success' });
+                loadDriverData(true);
+              }}
+              onClose={() => setIsGastoModalOpen(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 4. CUSTOM RECURRING MODALS & FEEDBACK DIALOGS (REPLACING NATIVE ALERTS/CONFIRMS) */}
       <AnimatePresence>
         {/* START TRIP CONFIRMATION DIALOG */}
         {modalType === 'START_TRIP' && selectedRutaToStart && (
-          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -1616,12 +1630,18 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 </button>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
 
         {/* FINALIZE TRIP WITHOUT PHOTO WARNING DIALOG */}
         {modalType === 'NO_PHOTO_CONFIRM' && (
-          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -1655,12 +1675,18 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 </button>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
 
         {/* TRIP SUCCESS DETAILED STATISTICS REPORT DIALOG */}
         {modalType === 'TRIP_SUCCESS' && tripSummaryData && (
-          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4"
+          >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -1722,7 +1748,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 </button>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

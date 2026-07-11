@@ -581,7 +581,13 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
   // Calculations with NaN defenses
   const totalExpensesThisMonth = gastos.reduce((sum, g) => sum + safeParse(g.monto), 0);
-  const ingresosValue = safeParse(summary?.ingresos_totales || 84000);
+  const ingresosValue = viajes.reduce((sum, v) => {
+    const route = rutas.find((r) => r.id_ruta === v.id_ruta);
+    const basePrice = Number(route?.tarifa_base || 5000);
+    const extraTons = Number(v.toneladas_extras) || 0;
+    const extraRateValue = (basePrice / 45) * extraTons;
+    return sum + basePrice + extraRateValue;
+  }, 0) || safeParse(summary?.ingresos_totales || 84000);
   const margenValue = ingresosValue - totalExpensesThisMonth;
   const isMargenNegative = margenValue < 0;
 
@@ -1547,6 +1553,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 choferes={choferes}
                 rutas={rutas}
                 gastos={gastos}
+                camiones={camiones}
                 onOpenDetails={(viaje) => {
                   setSelectedRouteViaje(viaje);
                   setIsRouteDetailOpen(true);
@@ -1575,7 +1582,13 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
       {/* DETAILED PROFILE POPUP OVERLAY */}
       <AnimatePresence>
         {selectedDriver && (
-          <div className="fixed inset-0 z-40 bg-white/90 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-40 bg-white/90 backdrop-blur-md flex items-center justify-center p-4"
+          >
             <ChoferProfileCard
               chofer={selectedDriver}
               gastos={gastos}
@@ -1587,14 +1600,20 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
               onClose={() => setSelectedDriver(null)}
               layoutId={`driver-card-${selectedDriver.id_chofer}`}
             />
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* ADD DRIVER MODAL FORM OVERLAY */}
       <AnimatePresence>
         {isAddDriverOpen && (
-          <div className="fixed inset-0 z-50 bg-slate-50/95 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 bg-slate-50/95 backdrop-blur-md flex items-center justify-center p-4"
+          >
             <motion.form
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -1712,14 +1731,20 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 </button>
               </div>
             </motion.form>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* SPARE PART HIGH RESOLUTION PICTURE VIEWER */}
       <AnimatePresence>
         {selectedRepuestoPhoto && (
-          <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4"
+          >
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -1761,7 +1786,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 Esta fotografía sirve como registro de control físico para verificar que la refacción realmente fue sustituida y evitar fugas de stock.
               </p>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
