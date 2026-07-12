@@ -646,11 +646,11 @@ export default function SaulDashboardOverview({
                                   ⚙️ Gestión de Ingresos (Fórmula Don Saúl)
                                 </span>
                                 <p className="text-[10px] text-slate-400 leading-normal">
-                                  Don Saúl determina los ingresos del flete directamente configurando la <strong>Tarifa Base</strong> de la ruta en la pestaña de configuración. Si hay sobrepeso (más de 45 toneladas), se añade el flete de extras:
+                                  Don Saúl determina los ingresos del flete directamente configurando la <strong>Tarifa Base</strong> de la ruta en la pestaña de configuración. Si hay sobrepeso (más de {baseTons} toneladas), se añade el flete de extras:
                                 </p>
                                 <div className="space-y-1.5 pt-1.5 border-t border-slate-800 text-[10px] font-mono">
                                   <div className="flex justify-between">
-                                    <span className="text-slate-400">Tarifa de Ruta Base (Hasta 45 t):</span>
+                                    <span className="text-slate-400">Tarifa de Ruta Base (Hasta {baseTons} t):</span>
                                     <span className="text-slate-200 font-black">Bs. {basePrice.toLocaleString('es-BO')}</span>
                                   </div>
                                   <div className="flex justify-between">

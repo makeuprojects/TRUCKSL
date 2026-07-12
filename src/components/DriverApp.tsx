@@ -735,7 +735,10 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
   const completedTrips = viajes.filter(v => v.id_chofer === authenticatedDriver.id_chofer && v.estado_viaje !== 'En Ciclo');
   const totalBonus = completedTrips.reduce((acc, v) => {
     const extras = parseFloat(v.toneladas_extras || '0');
-    return acc + (extras * (500 / 45) * 0.40);
+    const matchingRuta = rutas.find(r => r.id_ruta === v.id_ruta);
+    const basePrice = Number(v.tarifa_pactada || matchingRuta?.tarifa_base || 5000);
+    const baseTons = Number(v.toneladas_base || 45) || 45;
+    return acc + (extras * (basePrice / baseTons) * 0.40);
   }, 0);
   const totalTons = completedTrips.reduce((acc, v) => {
     const base = parseFloat(v.toneladas_base || '45');
@@ -745,8 +748,13 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
   // Active sub-state string for AnimatePresence tracking
   let subState = 'ROUTES';
+  let activeBasePrice = 5000;
+  let activeBaseTons = 45;
   if (activeViaje) {
     subState = isFinalizing ? 'FINALIZE' : 'ACTIVE';
+    const matchingRuta = rutas.find(r => r.id_ruta === activeViaje.id_ruta);
+    activeBasePrice = Number(activeViaje.tarifa_pactada || matchingRuta?.tarifa_base || 5000);
+    activeBaseTons = Number(activeViaje.toneladas_base || 45) || 45;
   }
 
   return (
@@ -1165,7 +1173,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   <div className="space-y-1.5">
                     <h4 className="text-white text-lg sm:text-xl font-black tracking-tight uppercase">Viaje Registrado en Ciclo</h4>
                     <p className="text-xs text-slate-200 max-w-md mx-auto leading-relaxed">
-                      Llevando cargamento de <strong className="text-emerald-400">45 Toneladas Base</strong>. Rutas secundarias bloqueadas hasta completar el pesaje.
+                      Llevando cargamento de <strong className="text-emerald-400">{activeBaseTons} Toneladas Base</strong>. Rutas secundarias bloqueadas hasta completar el pesaje.
                     </p>
                   </div>
 
@@ -1262,7 +1270,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <label className="text-xs text-slate-200 font-bold uppercase tracking-wider block">Sueldo / Toneladas Extra (Tons)</label>
-                        <span className="text-[10px] text-slate-400 font-semibold uppercase">Base obligatoria: 45 Tons</span>
+                        <span className="text-[10px] text-slate-400 font-semibold uppercase">Base obligatoria: {activeBaseTons} Tons</span>
                       </div>
                       <div className="flex items-center justify-between bg-slate-950 border border-[#112240] p-3 rounded-2xl">
                         <motion.button
@@ -1289,7 +1297,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
                       {toneladasExtras > 0 && (
                         <div className="p-3 bg-indigo-950/30 text-blue-400 border border-indigo-900/40 rounded-xl text-xs leading-relaxed font-semibold">
-                          <strong>Ganancia Estimada Extras (40% Chofer):</strong> Un estimado de <strong>{((toneladasExtras * (500 / 45)) * 0.40).toFixed(1)} Bs.</strong> se acumulará como bono personal.
+                          <strong>Ganancia Estimada Extras (40% Chofer):</strong> Un estimado de <strong>{((toneladasExtras * (activeBasePrice / activeBaseTons)) * 0.40).toFixed(1)} Bs.</strong> se acumulará como bono personal.
                         </div>
                       )}
                     </div>

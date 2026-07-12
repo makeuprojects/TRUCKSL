@@ -483,7 +483,7 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
     const extraTons = Number(v.toneladas_extras) || 0;
     const extraRateValue = (basePrice / baseTons) * extraTons;
     return sum + basePrice + extraRateValue;
-  }, 0) || safeParse(summary?.ingresos_totales || 75000);
+  }, 0);
   const margenValue = ingresosValue - totalEarningsThisMonth;
   const isMargenNegative = margenValue < 0;
 

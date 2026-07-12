@@ -624,7 +624,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
     const extraTons = Number(v.toneladas_extras) || 0;
     const extraRateValue = (basePrice / baseTons) * extraTons;
     return sum + basePrice + extraRateValue;
-  }, 0) || safeParse(summary?.ingresos_totales || 84000);
+  }, 0);
   const margenValue = ingresosValue - totalExpensesThisMonth;
   const isMargenNegative = margenValue < 0;
 

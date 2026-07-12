@@ -229,9 +229,15 @@ export default function RouteDetailDrawer({
                         <span className="text-[9px] text-slate-400 uppercase font-bold block">Valor Excedente (Calculado)</span>
                         <span className="font-mono font-bold text-orange-400">Bs. {extraRateValue.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
                       </div>
-                      <div className="col-span-2 pt-2 border-t border-slate-800/60 flex items-center justify-between">
-                        <span className="text-[10px] text-slate-300 font-black uppercase">Ingreso Total por Viaje:</span>
-                        <span className="font-mono text-sm font-black text-emerald-400">Bs. {totalTripEarnings.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                      <div className="col-span-2 pt-2 border-t border-slate-800/60 flex flex-col space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-slate-400 font-bold uppercase">Bono Chofer (40% de Extras):</span>
+                          <span className="font-mono text-xs font-bold text-blue-400">+Bs. {(extraRateValue * 0.40).toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-800/60">
+                          <span className="text-[10px] text-slate-300 font-black uppercase">Ingreso Total por Viaje:</span>
+                          <span className="font-mono text-sm font-black text-emerald-400">Bs. {totalTripEarnings.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                        </div>
                       </div>
                     </div>
                   ) : (

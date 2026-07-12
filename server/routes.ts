@@ -480,7 +480,7 @@ apiRouter.post('/viajes/:id/finalizar', async (req, res) => {
     const id_viaje = req.params.id;
     const { kilometraje_final, toneladas_extras, foto_pesaje_url } = req.body;
 
-    if (!kilometraje_final) {
+    if (kilometraje_final === undefined || kilometraje_final === null || kilometraje_final === '') {
       return res.status(400).json({ success: false, message: 'Se requiere el Kilometraje final.' });
     }
 
@@ -518,9 +518,9 @@ apiRouter.post('/viajes/:id/finalizar', async (req, res) => {
       // Financial payout calculation
       const rutas = await getSheetRows<any>(authHeader, 'Rutas');
       const ruta = rutas.find(r => r.id_ruta === viaje.id_ruta);
-      const tarifaBase = Number(ruta?.tarifa_base || 500);
-
-      const pricePerTon = tarifaBase / 45;
+      const tarifaBase = Number(viaje.tarifa_pactada || ruta?.tarifa_base || 5000);
+      const baseTons = Number(viaje.toneladas_base || 45) || 45;
+      const pricePerTon = tarifaBase / baseTons;
       const valueExtraTotal = extTons * pricePerTon;
       const driverBonus = valueExtraTotal * 0.40;
       const adminBonus = valueExtraTotal * 0.60;
@@ -812,7 +812,7 @@ apiRouter.post('/historial-aceite', async (req, res) => {
     const authHeader = getAuthHeader(req);
     const { id_camion, km_cambio, proximo_cambio_km } = req.body;
 
-    if (!id_camion || !km_cambio) {
+    if (!id_camion || km_cambio === undefined || km_cambio === null || km_cambio === '') {
       return res.status(400).json({ success: false, message: 'Camion y KM del Cambio son requeridos.' });
     }
 
