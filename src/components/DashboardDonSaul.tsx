@@ -131,6 +131,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   const [origen, setOrigen] = useState('');
   const [destino, setDestino] = useState('');
   const [tarifaBase, setTarifaBase] = useState('5000');
+  const [toneladasBase, setToneladasBase] = useState('45');
 
   const [camionModelo, setCamionModelo] = useState('');
   const [camionAnio, setCamionAnio] = useState('');
@@ -270,6 +271,39 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
     }
   };
 
+  const handleUpdateViaje = async (id_viaje: string, toneladas_base: string, tarifa_pactada: string): Promise<boolean> => {
+    try {
+      const authHeader = `Bearer ${token}`;
+      const res = await fetch(`/api/viajes/${id_viaje}/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: authHeader
+        },
+        body: JSON.stringify({ toneladas_base, tarifa_pactada })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.message || 'Parámetros del viaje ajustados.');
+        if (selectedRouteViaje && selectedRouteViaje.id_viaje === id_viaje) {
+          setSelectedRouteViaje({
+            ...selectedRouteViaje,
+            toneladas_base,
+            tarifa_pactada
+          });
+        }
+        await syncDatabase();
+        return true;
+      } else {
+        toast.error(data.message || 'Error al ajustar parámetros de viaje.');
+        return false;
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Error de conexión.');
+      return false;
+    }
+  };
+
   // Add Driver Form Submit
   const handleCreateDriverSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -325,8 +359,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   // Create Route Submit
   const handleCreateRouteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!origen.trim() || !destino.trim() || !tarifaBase) {
-      toast.error('Origen, destino y tarifa base de carga son obligatorios.');
+    if (!origen.trim() || !destino.trim() || !tarifaBase || !toneladasBase) {
+      toast.error('Origen, destino, tarifa base y toneladas son obligatorios.');
       return;
     }
     setIsCreatingRoute(true);
@@ -340,7 +374,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
         body: JSON.stringify({
           origen: origen.trim(),
           destino: destino.trim(),
-          tarifa_base: String(tarifaBase)
+          tarifa_base: String(tarifaBase),
+          toneladas_base: String(toneladasBase)
         })
       });
       const data = await res.json();
@@ -348,6 +383,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
       setOrigen('');
       setDestino('');
       setTarifaBase('5000');
+      setToneladasBase('45');
       await syncDatabase();
     };
 
@@ -583,9 +619,10 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   const totalExpensesThisMonth = gastos.reduce((sum, g) => sum + safeParse(g.monto), 0);
   const ingresosValue = viajes.reduce((sum, v) => {
     const route = rutas.find((r) => r.id_ruta === v.id_ruta);
-    const basePrice = Number(route?.tarifa_base || 5000);
+    const basePrice = Number(v.tarifa_pactada || route?.tarifa_base || 5000);
+    const baseTons = Number(v.toneladas_base || 45) || 45;
     const extraTons = Number(v.toneladas_extras) || 0;
-    const extraRateValue = (basePrice / 45) * extraTons;
+    const extraRateValue = (basePrice / baseTons) * extraTons;
     return sum + basePrice + extraRateValue;
   }, 0) || safeParse(summary?.ingresos_totales || 84000);
   const margenValue = ingresosValue - totalExpensesThisMonth;
@@ -1428,25 +1465,41 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[9px] text-slate-400 block uppercase font-bold">Tarifa Base por Carga Completa (BOB)</label>
-                  <div className="flex gap-2.5">
+                <div className="grid grid-cols-2 gap-3.5">
+                  <div className="space-y-1">
+                    <label className="text-[9px] text-slate-400 block uppercase font-bold">Toneladas (Base)</label>
                     <input
                       type="number"
+                      step="any"
+                      required
+                      placeholder="ej: 45"
+                      value={toneladasBase}
+                      onChange={(e) => setToneladasBase(e.target.value)}
+                      className="w-full bg-slate-900/60 border border-white/[0.06] focus:border-white/30 text-xs px-3 py-2.5 rounded-lg text-slate-100 font-mono outline-none transition"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] text-slate-400 block uppercase font-bold">Ganancia / Tarifa (BOB)</label>
+                    <input
+                      type="number"
+                      step="any"
                       required
                       placeholder="ej: 7500"
                       value={tarifaBase}
                       onChange={(e) => setTarifaBase(e.target.value)}
                       className="w-full bg-slate-900/60 border border-white/[0.06] focus:border-white/30 text-xs px-3 py-2.5 rounded-lg text-slate-100 font-mono outline-none transition"
                     />
-                    <button
-                      type="submit"
-                      disabled={isCreatingRoute}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-[10px] uppercase px-4.5 rounded-lg text-xs cursor-pointer transition shrink-0 flex items-center justify-center shadow-md shadow-emerald-950/20"
-                    >
-                      {isCreatingRoute ? '...' : 'Crear'}
-                    </button>
                   </div>
+                </div>
+
+                <div className="pt-1">
+                  <button
+                    type="submit"
+                    disabled={isCreatingRoute}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-[10px] uppercase py-2.5 rounded-lg text-xs cursor-pointer transition shadow-md shadow-emerald-950/20"
+                  >
+                    {isCreatingRoute ? 'Registrando...' : 'Confirmar Ruta y Tarifa'}
+                  </button>
                 </div>
               </form>
             </div>
@@ -1802,6 +1855,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
         rutas={rutas}
         gastos={gastos}
         onDeleteViaje={handleDeleteViaje}
+        onUpdateViaje={handleUpdateViaje}
       />
 
     </div>

@@ -63,9 +63,10 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
         const camionStr = camion ? `${camion.modelo} (Placa: ${camion.placa || 'N/A'})` : viaje.id_camion || 'N/A';
 
         // Rates & Settlement calculations matching UI exactly
-        const basePrice = Number(ruta?.tarifa_base || 5000);
+        const basePrice = Number(viaje.tarifa_pactada || ruta?.tarifa_base || 5000);
+        const baseTons = Number(viaje.toneladas_base || 45) || 45;
         const extraTons = Number(viaje.toneladas_extras) || 0;
-        const extraRateValue = (basePrice / 45) * extraTons;
+        const extraRateValue = (basePrice / baseTons) * extraTons;
         const totalFlete = basePrice + extraRateValue;
         const netSettlement = totalFlete - totalGastado;
 
@@ -325,9 +326,10 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
           const drv = choferes.find(c => c.id_chofer === viaje.id_chofer);
           const route = rutas.find(r => r.id_ruta === viaje.id_ruta);
           const totalGastado = getTripTotalExpenses(viaje.id_viaje);
-          const basePrice = Number(route?.tarifa_base || 5000);
+          const basePrice = Number(viaje.tarifa_pactada || route?.tarifa_base || 5000);
+          const baseTons = Number(viaje.toneladas_base || 45) || 45;
           const extraTons = Number(viaje.toneladas_extras) || 0;
-          const extraRateValue = (basePrice / 45) * extraTons;
+          const extraRateValue = (basePrice / baseTons) * extraTons;
           
           return [
             viaje.id_viaje || "",

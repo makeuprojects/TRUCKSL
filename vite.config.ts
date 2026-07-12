@@ -11,6 +11,9 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        workbox: {
+          maximumFileSizeToCacheInBytes: 5000000,
+        },
         manifest: {
           name: 'SL ROAD TRUCKING',
           short_name: 'SL ROAD',

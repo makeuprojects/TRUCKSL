@@ -24,6 +24,7 @@ export interface Ruta {
   origen: string;
   destino: string;
   tarifa_base: string;
+  toneladas_base?: string;
   estado: 'Disponible' | 'Ocupada';
 }
 
@@ -40,6 +41,7 @@ export interface Viaje {
   foto_pesaje_url: string;
   id_evento_uuid?: string;
   timestamp_registro?: string;
+  tarifa_pactada?: string;
 }
 
 export interface Gasto {

@@ -79,9 +79,10 @@ export default function SaulDashboardOverview({
   const recentTripsData = viajes.slice(-6).map(v => {
     const totalGasto = getTripTotalExpenses(v.id_viaje);
     const route = rutas.find(r => r.id_ruta === v.id_ruta);
-    const basePrice = Number(route?.tarifa_base || 5000);
+    const basePrice = Number(v.tarifa_pactada || route?.tarifa_base || 5000);
+    const baseTons = Number(v.toneladas_base || 45) || 45;
     const extraTons = Number(v.toneladas_extras) || 0;
-    const extraRateValue = (basePrice / 45) * extraTons;
+    const extraRateValue = (basePrice / baseTons) * extraTons;
     const baseFare = basePrice + extraRateValue;
     
     const label = route ? `${route.origen.substring(0, 3)}-${route.destino.substring(0, 3)}` : `V-${v.id_viaje.substring(0, 4)}`;
@@ -529,9 +530,10 @@ export default function SaulDashboardOverview({
                 const driver = choferes.find(c => c.id_chofer === v.id_chofer);
                 const truck = camiones.find(c => c.id_camion === v.id_camion);
 
-                const basePrice = Number(route?.tarifa_base || 5000);
+                const basePrice = Number(v.tarifa_pactada || route?.tarifa_base || 5000);
+                const baseTons = Number(v.toneladas_base || 45) || 45;
                 const extraTons = Number(v.toneladas_extras) || 0;
-                const extraRateValue = (basePrice / 45) * extraTons;
+                const extraRateValue = (basePrice / baseTons) * extraTons;
                 const totalIncome = basePrice + extraRateValue;
 
                 // Filter expenses that belong to this trip

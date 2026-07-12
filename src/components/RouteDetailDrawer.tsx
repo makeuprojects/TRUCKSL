@@ -22,6 +22,7 @@ interface RouteDetailDrawerProps {
   rutas: Ruta[];
   gastos: Gasto[];
   onDeleteViaje?: (id_viaje: string) => void;
+  onUpdateViaje?: (id_viaje: string, toneladas_base: string, tarifa_pactada: string) => Promise<boolean>;
 }
 
 type ExpenseCategory = 'DIESEL' | 'PEAJES' | 'OTROS';
@@ -58,10 +59,33 @@ export default function RouteDetailDrawer({
   camiones,
   rutas,
   gastos,
-  onDeleteViaje
+  onDeleteViaje,
+  onUpdateViaje
 }: RouteDetailDrawerProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [zoomScale, setZoomScale] = useState(1);
+
+  // States for parameters editing
+  const [isEditingParams, setIsEditingParams] = useState(false);
+  const [toneladasInput, setToneladasInput] = useState('');
+  const [tarifaInput, setTarifaInput] = useState('');
+  const [isSavingParams, setIsSavingParams] = useState(false);
+
+  const handleSaveParams = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!viaje || !onUpdateViaje) return;
+    setIsSavingParams(true);
+    try {
+      const success = await onUpdateViaje(viaje.id_viaje, toneladasInput, tarifaInput);
+      if (success) {
+        setIsEditingParams(false);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSavingParams(false);
+    }
+  };
 
   const handleDownload = async (url: string) => {
     try {
@@ -106,6 +130,13 @@ export default function RouteDetailDrawer({
     .reduce((acc, g) => acc + safeParseNum(g.monto), 0);
 
   const totalRouteSpent = routeExpenses.reduce((acc, g) => acc + safeParseNum(g.monto), 0);
+
+  const currentRoute = rutas.find((r) => r.id_ruta === viaje.id_ruta);
+  const basePrice = Number(viaje.tarifa_pactada || currentRoute?.tarifa_base || 5000);
+  const baseTons = Number(viaje.toneladas_base || 45) || 45;
+  const extraTons = Number(viaje.toneladas_extras) || 0;
+  const extraRateValue = (basePrice / baseTons) * extraTons;
+  const totalTripEarnings = basePrice + extraRateValue;
 
   return (
     <>
@@ -158,6 +189,97 @@ export default function RouteDetailDrawer({
                 <div className="grid grid-cols-2 gap-4 bg-slate-900/50 border border-slate-800/60 p-4 rounded-xl">
                   <div className="space-y-0.5"><span className="text-[9px] text-slate-400 uppercase font-bold">Chofer</span><span className="text-xs font-black text-slate-200 flex items-center gap-1.5"><User className="w-3.5 h-3.5 text-sky-400" />{currentDriver?.nombre_completo || 'N/A'}</span></div>
                   <div className="space-y-0.5"><span className="text-[9px] text-slate-400 uppercase font-bold">Camión</span><span className="text-xs font-black text-slate-200 flex items-center gap-1.5"><Truck className="w-3.5 h-3.5 text-sky-400" />{currentTruck?.modelo || 'N/A'}</span></div>
+                </div>
+
+                {/* FINANCIAL PARAMETERS & FREIGHT SETTLEMENT */}
+                <div className="bg-slate-900/40 border border-slate-800/60 p-4 rounded-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wide flex items-center gap-1.5">
+                      ⚖️ Configuración de Flete y Carga
+                    </span>
+                    {onUpdateViaje && !isEditingParams && (
+                      <button
+                        onClick={() => {
+                          setToneladasInput(viaje.toneladas_base || '45');
+                          setTarifaInput(viaje.tarifa_pactada || currentRoute?.tarifa_base || '5000');
+                          setIsEditingParams(true);
+                        }}
+                        className="text-[10px] font-bold text-sky-400 hover:text-sky-300 transition uppercase underline"
+                      >
+                        Ajustar
+                      </button>
+                    )}
+                  </div>
+
+                  {!isEditingParams ? (
+                    <div className="grid grid-cols-2 gap-4 text-xs">
+                      <div className="space-y-1">
+                        <span className="text-[9px] text-slate-400 uppercase font-bold block">Toneladas Pactadas (Base)</span>
+                        <span className="font-mono font-bold text-slate-200">{viaje.toneladas_base || '45'} t</span>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[9px] text-slate-400 uppercase font-bold block">Tarifa Base Pactada</span>
+                        <span className="font-mono font-bold text-slate-200">Bs. {basePrice.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[9px] text-slate-400 uppercase font-bold block">Toneladas Extras</span>
+                        <span className="font-mono font-bold text-orange-400">{extraTons} t</span>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[9px] text-slate-400 uppercase font-bold block">Valor Excedente (Calculado)</span>
+                        <span className="font-mono font-bold text-orange-400">Bs. {extraRateValue.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="col-span-2 pt-2 border-t border-slate-800/60 flex items-center justify-between">
+                        <span className="text-[10px] text-slate-300 font-black uppercase">Ingreso Total por Viaje:</span>
+                        <span className="font-mono text-sm font-black text-emerald-400">Bs. {totalTripEarnings.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSaveParams} className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[9px] text-slate-400 uppercase font-bold block">Toneladas Base (t)</label>
+                          <input
+                            type="number"
+                            step="any"
+                            value={toneladasInput}
+                            onChange={(e) => setToneladasInput(e.target.value)}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono focus:border-sky-500 focus:outline-none"
+                            placeholder="45"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[9px] text-slate-400 uppercase font-bold block">Tarifa Base (Bs.)</label>
+                          <input
+                            type="number"
+                            step="any"
+                            value={tarifaInput}
+                            onChange={(e) => setTarifaInput(e.target.value)}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono focus:border-sky-500 focus:outline-none"
+                            placeholder="5000"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2 justify-end pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingParams(false)}
+                          className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold uppercase transition"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={isSavingParams}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-[#10B981] text-slate-950 text-[10px] font-black uppercase transition flex items-center gap-1 disabled:opacity-50"
+                        >
+                          {isSavingParams ? 'Guardando...' : 'Guardar Ajustes'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
                 </div>
 
                 {/* Weigh Scale Ticket & Load Photos Section */}

@@ -387,6 +387,7 @@ apiRouter.post('/rutas', async (req, res) => {
       origen: body.origen || '',
       destino: body.destino || '',
       tarifa_base: body.tarifa_base || '500',
+      toneladas_base: body.toneladas_base || '45',
       estado: 'Disponible'
     };
 
@@ -453,7 +454,8 @@ apiRouter.post('/viajes', async (req, res) => {
         fecha_inicio: now,
         fecha_fin: '',
         estado_viaje: 'En Ciclo',
-        toneladas_base: '45',
+        toneladas_base: targetRuta.toneladas_base || '45',
+        tarifa_pactada: targetRuta.tarifa_base || '5000',
         toneladas_extras: '0',
         foto_pesaje_url: '',
         id_evento_uuid: req.body.id_evento_uuid || null,
@@ -603,6 +605,35 @@ apiRouter.delete('/viajes/:id', async (req, res) => {
     res.json({ success: true, message: 'Viaje cancelado exitosamente.' });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message || 'Error al eliminar viaje.' });
+  }
+});
+
+apiRouter.post('/viajes/:id/update', async (req, res) => {
+  try {
+    const authHeader = getAuthHeader(req);
+    const id_viaje = req.params.id;
+    const { toneladas_base, tarifa_pactada } = req.body;
+
+    const result = await sheetsQueue.enqueue(async () => {
+      const viajes = await getSheetRows<any>(authHeader, 'Viajes');
+      let viaje = viajes.find(v => v.id_viaje === id_viaje);
+      
+      if (!viaje) {
+        throw new Error('404: Viaje no registrado.');
+      }
+
+      const updates: any = {};
+      if (toneladas_base !== undefined) updates.toneladas_base = String(toneladas_base);
+      if (tarifa_pactada !== undefined) updates.tarifa_pactada = String(tarifa_pactada);
+
+      await updateSheetRow(authHeader, 'Viajes', 'id_viaje', id_viaje, updates);
+      invalidateSheetCache('Viajes');
+      return { ...viaje, ...updates };
+    });
+
+    res.json({ success: true, message: 'Viaje ajustado con éxito.', data: result });
+  } catch (error: any) {
+    return handleApiError(res, error, 'Error al ajustar parámetros de viaje.');
   }
 });
 
@@ -850,10 +881,11 @@ apiRouter.get('/dashboard-summary', async (req, res) => {
     let totalIncomes = 0;
     uniqueViajes.forEach((viaje) => {
       const matchingRuta = rutas.find(r => r.id_ruta === viaje.id_ruta);
-      const basePrice = Number(matchingRuta?.tarifa_base || 5000);
+      const basePrice = Number(viaje.tarifa_pactada || matchingRuta?.tarifa_base || 5000);
+      const baseTons = Number(viaje.toneladas_base || 45) || 45;
       const extraTons = Number(viaje.toneladas_extras) || 0;
       
-      const extraRateValue = (basePrice / 45) * extraTons;
+      const extraRateValue = (basePrice / baseTons) * extraTons;
       totalIncomes += basePrice + extraRateValue;
     });
 

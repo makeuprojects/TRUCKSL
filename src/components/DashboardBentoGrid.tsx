@@ -427,9 +427,10 @@ export default function DashboardBentoGrid({
             let totalBonoChofer = 0;
             completedTrips.forEach((v) => {
               const matchingRuta = rutas.find(r => r.id_ruta === v.id_ruta);
-              const basePrice = Number(matchingRuta?.tarifa_base || 500);
+              const basePrice = Number(v.tarifa_pactada || matchingRuta?.tarifa_base || 500);
+              const baseTons = Number(v.toneladas_base || 45) || 45;
               const extraTons = Number(v.toneladas_extras) || 0;
-              const extraRateValue = (basePrice / 45) * extraTons;
+              const extraRateValue = (basePrice / baseTons) * extraTons;
               totalBonoChofer += (extraRateValue * 0.40);
             });
 
@@ -1021,10 +1022,10 @@ export default function DashboardBentoGrid({
 
                   completed.forEach((v) => {
                     const matchingRuta = rutas.find(r => r.id_ruta === v.id_ruta);
-                    const basePrice = Number(matchingRuta?.tarifa_base || 500);
+                    const basePrice = Number(v.tarifa_pactada || matchingRuta?.tarifa_base || 500);
                     const baseTons = Number(v.toneladas_base) || 45;
                     const extraTons = Number(v.toneladas_extras) || 0;
-                    const extraRateValue = (basePrice / 45) * extraTons;
+                    const extraRateValue = (basePrice / baseTons) * extraTons;
                     
                     totalBonoAcumulado += (extraRateValue * 0.40);
                     totalTonsBases += baseTons;
