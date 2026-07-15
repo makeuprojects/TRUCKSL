@@ -23,7 +23,8 @@ import {
   TrendingUp,
   Award,
   AlertCircle,
-  Loader2
+  Loader2,
+  Phone
 } from 'lucide-react';
 import { Camion, Chofer, Ruta, Viaje, Gasto } from '../types';
 import RutaCard from './RutaCard';
@@ -738,7 +739,10 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
     const matchingRuta = rutas.find(r => r.id_ruta === v.id_ruta);
     const basePrice = Number(v.tarifa_pactada || matchingRuta?.tarifa_base || 5000);
     const baseTons = Number(v.toneladas_base || 45) || 45;
-    return acc + (extras * (basePrice / baseTons) * 0.40);
+    
+    const tripTotalTons = baseTons + extras;
+    const bonusTons = baseTons < 30 ? 0 : Math.max(0, tripTotalTons - 45);
+    return acc + (bonusTons * (basePrice / baseTons) * 0.40);
   }, 0);
   const totalTons = completedTrips.reduce((acc, v) => {
     const base = parseFloat(v.toneladas_base || '45');
@@ -884,6 +888,20 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           </div>
 
           <div className="space-y-3 pt-6 border-t border-slate-850">
+            {/* Centro de Soporte */}
+            <div className="bg-[#0b1b3d]/45 border border-[#233554]/40 p-3.5 rounded-2xl space-y-1.5 text-center">
+              <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none">¿TIENES PREGUNTAS O DUDAS?</span>
+              <a
+                href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-350 font-bold hover:underline transition"
+              >
+                <Phone className="w-3.5 h-3.5 fill-current" />
+                Contactar al 62730435
+              </a>
+            </div>
+
             <button
               onClick={onLogout}
               className="w-full border border-slate-800 hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
@@ -1015,6 +1033,20 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 </div>
 
                 <div className="space-y-3 pt-4 border-t border-slate-850">
+                  {/* Centro de Soporte */}
+                  <div className="bg-[#0b1b3d]/45 border border-[#233554]/40 p-3 rounded-xl space-y-1 text-center">
+                    <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none">¿TIENES PREGUNTAS O DUDAS?</span>
+                    <a
+                      href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-350 font-bold hover:underline transition"
+                    >
+                      <Phone className="w-3.5 h-3.5 fill-current" />
+                      Contactar al 62730435
+                    </a>
+                  </div>
+
                   <button
                     onClick={onLogout}
                     className="w-full border border-slate-800 hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2 px-4 rounded-lg text-xs transition cursor-pointer"
@@ -1295,11 +1327,34 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                         </motion.button>
                       </div>
 
-                      {toneladasExtras > 0 && (
-                        <div className="p-3 bg-indigo-950/30 text-blue-400 border border-indigo-900/40 rounded-xl text-xs leading-relaxed font-semibold">
-                          <strong>Ganancia Estimada Extras (40% Chofer):</strong> Un estimado de <strong>{((toneladasExtras * (activeBasePrice / activeBaseTons)) * 0.40).toFixed(1)} Bs.</strong> se acumulará como bono personal.
-                        </div>
-                      )}
+                      {(() => {
+                        const totalTonnage = activeBaseTons + toneladasExtras;
+                        const bonusTons = activeBaseTons < 30 ? 0 : Math.max(0, totalTonnage - 45);
+                        const expectedBonus = (bonusTons * (activeBasePrice / activeBaseTons)) * 0.40;
+                        
+                        const effectiveExtras = activeBaseTons < 45 ? Math.max(0, totalTonnage - 45) : toneladasExtras;
+                        const expectedExtraEarnings = (activeBasePrice / activeBaseTons) * effectiveExtras;
+
+                        return (
+                          <div className="space-y-2">
+                            {activeBaseTons < 45 && (
+                              <div className="p-3 bg-amber-950/20 text-amber-400 border border-amber-900/40 rounded-xl text-xs leading-relaxed">
+                                <strong>Nota de Tonelaje Base ({activeBaseTons}t):</strong> Al tener base de {activeBaseTons}t, las toneladas adicionales no se computan como extras para flete ni bono a menos que el peso total sea mayor a 45t.
+                              </div>
+                            )}
+                            {effectiveExtras > 0 && (
+                              <div className="p-3 bg-emerald-950/30 text-emerald-400 border border-emerald-500/20 rounded-xl text-xs leading-relaxed font-semibold">
+                                <strong>Flete Extra Estimado:</strong> +<strong>{expectedExtraEarnings.toFixed(1)} Bs.</strong> por {effectiveExtras} toneladas extra (sobre 45t).
+                              </div>
+                            )}
+                            {bonusTons > 0 && (
+                              <div className="p-3 bg-indigo-950/30 text-blue-400 border border-indigo-900/40 rounded-xl text-xs leading-relaxed font-semibold">
+                                <strong>Bono Estimado (Arriba de 45t):</strong> Un estimado de <strong>{expectedBonus.toFixed(1)} Bs.</strong> se acumulará como bono personal.
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Camera Capture */}
@@ -1393,6 +1448,32 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* BANNER DE SOPORTE */}
+          <div className="pt-6 border-t border-slate-850 mt-8">
+            <div className="bg-[#0b1b3d]/60 backdrop-blur-md border border-[#233554]/50 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+              <div className="flex items-center gap-3 text-left">
+                <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20 shrink-0">
+                  <Phone className="w-4 h-4 animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-xs text-white">Centro de Soporte</h4>
+                  <p className="text-[11px] text-slate-300 mt-0.5 leading-normal">
+                    Si tienes preguntas o dudas contactar a <a href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema" target="_blank" rel="noopener noreferrer" className="text-emerald-400 font-bold hover:underline transition">62730435</a>. Estamos en línea para ayudarte.
+                  </p>
+                </div>
+              </div>
+              <a
+                href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-[11px] tracking-wider uppercase px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition duration-200 cursor-pointer shadow-lg shadow-emerald-500/10"
+              >
+                <Phone className="w-3.5 h-3.5 fill-current stroke-none" />
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
         </main>
 
         {/* 3-Column Layout: Column 3 (Alerts & KPIs Panel, docked on Desktop, hidden on Mobile) */}

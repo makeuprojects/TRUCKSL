@@ -616,12 +616,16 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   };
 
   // Calculations with NaN defenses
-  const totalExpensesThisMonth = gastos.reduce((sum, g) => sum + safeParse(g.monto), 0);
+  const totalExpensesThisMonth = gastos
+    .filter(g => g.tipo_gasto !== 'Pago Chofer')
+    .reduce((sum, g) => sum + safeParse(g.monto), 0);
   const ingresosValue = viajes.reduce((sum, v) => {
     const route = rutas.find((r) => r.id_ruta === v.id_ruta);
     const basePrice = Number(v.tarifa_pactada || route?.tarifa_base || 5000);
     const baseTons = Number(v.toneladas_base || 45) || 45;
-    const extraTons = Number(v.toneladas_extras) || 0;
+    const extraTonsRaw = Number(v.toneladas_extras) || 0;
+    const totalTons = baseTons + extraTonsRaw;
+    const extraTons = baseTons < 45 ? Math.max(0, totalTons - 45) : extraTonsRaw;
     const extraRateValue = (basePrice / baseTons) * extraTons;
     return sum + basePrice + extraRateValue;
   }, 0);
@@ -1614,6 +1618,32 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
               />
             </motion.div>
           )}
+        </div>
+
+        {/* CENTRO DE SOPORTE */}
+        <div className="max-w-5xl mx-auto pt-8 border-t border-white/[0.06] mt-8">
+          <div className="bg-[#0b1b3d]/60 backdrop-blur-md border border-[#233554]/50 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+            <div className="flex items-center gap-3.5 text-left">
+              <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                <Phone className="w-5 h-5 animate-pulse" />
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-white">Centro de Soporte</h4>
+                <p className="text-xs text-slate-300 mt-0.5 leading-relaxed">
+                  Si tienes preguntas o dudas contactar a <a href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema" target="_blank" rel="noopener noreferrer" className="text-emerald-400 font-bold hover:underline transition">62730435</a> para soporte técnico inmediato.
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs tracking-wider uppercase px-5 py-3 rounded-xl flex items-center justify-center gap-2 transition duration-200 cursor-pointer shadow-lg shadow-emerald-500/10"
+            >
+              <Phone className="w-4 h-4 fill-current stroke-none" />
+              <span>Contactar WhatsApp</span>
+            </a>
+          </div>
         </div>
 
       </div>

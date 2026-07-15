@@ -430,8 +430,10 @@ export default function DashboardBentoGrid({
               const basePrice = Number(v.tarifa_pactada || matchingRuta?.tarifa_base || 500);
               const baseTons = Number(v.toneladas_base || 45) || 45;
               const extraTons = Number(v.toneladas_extras) || 0;
-              const extraRateValue = (basePrice / baseTons) * extraTons;
-              totalBonoChofer += (extraRateValue * 0.40);
+              
+              const totalTons = baseTons + extraTons;
+              const bonusTons = baseTons < 30 ? 0 : Math.max(0, totalTons - 45);
+              totalBonoChofer += (bonusTons * (basePrice / baseTons) * 0.40);
             });
 
             return (
@@ -1013,7 +1015,7 @@ export default function DashboardBentoGrid({
                   
                   // Extract all Gasto items associated with this driver's voyages
                   const driverExpenses = gastos.filter(g => {
-                    return driverTrips.some(t => t.id_viaje === g.id_viaje);
+                    return g.tipo_gasto !== 'Pago Chofer' && driverTrips.some(t => t.id_viaje === g.id_viaje);
                   });
 
                   let totalBonoAcumulado = 0;
@@ -1024,10 +1026,13 @@ export default function DashboardBentoGrid({
                     const matchingRuta = rutas.find(r => r.id_ruta === v.id_ruta);
                     const basePrice = Number(v.tarifa_pactada || matchingRuta?.tarifa_base || 500);
                     const baseTons = Number(v.toneladas_base) || 45;
-                    const extraTons = Number(v.toneladas_extras) || 0;
-                    const extraRateValue = (basePrice / baseTons) * extraTons;
+                    const extraTonsRaw = Number(v.toneladas_extras) || 0;
                     
-                    totalBonoAcumulado += (extraRateValue * 0.40);
+                    const totalTons = baseTons + extraTonsRaw;
+                    const extraTons = baseTons < 45 ? Math.max(0, totalTons - 45) : extraTonsRaw;
+                    const bonusTons = baseTons < 30 ? 0 : Math.max(0, totalTons - 45);
+                    totalBonoAcumulado += (bonusTons * (basePrice / baseTons) * 0.40);
+                    
                     totalTonsBases += baseTons;
                     totalTonsExtras += extraTons;
                   });

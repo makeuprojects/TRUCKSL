@@ -111,7 +111,7 @@ export default function RouteDetailDrawer({
   const currentTruck = camiones.find((t) => t.id_camion === viaje.id_camion);
 
   const routeExpenses = gastos
-    .filter((g) => g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(viaje.id_viaje).trim().toLowerCase())
+    .filter((g) => g.tipo_gasto !== 'Pago Chofer' && g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(viaje.id_viaje).trim().toLowerCase())
     .map(g => ({
       ...g,
       normalizedCat: normalizeCategory(g.tipo_gasto)
@@ -134,7 +134,13 @@ export default function RouteDetailDrawer({
   const currentRoute = rutas.find((r) => r.id_ruta === viaje.id_ruta);
   const basePrice = Number(viaje.tarifa_pactada || currentRoute?.tarifa_base || 5000);
   const baseTons = Number(viaje.toneladas_base || 45) || 45;
-  const extraTons = Number(viaje.toneladas_extras) || 0;
+  const extraTonsRaw = Number(viaje.toneladas_extras) || 0;
+  
+  const totalTons = baseTons + extraTonsRaw;
+  const extraTons = baseTons < 45 ? Math.max(0, totalTons - 45) : extraTonsRaw;
+  const bonusTons = baseTons < 30 ? 0 : Math.max(0, totalTons - 45);
+  const driverBonusValue = bonusTons * (basePrice / baseTons) * 0.40;
+
   const extraRateValue = (basePrice / baseTons) * extraTons;
   const totalTripEarnings = basePrice + extraRateValue;
 
@@ -231,8 +237,8 @@ export default function RouteDetailDrawer({
                       </div>
                       <div className="col-span-2 pt-2 border-t border-slate-800/60 flex flex-col space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] text-slate-400 font-bold uppercase">Bono Chofer (40% de Extras):</span>
-                          <span className="font-mono text-xs font-bold text-blue-400">+Bs. {(extraRateValue * 0.40).toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                          <span className="text-[10px] text-slate-400 font-bold uppercase">Bono Chofer (Arriba de 45t):</span>
+                          <span className="font-mono text-xs font-bold text-blue-400">+Bs. {driverBonusValue.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
                         </div>
                         <div className="flex items-center justify-between pt-1 border-t border-slate-800/60">
                           <span className="text-[10px] text-slate-300 font-black uppercase">Ingreso Total por Viaje:</span>

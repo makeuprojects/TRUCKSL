@@ -69,7 +69,7 @@ export default function ChoferProfileCard({
 
   // Filter expenses belonging to this driver
   const driverExpenses = restosSafe(gastos).filter(
-    (g: Gasto) => g.id_chofer === chofer.id_chofer
+    (g: Gasto) => g.id_chofer === chofer.id_chofer && g.tipo_gasto !== 'Pago Chofer'
   );
 
   // Parse list safety helper

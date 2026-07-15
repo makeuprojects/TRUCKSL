@@ -475,12 +475,16 @@ export default function DashboardAdminTower({ token }: DashboardAdminTowerProps)
     window.location.reload();
   };
 
-  const totalEarningsThisMonth = gastos.reduce((sum, g) => sum + safeParse(g.monto), 0);
+  const totalEarningsThisMonth = gastos
+    .filter(g => g.tipo_gasto !== 'Pago Chofer')
+    .reduce((sum, g) => sum + safeParse(g.monto), 0);
   const ingresosValue = viajes.reduce((sum, v) => {
     const route = rutas.find((r) => r.id_ruta === v.id_ruta);
     const basePrice = Number(v.tarifa_pactada || route?.tarifa_base || 5000);
     const baseTons = Number(v.toneladas_base || 45) || 45;
-    const extraTons = Number(v.toneladas_extras) || 0;
+    const extraTonsRaw = Number(v.toneladas_extras) || 0;
+    const totalTons = baseTons + extraTonsRaw;
+    const extraTons = baseTons < 45 ? Math.max(0, totalTons - 45) : extraTonsRaw;
     const extraRateValue = (basePrice / baseTons) * extraTons;
     return sum + basePrice + extraRateValue;
   }, 0);

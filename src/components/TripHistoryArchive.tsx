@@ -45,7 +45,7 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
 
   const getTripTotalExpenses = (tripId: string) => {
     return gastos
-      .filter(g => g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(tripId).trim().toLowerCase())
+      .filter(g => g.tipo_gasto !== 'Pago Chofer' && g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(tripId).trim().toLowerCase())
       .reduce((acc, g) => acc + safeParse(g.monto), 0);
   };
 
@@ -55,7 +55,7 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
     setTimeout(() => {
       try {
         const doc = new jsPDF('p', 'mm', 'a4');
-        const tripExpenses = gastos.filter(g => g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(viaje.id_viaje).trim().toLowerCase());
+        const tripExpenses = gastos.filter(g => g.tipo_gasto !== 'Pago Chofer' && g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(viaje.id_viaje).trim().toLowerCase());
         const totalGastado = getTripTotalExpenses(viaje.id_viaje);
 
         // Find assigned Camion
@@ -65,7 +65,9 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
         // Rates & Settlement calculations matching UI exactly
         const basePrice = Number(viaje.tarifa_pactada || ruta?.tarifa_base || 5000);
         const baseTons = Number(viaje.toneladas_base || 45) || 45;
-        const extraTons = Number(viaje.toneladas_extras) || 0;
+        const extraTonsRaw = Number(viaje.toneladas_extras) || 0;
+        const totalTons = baseTons + extraTonsRaw;
+        const extraTons = baseTons < 45 ? Math.max(0, totalTons - 45) : extraTonsRaw;
         const extraRateValue = (basePrice / baseTons) * extraTons;
         const totalFlete = basePrice + extraRateValue;
         const netSettlement = totalFlete - totalGastado;
@@ -328,7 +330,9 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
           const totalGastado = getTripTotalExpenses(viaje.id_viaje);
           const basePrice = Number(viaje.tarifa_pactada || route?.tarifa_base || 5000);
           const baseTons = Number(viaje.toneladas_base || 45) || 45;
-          const extraTons = Number(viaje.toneladas_extras) || 0;
+          const extraTonsRaw = Number(viaje.toneladas_extras) || 0;
+          const totalTons = baseTons + extraTonsRaw;
+          const extraTons = baseTons < 45 ? Math.max(0, totalTons - 45) : extraTonsRaw;
           const extraRateValue = (basePrice / baseTons) * extraTons;
           
           return [
@@ -338,7 +342,7 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
             route?.origen || "",
             route?.destino || "",
             viaje.toneladas_base || 0,
-            viaje.toneladas_extras || 0,
+            extraTons || 0,
             basePrice,
             extraRateValue.toFixed(2),
             totalGastado.toFixed(2),

@@ -71,7 +71,7 @@ export default function SaulDashboardOverview({
 
   const getTripTotalExpenses = (tripId: string) => {
     return gastos
-      .filter(g => g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(tripId).trim().toLowerCase())
+      .filter(g => g.tipo_gasto !== 'Pago Chofer' && g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(tripId).trim().toLowerCase())
       .reduce((acc, g) => acc + safeParse(g.monto), 0);
   };
 
@@ -81,7 +81,9 @@ export default function SaulDashboardOverview({
     const route = rutas.find(r => r.id_ruta === v.id_ruta);
     const basePrice = Number(v.tarifa_pactada || route?.tarifa_base || 5000);
     const baseTons = Number(v.toneladas_base || 45) || 45;
-    const extraTons = Number(v.toneladas_extras) || 0;
+    const extraTonsRaw = Number(v.toneladas_extras) || 0;
+    const totalTons = baseTons + extraTonsRaw;
+    const extraTons = baseTons < 45 ? Math.max(0, totalTons - 45) : extraTonsRaw;
     const extraRateValue = (basePrice / baseTons) * extraTons;
     const baseFare = basePrice + extraRateValue;
     
@@ -96,7 +98,9 @@ export default function SaulDashboardOverview({
   });
 
   // 2. Data for Expense Distribution Pie Chart
-  const expenseCategories = gastos.reduce((acc: { [key: string]: number }, curr) => {
+  const expenseCategories = gastos
+    .filter(g => g.tipo_gasto !== 'Pago Chofer')
+    .reduce((acc: { [key: string]: number }, curr) => {
     let cat = 'OTROS';
     const tipo = String(curr.tipo_gasto || '').toLowerCase();
     if (tipo.includes('diesel') || tipo.includes('combustible')) {
@@ -532,13 +536,15 @@ export default function SaulDashboardOverview({
 
                 const basePrice = Number(v.tarifa_pactada || route?.tarifa_base || 5000);
                 const baseTons = Number(v.toneladas_base || 45) || 45;
-                const extraTons = Number(v.toneladas_extras) || 0;
+                const extraTonsRaw = Number(v.toneladas_extras) || 0;
+                const totalTons = baseTons + extraTonsRaw;
+                const extraTons = baseTons < 45 ? Math.max(0, totalTons - 45) : extraTonsRaw;
                 const extraRateValue = (basePrice / baseTons) * extraTons;
                 const totalIncome = basePrice + extraRateValue;
 
                 // Filter expenses that belong to this trip
                 const tripExpensesList = gastos.filter(
-                  g => g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(v.id_viaje).trim().toLowerCase()
+                  g => g.tipo_gasto !== 'Pago Chofer' && g.id_viaje && String(g.id_viaje).trim().toLowerCase() === String(v.id_viaje).trim().toLowerCase()
                 );
 
                 const totalGasto = tripExpensesList.reduce((acc, g) => acc + safeParse(g.monto), 0);

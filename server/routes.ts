@@ -410,8 +410,9 @@ apiRouter.post('/rutas', async (req, res) => {
 apiRouter.get('/viajes', async (req, res) => {
   try {
     const authHeader = getAuthHeader(req);
-    const data = await getCachedSheetRows(authHeader, 'Viajes');
-    res.json({ success: true, data });
+    const data = await getCachedSheetRows<any>(authHeader, 'Viajes');
+    const filtered = data.filter(v => v.estado_viaje !== 'Eliminado');
+    res.json({ success: true, data: filtered });
   } catch (error: any) {
     return handleApiError(res, error);
   }
@@ -503,11 +504,11 @@ apiRouter.post('/viajes/:id/finalizar', async (req, res) => {
       });
 
       // Update Trip record
-      const extTons = Number(toneladas_extras) || 0;
+      const extTonsRaw = Number(toneladas_extras) || 0;
       const updateData = {
         fecha_fin: new Date().toISOString(),
         estado_viaje: 'Finalizado',
-        toneladas_extras: String(extTons),
+        toneladas_extras: String(extTonsRaw),
         foto_pesaje_url: foto_pesaje_url || '',
         id_evento_uuid: req.body.id_evento_uuid || null,
         timestamp_registro: req.body.timestamp_registro || new Date().toISOString()
@@ -521,9 +522,17 @@ apiRouter.post('/viajes/:id/finalizar', async (req, res) => {
       const tarifaBase = Number(viaje.tarifa_pactada || ruta?.tarifa_base || 5000);
       const baseTons = Number(viaje.toneladas_base || 45) || 45;
       const pricePerTon = tarifaBase / baseTons;
+      
+      const totalTons = baseTons + extTonsRaw;
+      const extTons = baseTons < 45 ? Math.max(0, totalTons - 45) : extTonsRaw;
       const valueExtraTotal = extTons * pricePerTon;
-      const driverBonus = valueExtraTotal * 0.40;
-      const adminBonus = valueExtraTotal * 0.60;
+      
+      // Driver bonus only applies to tonnage above 45, and ONLY if the base tons of the trip is 30 or more
+      const bonusTons = baseTons < 30 ? 0 : Math.max(0, totalTons - 45);
+      const driverBonus = bonusTons * pricePerTon * 0.40;
+      
+      const adminBonus = valueExtraTotal * 0.60; // Admin gets the rest or based on full extras?
+
 
       // 1. Maintain driver balance for next trips (DO NOT mix trip salary payouts with the monthly active cash advance wallet)
       console.log(`[Balance Control] Driver ${viaje.id_chofer} maintains their balance intact for next trips without mixing with salary payout.`);
@@ -599,6 +608,7 @@ apiRouter.delete('/viajes/:id', async (req, res) => {
 
       invalidateSheetCache('Viajes');
       invalidateSheetCache('Rutas');
+      invalidateSheetCache('Gastos');
       return true;
     });
 
@@ -644,8 +654,13 @@ apiRouter.post('/viajes/:id/update', async (req, res) => {
 apiRouter.get('/gastos', async (req, res) => {
   try {
     const authHeader = getAuthHeader(req);
-    const data = await getCachedSheetRows(authHeader, 'Gastos');
-    res.json({ success: true, data });
+    const data = await getCachedSheetRows<any>(authHeader, 'Gastos');
+    const viajes = await getCachedSheetRows<any>(authHeader, 'Viajes');
+    const deletedViajeIds = new Set(
+      viajes.filter(v => v.estado_viaje === 'Eliminado').map(v => v.id_viaje)
+    );
+    const filtered = data.filter(g => !g.id_viaje || !deletedViajeIds.has(g.id_viaje));
+    res.json({ success: true, data: filtered });
   } catch (error: any) {
     return handleApiError(res, error);
   }
@@ -850,11 +865,16 @@ apiRouter.get('/dashboard-summary', async (req, res) => {
     const gastos = await getCachedSheetRows<any>(authHeader, 'Gastos');
     const historialAceite = await getCachedSheetRows<any>(authHeader, 'Historial_Aceite');
 
+    const deletedViajeIds = new Set(
+      viajes.filter(v => v.estado_viaje === 'Eliminado').map(v => v.id_viaje)
+    );
+
     // Antiduplication Validation using id_evento_uuid
     const seenUuids = new Set<string>();
     
     const uniqueViajes: any[] = [];
     viajes.forEach((v: any) => {
+      if (v.estado_viaje === 'Eliminado') return;
       if (v.id_evento_uuid) {
         if (seenUuids.has(v.id_evento_uuid)) {
           console.log(`[Deduplicación Backend] Registro de viaje duplicado omitido: ${v.id_evento_uuid}`);
@@ -867,6 +887,7 @@ apiRouter.get('/dashboard-summary', async (req, res) => {
 
     const uniqueGastos: any[] = [];
     gastos.forEach((g: any) => {
+      if (g.id_viaje && deletedViajeIds.has(g.id_viaje)) return;
       if (g.id_evento_uuid) {
         if (seenUuids.has(g.id_evento_uuid)) {
           console.log(`[Deduplicación Backend] Registro de gasto duplicado omitido: ${g.id_evento_uuid}`);
@@ -889,8 +910,10 @@ apiRouter.get('/dashboard-summary', async (req, res) => {
       totalIncomes += basePrice + extraRateValue;
     });
 
-    // 2. EXPENSES
-    const totalExpenses = uniqueGastos.reduce((sum, g) => sum + (Number(g.monto) || 0), 0);
+    // 2. EXPENSES (Excluding driver payout logs, as they represent gross income flete payouts, not route expenses)
+    const totalExpenses = uniqueGastos
+      .filter(g => g.tipo_gasto !== 'Pago Chofer')
+      .reduce((sum, g) => sum + (Number(g.monto) || 0), 0);
 
     // 3. INCOME PROFIT NET
     const netProfit = totalIncomes - totalExpenses;
