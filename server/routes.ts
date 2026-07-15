@@ -301,7 +301,8 @@ apiRouter.post('/choferes', async (req, res) => {
       pin_acceso: body.pin_acceso || '0000',
       estado: body.estado || 'Activo',
       presupuesto: body.presupuesto || '10000',
-      saldo_actual: body.saldo_actual || body.presupuesto || '10000'
+      saldo_actual: body.saldo_actual || body.presupuesto || '10000',
+      creado_por: body.creado_por || ''
     };
 
     if (!payload.id_chofer || !payload.nombre_completo) {

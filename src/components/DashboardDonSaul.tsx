@@ -331,7 +331,8 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
           pin_acceso: newDriverPin,
           estado: 'Activo',
           presupuesto: newDriverBudget || '10000',
-          saldo_actual: newDriverBudget || '10000'
+          saldo_actual: newDriverBudget || '10000',
+          creado_por: 'don_saul'
         })
       });
       const data = await res.json();

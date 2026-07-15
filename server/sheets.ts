@@ -45,7 +45,8 @@ export const memoryStore: Record<string, any[]> = {
       pin_acceso: '1234',
       estado: 'Activo',
       presupuesto: '10000',
-      saldo_actual: '6200'
+      saldo_actual: '6200',
+      creado_por: 'don_saul'
     },
     {
       id_chofer: 'juan_carlos',
@@ -54,7 +55,8 @@ export const memoryStore: Record<string, any[]> = {
       pin_acceso: '4321',
       estado: 'Activo',
       presupuesto: '12000',
-      saldo_actual: '9500'
+      saldo_actual: '9500',
+      creado_por: 'don_saul'
     },
     {
       id_chofer: 'don_saul',
@@ -63,7 +65,8 @@ export const memoryStore: Record<string, any[]> = {
       pin_acceso: '0000',
       estado: 'Activo',
       presupuesto: '50000',
-      saldo_actual: '50000'
+      saldo_actual: '50000',
+      creado_por: 'admin'
     },
     {
       id_chofer: 'admin',
@@ -72,7 +75,8 @@ export const memoryStore: Record<string, any[]> = {
       pin_acceso: '9999',
       estado: 'Activo',
       presupuesto: '100000',
-      saldo_actual: '100000'
+      saldo_actual: '100000',
+      creado_por: 'admin'
     }
   ],
   Rutas: [
@@ -378,7 +382,7 @@ export function healGastosRows<T extends Record<string, any>>(rawParsedObjects: 
  */
 export const SHEET_SCHEMAS = {
   Camiones: ['id_camion', 'modelo', 'anio', 'kilometraje_actual', 'saldo_presupuesto', 'estado', 'placa', 'chasis'],
-  Choferes: ['id_chofer', 'nombre_completo', 'telefono', 'pin_acceso', 'estado', 'presupuesto', 'saldo_actual'],
+  Choferes: ['id_chofer', 'nombre_completo', 'telefono', 'pin_acceso', 'estado', 'presupuesto', 'saldo_actual', 'creado_por'],
   Rutas: ['id_ruta', 'origen', 'destino', 'tarifa_base', 'estado'],
   Viajes: ['id_viaje', 'id_camion', 'id_chofer', 'id_ruta', 'fecha_inicio', 'fecha_fin', 'estado_viaje', 'toneladas_base', 'toneladas_extras', 'foto_pesaje_url'],
   Gastos: ['id_gasto', 'id_viaje', 'id_camion', 'id_chofer', 'tipo_gasto', 'monto', 'fecha', 'descripcion', 'foto_url'],

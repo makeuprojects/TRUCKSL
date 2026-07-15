@@ -216,7 +216,8 @@ export default function DashboardAdministrador({ token }: DashboardAdministrador
           pin_acceso: newDriverPin,
           estado: 'Activo',
           presupuesto: newDriverBudget || '10000',
-          saldo_actual: newDriverBudget || '10000'
+          saldo_actual: newDriverBudget || '10000',
+          creado_por: 'admin'
         })
       });
       const resJson = await res.json();

@@ -511,10 +511,10 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
     }
     // Hardcoded active drivers fallback to ensure perfect robust operation
     return [
-      { id_chofer: 'CH-01', nombre_completo: 'Juan Carlos Perez', telefono: '71234567', pin_acceso: '1234', estado: 'Activo', presupuesto: '10000', saldo_actual: '9470' },
-      { id_chofer: 'CH-02', nombre_completo: 'Mario Gomez', telefono: '78912345', pin_acceso: '4321', estado: 'Activo', presupuesto: '10005', saldo_actual: '10005' },
-      { id_chofer: 'CH-03', nombre_completo: 'Don Saúl', telefono: '77742345', pin_acceso: '1111', estado: 'Activo', presupuesto: '15000', saldo_actual: '15000' },
-      { id_chofer: 'CH-04', nombre_completo: 'Mauricio', telefono: '76543210', pin_acceso: '1234', estado: 'Activo', presupuesto: '10000', saldo_actual: '10000' }
+      { id_chofer: 'CH-01', nombre_completo: 'Juan Carlos Perez', telefono: '71234567', pin_acceso: '1234', estado: 'Activo', presupuesto: '10000', saldo_actual: '9470', creado_por: 'don_saul' },
+      { id_chofer: 'CH-02', nombre_completo: 'Mario Gomez', telefono: '78912345', pin_acceso: '4321', estado: 'Activo', presupuesto: '10005', saldo_actual: '10005', creado_por: 'don_saul' },
+      { id_chofer: 'CH-03', nombre_completo: 'Don Saúl', telefono: '77742345', pin_acceso: '1111', estado: 'Activo', presupuesto: '15000', saldo_actual: '15000', creado_por: 'admin' },
+      { id_chofer: 'CH-04', nombre_completo: 'Mauricio', telefono: '76543210', pin_acceso: '1234', estado: 'Activo', presupuesto: '10000', saldo_actual: '10000', creado_por: 'don_saul' }
     ];
   });
   const [selectedDriverName, setSelectedDriverName] = useState('');
@@ -652,13 +652,16 @@ function ChoferLoginForm({ onLoginSuccess, googleToken }: ChoferLoginFormProps) 
                   >
                     <option value="">-- Elige tu Nombre de la Lista --</option>
                     {choferList
-                      .filter((driver) => driver.nombre_completo !== 'Don Saúl')
+                      .filter((driver) => {
+                        const name = (driver.nombre_completo || '').toLowerCase().trim();
+                        const id = (driver.id_chofer || '').toLowerCase().trim();
+                        return name !== 'don saúl' && name !== 'don saul' && id !== 'don_saul' && id !== 'admin';
+                      })
                       .map((driver, index) => (
                         <option key={`${driver.id_chofer || driver.nombre_completo}-${index}`} value={driver.nombre_completo}>
                           {driver.nombre_completo}
                         </option>
                       ))}
-                    <option value="Don Saúl">Don Saúl</option>
                   </select>
                   <span className="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-slate-400">
                     <ChevronDown className="w-4 h-4" />
