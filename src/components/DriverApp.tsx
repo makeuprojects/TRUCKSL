@@ -1589,28 +1589,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
       </div>
 
-      {/* 3. Floating Action Buttons (FABs) - Mobile view only */}
-      {subState === 'ACTIVE' && (
-        <div className="lg:hidden fixed bottom-6 right-6 z-30 flex flex-col items-end gap-3">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsGastoModalOpen(true)}
-            className="w-14 h-14 bg-orange-500 hover:bg-orange-400 text-white rounded-full flex items-center justify-center shadow-2xl border border-orange-500/40 cursor-pointer shadow-orange-500/20"
-            title="Registrar Gasto"
-          >
-            <DollarSign className="w-6 h-6" />
-          </motion.button>
-          
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsFinalizing(true)}
-            className="w-14 h-14 bg-orange-500 hover:bg-orange-400 text-white rounded-full flex items-center justify-center shadow-2xl border border-orange-500/40 cursor-pointer shadow-orange-500/20"
-            title="Finalizar Viaje"
-          >
-            <CheckCircle className="w-6 h-6" />
-          </motion.button>
-        </div>
-      )}
+      {/* 3. Floating Action Buttons (FABs) - Superseded by elegant persistent bottom dock */}
 
       {/* QUICK EXPENSE DISPATCHER MODAL */}
       <AnimatePresence>
@@ -1840,6 +1819,70 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* 5. GORGEOUS GLASSMORPHIC BOTTOM NAVIGATION DOCK (Mobile only) */}
+      <div className="lg:hidden fixed bottom-5 left-4 right-4 z-40 bg-slate-900/85 backdrop-blur-xl border border-white/10 rounded-3xl p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-around">
+        {/* Toggle Routes / Active Trip view */}
+        <motion.button
+          whileTap={{ scale: 0.90 }}
+          onClick={() => {
+            setIsFinalizing(false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition ${
+            !isFinalizing ? 'text-orange-400 font-extrabold' : 'text-slate-400 font-bold'
+          }`}
+        >
+          <Navigation className={`w-5 h-5 ${activeViaje && !isFinalizing ? 'animate-bounce text-orange-400' : ''}`} />
+          <span className="text-[9px] uppercase tracking-wider font-extrabold">
+            {activeViaje ? 'En Viaje' : 'Rutas'}
+          </span>
+        </motion.button>
+
+        {/* Quick Gasto button (Central, high-end action button) */}
+        <motion.button
+          whileTap={{ scale: 0.90 }}
+          onClick={() => setIsGastoModalOpen(true)}
+          className="relative flex flex-col items-center justify-center gap-1 cursor-pointer -mt-8 bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 p-4.5 rounded-2xl shadow-[0_8px_24px_rgba(16,185,129,0.4)] border border-emerald-400/20"
+        >
+          <DollarSign className="w-6 h-6 stroke-[3]" />
+          <span className="text-[8.5px] uppercase font-black tracking-widest leading-none">Gasto Rápido</span>
+          {/* Subtle glowing ring */}
+          <span className="absolute -inset-1 rounded-2xl border border-emerald-400/30 animate-pulse pointer-events-none"></span>
+        </motion.button>
+
+        {/* Conditional finalization or whatsapp support */}
+        {activeViaje && !isFinalizing ? (
+          <motion.button
+            whileTap={{ scale: 0.90 }}
+            onClick={() => setIsFinalizing(true)}
+            className="flex flex-col items-center justify-center gap-1 cursor-pointer text-orange-400 font-bold"
+          >
+            <CheckCircle className="w-5 h-5 animate-pulse text-orange-400" />
+            <span className="text-[9px] uppercase tracking-wider font-extrabold">Cerrar Viaje</span>
+          </motion.button>
+        ) : (
+          <a
+            href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center justify-center gap-1 cursor-pointer text-slate-400 font-bold hover:text-emerald-400 transition"
+          >
+            <Phone className="w-5 h-5" />
+            <span className="text-[9px] uppercase tracking-wider font-extrabold">Soporte</span>
+          </a>
+        )}
+
+        {/* Toggle Mobile Menu drawer */}
+        <motion.button
+          whileTap={{ scale: 0.90 }}
+          onClick={() => setIsMobileSidebarOpen(true)}
+          className="flex flex-col items-center justify-center gap-1 cursor-pointer text-slate-400 font-bold hover:text-white transition"
+        >
+          <Menu className="w-5 h-5" />
+          <span className="text-[9px] uppercase tracking-wider font-extrabold">Menú</span>
+        </motion.button>
+      </div>
     </div>
   );
 }

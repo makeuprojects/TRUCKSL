@@ -287,6 +287,30 @@ export default function RouteMiniMap({ origen, destino, idViaje, variant = 'saul
               from { transform: rotate(0deg); }
               to { transform: rotate(360deg); }
             }
+            @keyframes wheelSpin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+            @keyframes liveExhaustDrift {
+              0% { transform: translate(0, 0) scale(0.6); opacity: 0.85; }
+              50% { transform: translate(-10px, -5px) scale(1.3); opacity: 0.45; }
+              100% { transform: translate(-22px, -9px) scale(2); opacity: 0; }
+            }
+            @keyframes gpsPulseRing {
+              0% { r: 1.5px; opacity: 0.9; stroke-width: 0.5px; }
+              100% { r: 14px; opacity: 0; stroke-width: 0.1px; }
+            }
+            .animate-gps-pulse-ring {
+              animation: gpsPulseRing 2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+              transform-origin: center;
+            }
+            .animate-wheel-spin {
+              animation: wheelSpin 0.35s linear infinite;
+              transform-origin: center;
+            }
+            .animate-exhaust-drift-live {
+              animation: liveExhaustDrift 0.9s ease-out infinite;
+            }
             .animate-route-dash {
               animation: dashEffect 0.6s linear infinite;
             }
@@ -583,31 +607,9 @@ export default function RouteMiniMap({ origen, destino, idViaje, variant = 'saul
                 stroke="none"
               />
 
-              {/* HEAVY CARGO TRUCK: Ultimate detailed vector design & organic easing motion */}
-              {/* Truck Ghost Trails */}
-              {variant === 'saul' && [1, 2, 3].map((ghostIndex) => (
-                 <g key={`ghost-${ghostIndex}`} className="gpu-accelerated animate-truck-fade" opacity={0.15 - (ghostIndex * 0.04)}>
-                   <animateMotion 
-                     dur="10s" 
-                     repeatCount="indefinite" 
-                     rotate="auto"
-                     calcMode="linear"
-                     keyTimes="0;0.05;0.95;1"
-                     keyPoints="0;0;1;1"
-                     begin={`-${ghostIndex * 0.2}s`}
-                   >
-                     <mpath href={`#route-path-${idViaje || 'demo'}`} />
-                   </animateMotion>
-                   <g transform="translate(0, 0) scale(0.6)">
-                     <rect x="-23" y="-5.5" width="22" height="11" rx="1" fill="#38bdf8" />
-                     <path d="M 0,-4.5 L 9,-4 L 10.5,-2 L 10.5,2 L 9,4 L 0,4.5 Z" fill="#38bdf8" />
-                   </g>
-                 </g>
-              ))}
-
-              <g className="gpu-accelerated animate-truck-fade">
+              <g className="gpu-accelerated">
                 <animateMotion 
-                  dur="10s" 
+                  dur="14s" 
                   repeatCount="indefinite" 
                   rotate="auto"
                   calcMode="linear"
@@ -616,91 +618,11 @@ export default function RouteMiniMap({ origen, destino, idViaje, variant = 'saul
                 >
                   <mpath href={`#route-path-${idViaje || 'demo'}`} />
                 </animateMotion>
-                
-                {/* 🌟 PREMIUM DYNAMIC LIGHTS (Movable headlights, Taillights, lasers) */}
-                {/* Wide golden fog lights fan */}
-                <polygon 
-                  points="12,0 55,-22 55,22" 
-                  fill="url(#headlightGlow)" 
-                  pointerEvents="none" 
-                  className="animate-headlight-flicker"
-                  style={{ mixBlendMode: 'screen' }}
-                />
-                {/* High beam narrow blue-laser headlights */}
-                <polygon 
-                  points="12,0 80,-8 80,8" 
-                  fill="url(#laserBeam)" 
-                  pointerEvents="none" 
-                  opacity="0.8"
-                  className="animate-headlight-flicker"
-                  style={{ mixBlendMode: 'screen' }}
-                />
-                
-                {/* Red warning taillights reflection fans */}
-                <polygon 
-                  points="-18,0 -45,-12 -45,12" 
-                  fill="url(#taillightGlow)" 
-                  pointerEvents="none" 
-                  className="animate-taillight-flicker"
-                  style={{ mixBlendMode: 'screen' }}
-                />
-
-                {/* Holographic HUD trip overlay directly above the moving vehicle */}
-                {variant === 'saul' && (
-                  <g transform="translate(0, -18)" className="pointer-events-none">
-                    {/* Glowing Location Pin Marker */}
-                    <g transform="translate(0, 5)">
-                      {/* Pulsing base */}
-                      <ellipse cx="0" cy="8" rx="8" ry="4" fill="#38bdf8" fillOpacity="0.3">
-                        <animate attributeName="rx" values="4;16;4" dur="2s" repeatCount="indefinite" />
-                        <animate attributeName="ry" values="2;8;2" dur="2s" repeatCount="indefinite" />
-                        <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
-                      </ellipse>
-                      
-                      {/* Secondary sonar ping for the base */}
-                      <circle cx="0" cy="8" r="4" fill="none" stroke="#38bdf8" strokeWidth="0.8" opacity="0.6">
-                         <animate attributeName="r" values="4;24" dur="2s" repeatCount="indefinite" />
-                         <animate attributeName="opacity" values="0.6;0" dur="2s" repeatCount="indefinite" />
-                      </circle>
-
-                      {/* Floating Pin */}
-                      <g className="animate-bounce" style={{ animationDuration: '2s' }}>
-                        <path d="M0,0 C-5,-5 -8,-10 -8,-14 C-8,-18.4 4,-22 0,-22 C4,-22 8,-18.4 8,-14 C8,-10 5,-5 0,0 Z" fill="url(#laserBeam)" stroke="#38bdf8" strokeWidth="0.8" filter="url(#neonGlow)" />
-                        <circle cx="0" cy="-14" r="4" fill="#020817" stroke="#38bdf8" strokeWidth="1" />
-                        {/* Inner dot */}
-                        <circle cx="0" cy="-14" r="2" fill="#10b981" className="animate-pulse" />
-                        {/* Scanner beam from pin */}
-                        <polygon points="0,-14 -15,5 15,5" fill="url(#laserBeam)" opacity="0.4">
-                           <animate attributeName="opacity" values="0.1;0.4;0.1" dur="1s" repeatCount="indefinite" />
-                        </polygon>
-                      </g>
-                    </g>
-
-                    {/* Holographic background border with glassmorphism */}
-                    <rect x="-38" y="-32.5" width="76" height="13.5" rx="4" fill="#020817" fillOpacity="0.88" stroke="#0ea5e9" strokeWidth="1" filter="url(#neonGlow)" />
-                    {/* Outer border cyan glow */}
-                    <rect x="-38" y="-32.5" width="76" height="13.5" rx="4" fill="none" stroke="#38bdf8" strokeWidth="0.5" strokeOpacity="0.7" />
-                    
-                    {/* HUD Text: Destination Indicator */}
-                    <text x="0" y="-23.5" textAnchor="middle" fill="#38bdf8" fontSize="5.5" fontWeight="900" fontFamily="sans-serif" letterSpacing="0.8">
-                      {origen.toUpperCase()} ➔ {destino.toUpperCase()}
-                    </text>
-                    
-                    {/* Bottom neon HUD line */}
-                    <line x1="-30" y1="-21.5" x2="30" y2="-21.5" stroke="#38bdf8" strokeWidth="0.4" strokeOpacity="0.6" />
-                    
-                    {/* Dynamic tracking status */}
-                    <text x="0" y="-14" textAnchor="middle" fill="#10b981" fontSize="4.5" fontWeight="900" fontFamily="monospace" letterSpacing="0.5" className="animate-pulse">
-                      🛰️ EN RUTA ACTIVA
-                    </text>
-                  </g>
-                )}
 
                 {/* 🚛 HIGH-FIDELITY TOP-DOWN TRUCK (Accurate 3D Depth View) WITH DIESEL ENGINE VIBRATION */}
-                <g className="animate-truck-vibe" transform="translate(0, 0) scale(0.6)">
-                  {/* Cyber Underglow (Cyan/Blue Neon) */}
-                  <rect x="-24" y="-7.5" width="38" height="15" rx="2" stroke="#38bdf8" strokeWidth="1.2" fill="none" opacity="0.65" filter="url(#neonGlow)" />
-                  <rect x="-22" y="-5.5" width="34" height="11" rx="1.5" fill="#00f2ff" opacity="0.32" filter="url(#neonGlow)" />
+                <g className="animate-truck-vibe" transform="translate(0, 0) scale(0.65)">
+                  {/* Subtle Underglow */}
+                  <rect x="-24" y="-7.5" width="38" height="15" rx="2" stroke="#38bdf8" strokeWidth="0.5" fill="none" opacity="0.3" filter="url(#neonGlow)" />
 
                   {/* --- HEAVY CARGO TRAILER --- */}
                   {/* Base chassis shadow */}
@@ -738,20 +660,6 @@ export default function RouteMiniMap({ origen, destino, idViaje, variant = 'saul
                   {/* Chrome Exhaust Stack Tips */}
                   <rect x="-1" y="-5.5" width="2" height="1.2" rx="0.3" fill="url(#chromeGrad)" stroke="#475569" strokeWidth="0.4" />
                   <rect x="-1" y="4.3" width="2" height="1.2" rx="0.3" fill="url(#chromeGrad)" stroke="#475569" strokeWidth="0.4" />
-
-                  {/* 💨 DUAL LIVE EXHAUST SMOKE PUFFS (Drifting and fading dynamically behind) */}
-                  <g>
-                    <circle cx="-1" cy="-5" r="1.5" fill="#38bdf8" fillOpacity="0.4">
-                      <animate attributeName="r" values="1.5;4;6" dur="1s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.8;0.3;0" dur="1s" repeatCount="indefinite" />
-                      <animate attributeName="cx" values="-1;-8;-16" dur="1s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="-1" cy="5" r="1.5" fill="#38bdf8" fillOpacity="0.4">
-                      <animate attributeName="r" values="1.5;4;6" dur="1s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.8;0.3;0" dur="1s" repeatCount="indefinite" />
-                      <animate attributeName="cx" values="-1;-8;-16" dur="1s" repeatCount="indefinite" />
-                    </circle>
-                  </g>
 
                   {/* Symmetrical Wheels (visible from above) */}
                   <g fill="#020617" stroke="#475569" strokeWidth="0.5">
@@ -917,20 +825,48 @@ export default function RouteMiniMap({ origen, destino, idViaje, variant = 'saul
           {/* 🚛 LIVE SIDE-PROFILE DRIVING CONTROLS & PARALLAX TRACKER */}
           <div className="h-16 w-full bg-gradient-to-r from-slate-950/70 to-slate-900/40 border border-slate-800/80 rounded-xl overflow-hidden relative mb-2 flex items-center justify-between px-3">
             {/* Parallax Moving Landscape (animated lines to simulate speed) */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-25">
-              {/* Mountain ridge outline sliding right-to-left */}
-              <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="absolute bottom-1.5 left-0 w-[200%] h-6 text-slate-700">
-                <path d="M 0,20 L 15,10 L 30,17 L 45,5 L 60,15 L 75,8 L 90,18 L 100,20 L 115,10 L 130,17 L 145,5 L 160,15 L 175,8 L 190,18 L 200,20" fill="none" stroke="currentColor" strokeWidth="0.5" />
+            <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-35">
+              {/* Layer 1: Far mountain range in deep blue-slate (moving slow: 24s) */}
+              <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="absolute bottom-2 left-0 w-[200%] h-7 text-slate-900/60">
+                <path d="M 0,20 L 12,8 L 24,18 L 36,4 L 48,15 L 60,6 L 72,17 L 85,11 L 100,20 L 112,8 L 124,18 L 136,4 L 148,15 L 160,6 L 172,17 L 185,11 L 200,20" fill="none" stroke="currentColor" strokeWidth="0.4" />
                 <animateTransform 
                   attributeName="transform" 
                   type="translate" 
                   from="0 0" 
                   to="-100 0" 
-                  dur="8s" 
+                  dur="24s" 
                   repeatCount="indefinite" 
                 />
               </svg>
-              {/* Road dashes sliding left-to-right (truck moving forward) */}
+
+              {/* Layer 2: Mid mountain peaks in mid-teal-slate (moving medium: 10s) */}
+              <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="absolute bottom-1.5 left-0 w-[200%] h-5.5 text-slate-800/85">
+                <path d="M 0,20 L 15,10 L 30,17 L 45,5 L 60,15 L 75,8 L 90,18 L 100,20 L 115,10 L 130,17 L 145,5 L 160,15 L 175,8 L 190,18 L 200,20" fill="none" stroke="currentColor" strokeWidth="0.55" />
+                <animateTransform 
+                  attributeName="transform" 
+                  type="translate" 
+                  from="0 0" 
+                  to="-100 0" 
+                  dur="10s" 
+                  repeatCount="indefinite" 
+                />
+              </svg>
+
+              {/* Layer 3: Closer roadside bushes / fence poles (moving fast: 3s) */}
+              <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="absolute bottom-0.5 left-0 w-[200%] h-3.5 text-emerald-950/40">
+                {/* Visualizing small grass tufts or fence lines */}
+                <path d="M 0,20 L 3,18 L 6,20 M 15,20 L 15,14 L 16,14 L 16,20 M 25,20 L 28,17 L 31,20 M 45,20 L 45,14 L 46,14 L 46,20 M 60,20 L 63,18 L 66,20 M 80,20 L 80,14 L 81,14 L 81,20 M 100,20 L 103,18 L 106,20 M 115,20 L 115,14 L 116,14 L 116,20 M 125,20 L 128,17 L 131,20 M 145,20 L 145,14 L 146,14 L 146,20 M 160,20 L 163,18 L 166,20 M 180,20 L 180,14 L 181,14 L 181,20" fill="none" stroke="currentColor" strokeWidth="0.6" />
+                <animateTransform 
+                  attributeName="transform" 
+                  type="translate" 
+                  from="0 0" 
+                  to="-100 0" 
+                  dur="3s" 
+                  repeatCount="indefinite" 
+                />
+              </svg>
+
+              {/* Road dashes sliding left-to-right (truck moving forward - moving ultra fast: 0.6s) */}
               <svg viewBox="0 0 100 2" preserveAspectRatio="none" className="absolute bottom-0.5 left-0 w-[200%] h-1 text-slate-500">
                 <line x1="0" y1="1" x2="200" y2="1" stroke="currentColor" strokeWidth="0.5" strokeDasharray="3,6" />
                 <animateTransform 
@@ -938,7 +874,7 @@ export default function RouteMiniMap({ origen, destino, idViaje, variant = 'saul
                   type="translate" 
                   from="0 0" 
                   to="-50 0" 
-                  dur="0.8s" 
+                  dur="0.6s" 
                   repeatCount="indefinite" 
                 />
               </svg>
