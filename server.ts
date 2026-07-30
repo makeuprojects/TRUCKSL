@@ -6,7 +6,7 @@ import { apiRouter } from './server/routes';
 
 async function startServer() {
   const app = express();
-  const PORT = Number(process.env.PORT || 3000);
+  const PORT = 3000;
 
   // Parse JSON and form-url bodies with high limit for image uploads
   app.use(express.json({ limit: '50mb' }));
