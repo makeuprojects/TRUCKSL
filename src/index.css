@@ -1,9 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+    background-color: #050811;
+  }
+
+  /* Sleek dark custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(5, 8, 17, 0.6);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.2);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(56, 189, 248, 0.45);
+  }
 }
 
 @layer utilities {
@@ -18,21 +42,271 @@
   }
 }
 
-/* Animations */
+/* Animations & Microinteractions */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulseBorder {
   0%, 100% { border-color: rgba(16, 185, 129, 0.2); }
-  50% { border-color: rgba(16, 185, 129, 0.6); }
+  50% { border-color: rgba(16, 185, 129, 0.55); }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.92; }
+}
+
+@keyframes subtleRadarPing {
+  0% { transform: scale(0.95); opacity: 0.85; }
+  65% { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+@keyframes shimmerSweep {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(220%) skewX(-18deg); }
+}
+
+@keyframes ambientFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -12px, 0) scale(1.03); }
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes routeDashFlow {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -26; }
+}
+
+@keyframes truckBeaconRing {
+  0% { transform: scale(0.65); opacity: 0.9; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+@keyframes truckDriveMicro {
+  0%, 100% { transform: translateY(0px); }
+  25% { transform: translateY(-0.28px); }
+  75% { transform: translateY(0.24px); }
+}
+
+@keyframes truckHoverBob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-0.45px); }
+}
+
+@keyframes headlightPulse {
+  0%, 100% { opacity: 0.62; }
+  50% { opacity: 0.95; }
+}
+
+@keyframes taillightPulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.45; }
+}
+
+@keyframes scanlineSweep {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes windStreak {
+  0% { transform: translateX(18px); opacity: 0; }
+  25% { opacity: 0.75; }
+  100% { transform: translateX(-34px); opacity: 0; }
+}
+
+@keyframes exhaustWake {
+  0% { transform: translateX(0px) scale(0.75); opacity: 0.65; }
+  100% { transform: translateX(-8px) scale(1.6); opacity: 0; }
+}
+
+@keyframes gpsPulseRing {
+  0% { transform: scale(0.5); opacity: 0.85; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+@keyframes weatherRainFall {
+  0% { transform: translate3d(0, -18px, 0); opacity: 0; }
+  20% { opacity: 0.55; }
+  85% { opacity: 0.45; }
+  100% { transform: translate3d(-14px, 72px, 0); opacity: 0; }
+}
+
+@keyframes weatherMistDrift {
+  0%, 100% { transform: translate3d(-4%, 0, 0); opacity: 0.14; }
+  50% { transform: translate3d(4%, 0, 0); opacity: 0.28; }
+}
+
+@keyframes skeletonSweep {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
+}
+
+@keyframes freshPulseGlow {
+  0% { border-color: rgba(52, 211, 153, 0.7); background-color: rgba(16, 185, 129, 0.12); }
+  100% { border-color: rgba(255, 255, 255, 0.06); background-color: rgba(15, 23, 42, 0.5); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 7s linear infinite;
 }
 
 .animate-pulse-border {
-  animation: pulseBorder 2s infinite ease-in-out;
+  animation: pulseBorder 2.4s infinite ease-in-out;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s infinite ease-in-out;
 }
 
 .animate-fade-in {
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-ambient-float {
+  animation: ambientFloat 9s ease-in-out infinite;
+}
+
+.route-dash-flow {
+  animation: routeDashFlow 0.85s linear infinite;
+}
+
+.truck-beacon-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: truckBeaconRing 1.9s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.truck-drive-micro {
+  animation: truckDriveMicro 0.55s ease-in-out infinite;
+}
+
+.truck-hover-bob {
+  animation: truckHoverBob 0.8s ease-in-out infinite;
+}
+
+.truck-headlight-flicker {
+  animation: headlightPulse 0.16s ease-in-out infinite alternate;
+}
+
+.truck-taillight-flicker {
+  animation: taillightPulse 0.25s ease-in-out infinite alternate;
+}
+
+.map-scanline {
+  animation: scanlineSweep 4.5s linear infinite;
+}
+
+.wind-streak-1 {
+  animation: windStreak 0.9s linear infinite;
+}
+
+.wind-streak-2 {
+  animation: windStreak 1.15s linear 0.45s infinite;
+}
+
+.exhaust-wake-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: exhaustWake 0.65s ease-out infinite;
+}
+
+.gps-pulse-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gpsPulseRing 2.1s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.weather-rain-drop {
+  animation: weatherRainFall 1.35s linear infinite;
+  will-change: transform, opacity;
+}
+
+.weather-mist-band {
+  animation: weatherMistDrift 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.feed-item-fresh {
+  animation: freshPulseGlow 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.09), transparent);
+  animation: skeletonSweep 1.3s ease-in-out infinite;
+}
+
+.ease-natural {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.perf-contain {
+  contain: layout style;
+}
+
+/* Mobile-first glassmorphism: lighter blur on phones for locked 60fps scrolling, rich blur on desktop */
+.glass-panel {
+  background: rgba(10, 16, 30, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+@media (min-width: 768px) {
+  .glass-panel {
+    background: rgba(10, 16, 30, 0.74);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+  }
+}
+
+/* Subtle glossy sheen utility guarded to pointer-hover devices so mobile scrolling stays blazing fast */
+.glass-sheen {
+  position: relative;
+  overflow: hidden;
+}
+@media (hover: hover) {
+  .glass-sheen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.055) 50%,
+      transparent 100%
+    );
+    transform: translateX(-140%) skewX(-18deg);
+    pointer-events: none;
+    transition: none;
+  }
+  .glass-sheen:hover::after {
+    animation: shimmerSweep 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *:not(.route-live-anim),
+  *:not(.route-live-anim)::before,
+  *:not(.route-live-anim)::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -678,7 +678,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
               className={`px-2 py-0.5 rounded text-[10px] font-mono leading-none border transition-colors cursor-pointer ${
                 simulateOffline 
                   ? 'bg-orange-950/40 text-orange-400 border-amber-800' 
-                  : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-750'
+                  : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700'
               }`}
             >
               {simulateOffline ? 'SIM: OFFLINE' : 'PROBAR OFFLINE'}
@@ -768,7 +768,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setIsMobileSidebarOpen(true)}
-            className="p-1.5 hover:bg-slate-850 rounded-lg text-slate-200 hover:text-white transition cursor-pointer font-bold uppercase text-[10px]"
+            className="p-1.5 hover:bg-slate-800 active:bg-slate-700 rounded-lg text-slate-200 hover:text-white transition cursor-pointer font-bold uppercase text-[10px]"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -801,7 +801,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
         {/* Desktop Sidebar (Docked) */}
         <aside className="hidden lg:flex flex-col w-80 shrink-0 border-r border-slate-800/65 bg-slate-950/60 backdrop-blur-md p-6 h-[calc(100vh-0px)] sticky top-0 justify-between">
           <div className="space-y-6">
-            <div className="flex items-center space-x-2.5 pb-2 border-b border-slate-850">
+            <div className="flex items-center space-x-2.5 pb-2 border-b border-white/[0.08]">
               <span className="p-2 bg-orange-500/10 text-emerald-400 rounded-2xl border border-slate-800/80 shadow-inner">
                 <Truck className="w-6 h-6" />
               </span>
@@ -812,7 +812,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             </div>
 
             {/* Profile Summary */}
-            <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-3xl space-y-3">
+            <div className="bg-slate-950/40 border border-white/[0.08] p-4 rounded-3xl space-y-3">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 rounded-full bg-orange-500/10 text-emerald-400 border border-slate-800/80 flex items-center justify-center font-extrabold shadow-inner shrink-0 leading-none">
                   {authenticatedDriver.nombre_completo.charAt(0)}
@@ -849,7 +849,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             </div>
 
             {/* Offline simulator */}
-            <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-3xl space-y-3">
+            <div className="bg-slate-950/40 border border-white/[0.08] p-4 rounded-3xl space-y-3">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-200 font-semibold uppercase tracking-wider text-[10px]">Conexión</span>
                 {currentNetworkActive ? (
@@ -887,7 +887,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             </div>
           </div>
 
-          <div className="space-y-3 pt-6 border-t border-slate-850">
+          <div className="space-y-3 pt-6 border-t border-white/[0.08]">
             {/* Centro de Soporte */}
             <div className="bg-[#0b1b3d]/45 border border-[#233554]/40 p-3.5 rounded-2xl space-y-1.5 text-center">
               <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none">¿TIENES PREGUNTAS O DUDAS?</span>
@@ -895,7 +895,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-350 font-bold hover:underline transition"
+                className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 font-bold hover:underline transition"
               >
                 <Phone className="w-3.5 h-3.5 fill-current" />
                 Contactar al 62730435
@@ -904,7 +904,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
             <button
               onClick={onLogout}
-              className="w-full border border-slate-800 hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full border border-slate-800 hover:bg-slate-800 text-slate-100 hover:text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer"
             >
               ← Volver al Portal
             </button>
@@ -935,11 +935,11 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 initial={{ x: '-100%' }}
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-                className="fixed inset-y-0 left-0 z-50 w-80 bg-slate-950 border-r border-slate-850 p-6 flex flex-col justify-between shadow-2xl lg:hidden"
+                transition={{ type: 'spring', damping: 28, stiffness: 260 }}
+                className="fixed inset-y-0 left-0 z-50 w-80 bg-slate-950 border-r border-white/[0.08] p-6 flex flex-col justify-between shadow-2xl lg:hidden"
               >
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-850">
+                  <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
                     <div className="flex items-center space-x-2">
                       <span className="p-1.5 bg-orange-500/10 text-emerald-400 rounded-xl border border-slate-800 shadow-inner">
                         <Truck className="w-5 h-5" />
@@ -948,14 +948,14 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                     </div>
                     <button
                       onClick={() => setIsMobileSidebarOpen(false)}
-                      className="p-1 hover:bg-slate-850 rounded-lg text-slate-200 hover:text-white transition cursor-pointer"
+                      className="p-1 hover:bg-slate-800 rounded-lg text-slate-200 hover:text-white transition cursor-pointer"
                     >
                       <X className="w-5 h-5" />
                     </button>
                   </div>
 
                   {/* Profile section */}
-                  <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-2xl space-y-3">
+                  <div className="bg-slate-900/50 border border-white/[0.08] p-4 rounded-2xl space-y-3">
                     <div className="flex items-center space-x-3">
                       <div className="w-9 h-9 rounded-full bg-orange-500/10 text-emerald-400 border border-slate-800 flex items-center justify-center font-bold shrink-0">
                         {authenticatedDriver.nombre_completo.charAt(0)}
@@ -991,7 +991,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   </div>
 
                   {/* Offline helper */}
-                  <div className="bg-slate-950/40 border border-slate-850 p-4 rounded-2xl space-y-3">
+                  <div className="bg-slate-900/50 border border-white/[0.08] p-4 rounded-2xl space-y-3">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-slate-200 font-semibold uppercase tracking-wider text-[9px]">Sincronización</span>
                       {currentNetworkActive ? (
@@ -1032,7 +1032,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-4 border-t border-slate-850">
+                <div className="space-y-3 pt-4 border-t border-white/[0.08]">
                   {/* Centro de Soporte */}
                   <div className="bg-[#0b1b3d]/45 border border-[#233554]/40 p-3 rounded-xl space-y-1 text-center">
                     <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none">¿TIENES PREGUNTAS O DUDAS?</span>
@@ -1040,7 +1040,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                       href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-350 font-bold hover:underline transition"
+                      className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 font-bold hover:underline transition"
                     >
                       <Phone className="w-3.5 h-3.5 fill-current" />
                       Contactar al 62730435
@@ -1049,7 +1049,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
 
                   <button
                     onClick={onLogout}
-                    className="w-full border border-slate-800 hover:bg-slate-850 text-slate-100 hover:text-white font-bold py-2 px-4 rounded-lg text-xs transition cursor-pointer"
+                    className="w-full border border-slate-800 hover:bg-slate-800 text-slate-100 hover:text-white font-bold py-2 px-4 rounded-lg text-xs transition cursor-pointer"
                   >
                     ← Volver al Portal
                   </button>
@@ -1101,24 +1101,57 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             )}
           </AnimatePresence>
 
+          {/* Mobile Caja Chica HUD (compact, high-contrast dynamic bar for phones) */}
+          {(() => {
+            const mPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
+            const mSaldo = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : mPresupuesto);
+            const mPct = Math.max(0, Math.min(100, (mSaldo / mPresupuesto) * 100));
+            const barClass = mPct > 50 ? 'from-emerald-500 to-teal-400' : mPct >= 20 ? 'from-amber-500 to-orange-400' : 'from-rose-600 to-rose-400';
+            const textTone = mPct > 50 ? 'text-emerald-400' : mPct >= 20 ? 'text-amber-400' : 'text-rose-400';
+            return (
+              <div className="lg:hidden perf-contain bg-gradient-to-b from-slate-900/85 to-slate-950/90 backdrop-blur-md border border-white/[0.08] p-4 rounded-2xl space-y-2.5 shadow-lg">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider block leading-none">Caja Chica Disponible</span>
+                    <div className="mt-1 flex items-baseline gap-1 font-mono tabular-nums">
+                      <span className="text-lg font-black text-white">Bs. {mSaldo.toLocaleString('es-BO')}</span>
+                      <span className="text-[10px] text-slate-500">/ {mPresupuesto.toLocaleString('es-BO')}</span>
+                    </div>
+                  </div>
+                  <span className={`text-xs font-mono font-black px-2.5 py-1 rounded-lg bg-slate-950/80 border border-white/[0.08] tabular-nums ${textTone}`}>
+                    {mPct.toFixed(0)}%
+                  </span>
+                </div>
+                <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden border border-white/[0.05]">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${mPct}%` }}
+                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                    className={`h-full bg-gradient-to-r ${barClass} rounded-full`}
+                  />
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Core Display State Navigation with smooth Framer Motion Transitions */}
           <AnimatePresence mode="wait">
             {subState === 'ROUTES' && (
               <motion.div
                 key="state-routes"
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
+                exit={{ opacity: 0, x: -16 }}
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-6"
               >
                 {/* Odometer selector visible only on mobile layout */}
-                <div className="lg:hidden bg-[#0A192F] border border-[#112240] p-4 rounded-3xl space-y-2.5">
-                  <span className="text-[10px] text-slate-505 font-extrabold uppercase tracking-wider block">Camión de la Flota</span>
+                <div className="lg:hidden perf-contain bg-[#0A192F]/90 border border-white/[0.08] p-4 rounded-3xl space-y-2.5">
+                  <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider block">Camión de la Flota</span>
                   <select
                     value={selectedCamionId}
                     onChange={(e) => setSelectedCamionId(e.target.value)}
-                    className="w-full bg-slate-950 border border-[#112240] p-3.5 rounded-2xl focus:ring-1 focus:ring-emerald-500 text-sm outline-none text-white font-bold cursor-pointer"
+                    className="w-full bg-slate-950 border border-white/[0.1] p-3.5 rounded-2xl focus:ring-1 focus:ring-emerald-500 text-sm outline-none text-white font-bold cursor-pointer"
                   >
                     <option value="">Selecciona tu camión asignado...</option>
                     {camiones.map((c, idx) => (
@@ -1132,7 +1165,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Rutas de Transporte</h2>
-                    <p className="text-xs text-slate-200 mt-0.5">Selecciona tu destino para iniciar el ciclo comercial.</p>
+                    <p className="text-xs text-slate-300 mt-0.5">Selecciona tu destino para iniciar el ciclo comercial.</p>
                   </div>
                   <button
                     onClick={async () => {
@@ -1140,7 +1173,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                       await loadDriverData(true);
                       setMessage({ text: 'Rutas actualizadas correctamente.', type: 'success' });
                     }}
-                    className="p-2 sm:p-3 bg-[#0A192F] border border-[#112240] hover:bg-slate-850 active:bg-slate-850 text-slate-200 hover:text-emerald-400 hover:border-[#233554]/60 rounded-2xl transition cursor-pointer flex items-center justify-center shadow"
+                    className="p-2.5 sm:p-3 bg-[#0A192F] border border-white/[0.1] hover:bg-slate-800 active:scale-95 text-slate-200 hover:text-emerald-400 rounded-2xl transition cursor-pointer flex items-center justify-center shadow"
                     title="Actualizar Rutas"
                     disabled={isLoading}
                   >
@@ -1149,10 +1182,10 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 </div>
 
                 {rutas.filter(r => r.estado === 'Disponible' && !viajes.some(v => v.id_ruta === r.id_ruta && v.estado_viaje === 'En Ciclo')).length === 0 ? (
-                  <div className="p-12 text-center bg-slate-905/30 border border-slate-850 rounded-3xl text-slate-400 flex flex-col items-center justify-center space-y-2">
+                  <div className="p-12 text-center bg-slate-950/50 border border-white/[0.08] rounded-3xl text-slate-400 flex flex-col items-center justify-center space-y-2">
                     <AlertTriangle className="w-8 h-8 text-slate-600 animate-bounce" />
                     <span className="font-semibold text-sm">No hay rutas asignadas disponibles.</span>
-                    <span className="text-xs text-slate-600 max-w-xs">Pídele a Don Saúl o administración que asigne rutas con estado "Disponible" en Google Sheets.</span>
+                    <span className="text-xs text-slate-500 max-w-xs">Pídele a Don Saúl o administración que asigne rutas con estado "Disponible" en Google Sheets.</span>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1189,13 +1222,13 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             {subState === 'ACTIVE' && (
               <motion.div
                 key="state-active"
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
+                exit={{ opacity: 0, x: -16 }}
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-6"
               >
-                <div className="bg-[#0A192F] border border-emerald-500/20 rounded-3xl p-6 sm:p-8 text-center space-y-6 animate-pulse-border shadow-2xl relative overflow-hidden">
+                <div className="perf-contain bg-[#0A192F]/90 border border-emerald-500/20 rounded-3xl p-5 sm:p-8 text-center space-y-6 shadow-2xl relative overflow-hidden">
                   <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
 
                   <div className="inline-flex p-4 bg-orange-500/10 text-emerald-400 rounded-full border border-emerald-500/20 shadow-inner">
@@ -1220,19 +1253,19 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2">
-                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850">
+                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
                       <span className="text-[9px] text-slate-400 font-bold block uppercase leading-none pb-1.5 tracking-wider">Origen del Viaje</span>
                       <span className="text-white font-extrabold text-sm sm:text-base">
                         {rutas.find(r => r.id_ruta === activeViaje?.id_ruta)?.origen || 'Consultando...'}
                       </span>
                     </div>
-                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850">
+                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
                       <span className="text-[9px] text-slate-400 font-bold block uppercase leading-none pb-1.5 tracking-wider">Destino del Viaje</span>
                       <span className="text-white font-extrabold text-sm sm:text-base">
                         {rutas.find(r => r.id_ruta === activeViaje?.id_ruta)?.destino || 'Consultando...'}
                       </span>
                     </div>
-                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-850">
+                    <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
                       <span className="text-[9px] text-slate-400 font-bold block uppercase leading-none pb-1.5 tracking-wider">Vehículo Utilizado</span>
                       <span className="text-white font-extrabold text-sm truncate block">
                         {camiones.find(c => c.id_camion === activeViaje?.id_camion)?.modelo || 'Camión'}
@@ -1254,7 +1287,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setIsFinalizing(true)}
-                    className="bg-rose-500 hover:bg-rose-450 text-white font-extrabold text-sm sm:text-base py-5 px-6 rounded-3xl flex items-center justify-center gap-3 transition-all cursor-pointer shadow-xl border border-rose-500/30 font-sans leading-none"
+                    className="bg-rose-500 hover:bg-rose-400 text-white font-extrabold text-sm sm:text-base py-5 px-6 rounded-3xl flex items-center justify-center gap-3 transition-all cursor-pointer shadow-xl border border-rose-500/30 font-sans leading-none"
                   >
                     <CheckCircle className="w-5.5 h-5.5" />
                     <span>FINALIZAR VIAJE ACTIVO</span>
@@ -1266,10 +1299,10 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             {subState === 'FINALIZE' && (
               <motion.div
                 key="state-finalize"
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
+                exit={{ opacity: 0, x: -16 }}
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-6"
               >
                 <div className="bg-[#0A192F] border border-[#112240] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
@@ -1309,7 +1342,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                           whileTap={{ scale: 0.90 }}
                           type="button"
                           onClick={() => setToneladasExtras(Math.max(0, toneladasExtras - 1))}
-                          className="w-12 h-12 bg-[#0A192F] border border-slate-705 rounded-xl text-slate-305 font-bold hover:bg-slate-850 flex items-center justify-center transition cursor-pointer shadow"
+                          className="w-12 h-12 bg-[#0A192F] border border-slate-700 rounded-xl text-slate-300 font-bold hover:bg-slate-800 flex items-center justify-center transition cursor-pointer shadow"
                         >
                           <Minus className="w-5 h-5" />
                         </motion.button>
@@ -1321,7 +1354,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                           whileTap={{ scale: 0.90 }}
                           type="button"
                           onClick={() => setToneladasExtras(toneladasExtras + 1)}
-                          className="w-12 h-12 bg-[#0A192F] border border-slate-705 rounded-xl text-slate-305 font-bold hover:bg-slate-850 flex items-center justify-center transition cursor-pointer shadow"
+                          className="w-12 h-12 bg-[#0A192F] border border-slate-700 rounded-xl text-slate-300 font-bold hover:bg-slate-800 flex items-center justify-center transition cursor-pointer shadow"
                         >
                           <Plus className="w-5 h-5" />
                         </motion.button>
@@ -1387,7 +1420,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                                     <button
                                       type="button"
                                       onClick={() => handleRemoveFoto(index)}
-                                      className="absolute -top-1 -right-1 bg-rose-500 hover:bg-rose-650 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-md cursor-pointer border border-rose-450"
+                                      className="absolute -top-1 -right-1 bg-rose-500 hover:bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-md cursor-pointer border border-rose-400"
                                     >
                                       ✕
                                     </button>
@@ -1450,11 +1483,11 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
           </AnimatePresence>
 
           {/* BANNER DE SOPORTE */}
-          <div className="pt-6 border-t border-slate-850 mt-8">
-            <div className="bg-[#0b1b3d]/60 backdrop-blur-md border border-[#233554]/50 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+          <div className="pt-6 border-t border-white/[0.08] mt-8">
+            <div className="perf-contain bg-gradient-to-r from-slate-900/75 via-slate-950/85 to-slate-900/75 backdrop-blur-md lg:backdrop-blur-xl border border-white/[0.08] rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_12px_36px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)]">
               <div className="flex items-center gap-3 text-left">
-                <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20 shrink-0">
-                  <Phone className="w-4 h-4 animate-pulse" />
+                <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20 shrink-0">
+                  <Phone className="w-4 h-4" />
                 </div>
                 <div>
                   <h4 className="font-bold text-xs text-white">Centro de Soporte</h4>
@@ -1467,7 +1500,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 href="https://wa.me/59162730435?text=Hola,%20tengo%20una%20pregunta%20o%20duda%20sobre%20el%20sistema"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-[11px] tracking-wider uppercase px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition duration-200 cursor-pointer shadow-lg shadow-emerald-500/10"
+                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] tracking-wider uppercase px-4 py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer shadow-lg shadow-emerald-500/15 active:scale-95 whitespace-nowrap shrink-0"
               >
                 <Phone className="w-3.5 h-3.5 fill-current stroke-none" />
                 <span>WhatsApp</span>
@@ -1477,9 +1510,9 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
         </main>
 
         {/* 3-Column Layout: Column 3 (Alerts & KPIs Panel, docked on Desktop, hidden on Mobile) */}
-        <aside className="hidden lg:flex flex-col w-80 shrink-0 border-l border-[#112240] bg-[#0A192F]/80 backdrop-blur-md p-6 h-[calc(100vh-0px)] sticky top-0 justify-between">
+        <aside className="hidden lg:flex flex-col w-80 shrink-0 border-l border-white/[0.06] bg-slate-950/80 backdrop-blur-xl p-6 h-[calc(100vh-0px)] sticky top-0 justify-between">
           <div className="space-y-6">
-            <div className="pb-2 border-b border-slate-850">
+            <div className="pb-2 border-b border-white/[0.08]">
               <h3 className="font-extrabold text-sm text-white tracking-tight flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-emerald-400" />
                 Estadísticas del Chofer
@@ -1490,51 +1523,42 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             {/* KPIs statistics */}
             <div className="grid grid-cols-1 gap-3">
               {/* Progress Bar for Expenses */}
-              <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl space-y-2">
-                <div className="flex justify-between items-end">
-                  <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none mb-1">
-                    Saldo Actual Disponible (Bs.)
-                  </span>
-                  {(() => {
-                    const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
-                    const statSaldoActual = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : statPresupuesto);
-                    return (
-                      <div className="text-right">
+              {(() => {
+                const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
+                const statSaldoActual = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : statPresupuesto);
+                const remainingPercent = Math.max(0, Math.min(100, (statSaldoActual / statPresupuesto) * 100));
+                const barGradient = remainingPercent > 50 ? 'from-emerald-500 to-teal-400' : remainingPercent >= 20 ? 'from-amber-500 to-orange-400' : 'from-rose-600 to-rose-400';
+                return (
+                  <div className="bg-slate-900 border border-white/[0.08] p-4 rounded-3xl space-y-2">
+                    <div className="flex justify-between items-end">
+                      <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none mb-1">
+                        Saldo Actual Disponible (Bs.)
+                      </span>
+                      <div className="text-right tabular-nums">
                         <span className="text-xl font-black text-white font-mono">{statSaldoActual.toLocaleString('es-BO')}</span>
                         <span className="text-xs text-slate-500 font-mono"> / {statPresupuesto.toLocaleString('es-BO')} Bs.</span>
                       </div>
-                    );
-                  })()}
-                </div>
-                <div className="flex justify-between items-center text-[9px] text-slate-400 font-extrabold uppercase tracking-wider leading-none mt-1">
-                  <span>Caja Chica del Chofer</span>
-                  {(() => {
-                    const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
-                    const statSaldoActual = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : statPresupuesto);
-                    const remainingPercent = Math.max(0, Math.min(100, (statSaldoActual / statPresupuesto) * 100));
-                    return <span>{remainingPercent.toFixed(0)}% Restante</span>;
-                  })()}
-                </div>
-                <div className="h-1.5 w-full bg-[#0A192F] rounded-full overflow-hidden mt-2">
-                  <div 
-                    className="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full"
-                    style={{
-                      width: `${Math.max(0, Math.min(100, (() => {
-                        const statPresupuesto = Number(authenticatedDriver?.presupuesto !== undefined && authenticatedDriver?.presupuesto !== "" ? authenticatedDriver.presupuesto : 10000) || 10000;
-                        const statSaldoActual = Number(authenticatedDriver?.saldo_actual !== undefined && authenticatedDriver?.saldo_actual !== "" ? authenticatedDriver.saldo_actual : statPresupuesto);
-                        return (statSaldoActual / statPresupuesto) * 100;
-                      })()))}%`
-                    }}
-                  />
-                </div>
-              </div>
+                    </div>
+                    <div className="flex justify-between items-center text-[9px] text-slate-400 font-extrabold uppercase tracking-wider leading-none mt-1">
+                      <span>Caja Chica del Chofer</span>
+                      <span>{remainingPercent.toFixed(0)}% Restante</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-[#0A192F] rounded-full overflow-hidden mt-2">
+                      <div 
+                        className={`h-full bg-gradient-to-r ${barGradient} rounded-full transition-all duration-500`}
+                        style={{ width: `${remainingPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
 
-              <div className="bg-slate-950/40 border border-slate-855 p-4 rounded-3xl space-y-1">
+              <div className="bg-slate-950/40 border border-white/[0.08] p-4 rounded-3xl space-y-1">
                 <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none">VIAJES COMPLETADOS</span>
                 <div className="text-xl font-black text-white font-mono mt-1">{completedTrips.length} Viajes</div>
               </div>
 
-              <div className="bg-slate-950/40 border border-slate-855 p-4 rounded-3xl space-y-1">
+              <div className="bg-slate-950/40 border border-white/[0.08] p-4 rounded-3xl space-y-1">
                 <span className="text-[9px] text-slate-400 font-extrabold uppercase block tracking-wider leading-none">TONELADAS RECIENTES</span>
                 <div className="text-xl font-black text-white font-mono mt-1">{totalTons.toFixed(0)} Tons</div>
               </div>
@@ -1563,7 +1587,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
             </div>
 
             {/* Daily warnings checklist */}
-            <div className="bg-slate-950/40 border border-slate-855 p-4 rounded-3xl space-y-3">
+            <div className="bg-slate-950/40 border border-white/[0.08] p-4 rounded-3xl space-y-3">
               <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">RECOMENDACIONES DIARIAS</span>
               <ul className="text-[10px] text-slate-200 space-y-2 leading-tight">
                 <li className="flex items-start gap-1.5">
@@ -1651,7 +1675,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 </p>
               </div>
 
-              <div className="bg-slate-950 border border-slate-850 p-4 rounded-2xl space-y-2">
+              <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl space-y-2">
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="text-slate-400">ORIGEN:</span>
                   <span className="text-white">{selectedRutaToStart.origen}</span>
@@ -1660,7 +1684,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                   <span className="text-slate-400">DESTINO:</span>
                   <span className="text-white">{selectedRutaToStart.destino}</span>
                 </div>
-                <div className="flex justify-between text-xs font-semibold border-t border-slate-850 pt-2">
+                <div className="flex justify-between text-xs font-semibold border-t border-slate-800 pt-2">
                   <span className="text-orange-500">TARIFA BASE:</span>
                   <span className="text-orange-400 font-bold font-mono">{selectedRutaToStart.tarifa_base} Bs.</span>
                 </div>
@@ -1771,8 +1795,8 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
                 </p>
               </div>
 
-              <div className="bg-slate-950 border border-slate-850 p-5 rounded-2xl space-y-3.5 shadow-inner">
-                <div className="flex justify-between items-center text-xs font-semibold border-b border-slate-850/50 pb-2.5">
+              <div className="bg-slate-950 border border-slate-800 p-5 rounded-2xl space-y-3.5 shadow-inner">
+                <div className="flex justify-between items-center text-xs font-semibold border-b border-slate-800/70 pb-2.5">
                   <span className="text-slate-200 uppercase">Total Pago Extra:</span>
                   <span className="text-white font-extrabold text-base font-mono">
                     {tripSummaryData.valor_extra_total.toFixed(2)} Bs.
@@ -1821,7 +1845,7 @@ export default function DriverApp({ token, onLogout, initialDriver }: DriverAppP
       </AnimatePresence>
 
       {/* 5. GORGEOUS GLASSMORPHIC BOTTOM NAVIGATION DOCK (Mobile only) */}
-      <div className="lg:hidden fixed bottom-5 left-4 right-4 z-40 bg-slate-900/85 backdrop-blur-xl border border-white/10 rounded-3xl p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-around">
+      <div className="lg:hidden fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 right-4 z-40 perf-contain bg-slate-900/90 backdrop-blur-md border border-white/[0.12] rounded-3xl p-3 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex items-center justify-around">
         {/* Toggle Routes / Active Trip view */}
         <motion.button
           whileTap={{ scale: 0.90 }}

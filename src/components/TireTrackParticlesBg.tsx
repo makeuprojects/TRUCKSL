@@ -31,14 +31,16 @@ export default function TireTrackParticlesBg() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // On Mobile, return a completely static background with zero overhead
+  // On Mobile, return a zero-blur static radial gradient background for instant paint
   if (isMobile) {
     return (
-      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0 bg-[#0b1b3d]/90">
-        {/* Subtle, non-animated gradient spots for depth */}
-        <div className="absolute top-1/4 left-10 w-[150px] h-[150px] bg-orange-600/5 rounded-full blur-[60px]" />
-        <div className="absolute bottom-1/4 right-10 w-[150px] h-[150px] bg-blue-600/5 rounded-full blur-[60px]" />
-      </div>
+      <div
+        className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0"
+        style={{
+          background:
+            'radial-gradient(circle at 18% 25%, rgba(234, 88, 12, 0.06), transparent 48%), radial-gradient(circle at 82% 75%, rgba(37, 99, 235, 0.07), transparent 52%), rgba(11, 27, 61, 0.92)'
+        }}
+      />
     );
   }
 

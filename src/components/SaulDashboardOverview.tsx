@@ -239,95 +239,143 @@ export default function SaulDashboardOverview({
         </div>
       )}
 
-      {/* 4 Multi-Dimension Cards row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* 4 Multi-Dimension Cards row with Refined Dark Glassmorphism & Mobile-First GPU Speed */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-5">
         
         {/* Card 1: Eficiencia de Margen */}
-        <div className="bg-slate-900/80 backdrop-blur-md border border-white/[0.08] p-4 rounded-2xl flex flex-col justify-between shadow-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">Rentabilidad</span>
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.04, ease: [0.16, 1, 0.3, 1] }}
+          className="group glass-sheen perf-contain bg-gradient-to-b from-slate-900/85 to-slate-950/95 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-emerald-500/35 p-4 sm:p-5 rounded-3xl flex flex-col justify-between shadow-[0_8px_28px_-8px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-all duration-300 ease-natural md:hover:-translate-y-1 cursor-default relative overflow-hidden"
+        >
+          <div className="flex items-center justify-between relative z-10">
+            <span className="text-[10px] text-slate-400 group-hover:text-slate-300 font-bold uppercase tracking-wider transition-colors">Rentabilidad</span>
+            <div className="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300 ease-natural">
               <Percent className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3">
-            <h4 className="text-xl font-black font-mono tracking-tight text-emerald-400">
-              {profitabilityRate.toFixed(1)}%
-            </h4>
-            <span className="text-[9px] text-slate-300 font-bold block mt-1">
-              {profitabilityRate >= 30 ? '🔥 Margen altamente óptimo' : '⚡ Margen operativo normal'}
-            </span>
+          <div className="mt-3 relative z-10 flex items-end justify-between gap-2">
+            <div>
+              <h4 className="text-xl sm:text-2xl font-black font-mono tracking-tight text-emerald-400 tabular-nums">
+                {profitabilityRate.toFixed(1)}%
+              </h4>
+              <span className="text-[9.5px] sm:text-[10px] text-slate-400 font-medium block mt-1">
+                {profitabilityRate >= 30 ? 'Margen óptimo' : 'Margen normal'}
+              </span>
+            </div>
+            <svg viewBox="0 0 42 18" className="w-10 h-5 shrink-0 opacity-85" fill="none">
+              <motion.path
+                d="M 2,14 L 10,11 L 18,13 L 27,6 L 34,8 L 40,3"
+                stroke="#34d399"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0, opacity: 0.2 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </svg>
           </div>
-        </div>
+        </motion.div>
 
         {/* Card 2: Monitoreo Viajes */}
-        <div className="bg-slate-900/80 backdrop-blur-md border border-white/[0.08] p-4 rounded-2xl flex flex-col justify-between shadow-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">Viajes (Status)</span>
-            <div className="p-1.5 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+          className="group glass-sheen perf-contain bg-gradient-to-b from-slate-900/85 to-slate-950/95 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-sky-500/35 p-4 sm:p-5 rounded-3xl flex flex-col justify-between shadow-[0_8px_28px_-8px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-all duration-300 ease-natural md:hover:-translate-y-1 cursor-default relative overflow-hidden"
+        >
+          <div className="flex items-center justify-between relative z-10">
+            <span className="text-[10px] text-slate-400 group-hover:text-slate-300 font-bold uppercase tracking-wider transition-colors">Viajes (Status)</span>
+            <div className="p-1.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 group-hover:scale-110 transition-transform duration-300 ease-natural">
               <Activity className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-xl font-black font-mono text-white">{viajes.length}</span>
-              <span className="text-[10px] text-slate-400">totales</span>
+          <div className="mt-3 relative z-10 flex items-end justify-between gap-2">
+            <div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl sm:text-2xl font-black font-mono text-white tabular-nums">{viajes.length}</span>
+                <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono">totales</span>
+              </div>
+              <div className="flex gap-2 mt-1 font-mono tabular-nums">
+                <span className="text-[9.5px] sm:text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> {completedTripsCount} Fin
+                </span>
+                <span className="text-[9.5px] sm:text-[10px] text-sky-400 font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400"></span> {activeTripsCount} Cicl
+                </span>
+              </div>
             </div>
-            <div className="flex gap-2 mt-1">
-              <span className="text-[9px] text-emerald-400 font-bold flex items-center gap-0.5">
-                ● {completedTripsCount} Fin
-              </span>
-              <span className="text-[9px] text-sky-400 font-bold flex items-center gap-0.5">
-                ● {activeTripsCount} Cicl
-              </span>
-            </div>
+            <svg viewBox="0 0 42 18" className="w-10 h-5 shrink-0 opacity-85" fill="none">
+              <motion.path
+                d="M 2,13 L 9,9 L 17,12 L 24,5 L 33,7 L 40,4"
+                stroke="#38bdf8"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0, opacity: 0.2 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </svg>
           </div>
-        </div>
+        </motion.div>
 
         {/* Card 3: Estado de Flota */}
-        <div className="bg-slate-900/80 backdrop-blur-md border border-white/[0.08] p-4 rounded-2xl flex flex-col justify-between shadow-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">Unidades de Flota</span>
-            <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          className="group glass-sheen perf-contain bg-gradient-to-b from-slate-900/85 to-slate-950/95 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-indigo-500/35 p-4 sm:p-5 rounded-3xl flex flex-col justify-between shadow-[0_8px_28px_-8px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-all duration-300 ease-natural md:hover:-translate-y-1 cursor-default relative overflow-hidden"
+        >
+          <div className="flex items-center justify-between relative z-10">
+            <span className="text-[10px] text-slate-400 group-hover:text-slate-300 font-bold uppercase tracking-wider transition-colors">Unidades Flota</span>
+            <div className="p-1.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 group-hover:scale-110 transition-transform duration-300 ease-natural">
               <Truck className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3">
+          <div className="mt-3 relative z-10">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xl font-black font-mono text-white">{camiones.length}</span>
-              <span className="text-[10px] text-slate-400">camiones</span>
+              <span className="text-xl sm:text-2xl font-black font-mono text-white tabular-nums">{camiones.length}</span>
+              <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono">camiones</span>
             </div>
-            <div className="flex gap-2 mt-1">
-              <span className="text-[9px] text-slate-300 font-bold">
-                ✓ {activeTrucksCount} Operando
+            <div className="flex gap-2 mt-1 tabular-nums">
+              <span className="text-[9.5px] sm:text-[10px] text-slate-300 font-medium">
+                {activeTrucksCount} Operando
               </span>
               {maintenanceTrucksCount > 0 && (
-                <span className="text-[9px] text-amber-400 font-bold animate-pulse">
-                  ⚠ {maintenanceTrucksCount} Taller
+                <span className="text-[9.5px] sm:text-[10px] text-amber-400 font-bold">
+                  ({maintenanceTrucksCount} Taller)
                 </span>
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Card 4: Choferes Totales */}
-        <div className="bg-slate-900/80 backdrop-blur-md border border-white/[0.08] p-4 rounded-2xl flex flex-col justify-between shadow-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] text-slate-400 font-extrabold uppercase tracking-widest">Personal / Choferes</span>
-            <div className="p-1.5 rounded-lg bg-violet-500/10 text-violet-400 border border-violet-500/20">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
+          className="group glass-sheen perf-contain bg-gradient-to-b from-slate-900/85 to-slate-950/95 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-violet-500/35 p-4 sm:p-5 rounded-3xl flex flex-col justify-between shadow-[0_8px_28px_-8px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-all duration-300 ease-natural md:hover:-translate-y-1 cursor-default relative overflow-hidden"
+        >
+          <div className="flex items-center justify-between relative z-10">
+            <span className="text-[10px] text-slate-400 group-hover:text-slate-300 font-bold uppercase tracking-wider transition-colors">Personal / Choferes</span>
+            <div className="p-1.5 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/20 group-hover:scale-110 transition-transform duration-300 ease-natural">
               <Users className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3">
+          <div className="mt-3 relative z-10">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xl font-black font-mono text-white">{choferes.length}</span>
-              <span className="text-[10px] text-slate-400">conductores</span>
+              <span className="text-xl sm:text-2xl font-black font-mono text-white tabular-nums">{choferes.length}</span>
+              <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono">conductores</span>
             </div>
-            <span className="text-[9px] text-slate-400 font-bold block mt-1">
-              🔋 Sincronización biométrica activa
+            <span className="text-[9.5px] sm:text-[10px] text-slate-400 font-medium block mt-1 truncate">
+              Sincronización activa
             </span>
           </div>
-        </div>
+        </motion.div>
 
       </div>
 
@@ -335,7 +383,13 @@ export default function SaulDashboardOverview({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left: Bar Chart of Income vs Expenses */}
-        <div className="lg:col-span-2 bg-slate-900/80 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 shadow-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          className="lg:col-span-2 perf-contain bg-gradient-to-b from-slate-900/85 to-slate-950/95 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-white/[0.14] rounded-3xl p-5 sm:p-6 shadow-[0_12px_32px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-colors duration-300 relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-100">
@@ -344,12 +398,12 @@ export default function SaulDashboardOverview({
               <p className="text-[10px] text-slate-400">Últimos 6 fletes liquidados o activos en ruta</p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
                 <span className="text-[9px] text-slate-300 font-bold font-mono">Flete</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-orange-500" />
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_6px_rgba(249,115,22,0.5)]" />
                 <span className="text-[9px] text-slate-300 font-bold font-mono">Gasto</span>
               </div>
             </div>
@@ -361,32 +415,39 @@ export default function SaulDashboardOverview({
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff0a" vertical={false} />
                 <XAxis 
                   dataKey="name" 
-                  stroke="#64748b" 
+                  stroke="#94a3b8" 
                   fontSize={10} 
                   fontWeight="bold" 
                   tickLine={false} 
                 />
                 <YAxis 
-                  stroke="#64748b" 
+                  stroke="#94a3b8" 
                   fontSize={10} 
                   fontWeight="bold" 
                   tickLine={false} 
                   axisLine={false}
                 />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '12px' }}
-                  labelStyle={{ color: '#fff', fontWeight: 'bold', fontSize: '11px' }}
-                  itemStyle={{ fontSize: '11px' }}
+                  cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }}
+                  contentStyle={{ backgroundColor: 'rgba(2, 6, 23, 0.92)', backdropFilter: 'blur(12px)', borderColor: 'rgba(255, 255, 255, 0.12)', borderRadius: '14px', boxShadow: '0 16px 36px rgba(0, 0, 0, 0.6)' }}
+                  labelStyle={{ color: '#f8fafc', fontWeight: 'bold', fontSize: '11px', marginBottom: '4px' }}
+                  itemStyle={{ fontSize: '11px', fontFamily: 'JetBrains Mono, monospace' }}
                 />
-                <Bar dataKey="Ingreso" fill="#10b981" radius={[4, 4, 0, 0]} name="Ingreso Flete (Bs.)" />
-                <Bar dataKey="Gastos" fill="#f97316" radius={[4, 4, 0, 0]} name="Gastos Ruta (Bs.)" />
+                <Bar dataKey="Ingreso" fill="#10b981" radius={[6, 6, 0, 0]} name="Ingreso Flete (Bs.)" />
+                <Bar dataKey="Gastos" fill="#f97316" radius={[6, 6, 0, 0]} name="Gastos Ruta (Bs.)" />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right: Pie Chart for Category breakdown */}
-        <div className="bg-slate-900/80 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          className="perf-contain bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-white/[0.14] rounded-3xl p-5 sm:p-6 shadow-[0_12px_36px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-colors duration-300 flex flex-col justify-between relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
           <div>
             <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-100">
               Distribución de Gastos por Categoría
@@ -405,42 +466,50 @@ export default function SaulDashboardOverview({
                   outerRadius={75}
                   paddingAngle={4}
                   dataKey="value"
+                  stroke="rgba(2,6,23,0.7)"
+                  strokeWidth={2}
                 >
                   {finalPieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '12px' }}
-                  itemStyle={{ fontSize: '11px', color: '#fff' }}
+                  contentStyle={{ backgroundColor: 'rgba(2, 6, 23, 0.92)', backdropFilter: 'blur(12px)', borderColor: 'rgba(255, 255, 255, 0.12)', borderRadius: '14px', boxShadow: '0 16px 36px rgba(0, 0, 0, 0.6)' }}
+                  itemStyle={{ fontSize: '11px', color: '#f8fafc', fontFamily: 'JetBrains Mono, monospace' }}
                 />
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-[10px] text-slate-400 uppercase font-black tracking-widest leading-none">Total</span>
-              <span className="text-sm font-black font-mono text-emerald-400 mt-1">
+              <span className="text-sm font-black font-mono text-emerald-400 mt-1 tabular-nums">
                 Bs.{totalExpensesValue.toLocaleString('es-BO', { maximumFractionDigits: 0 })}
               </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-left pt-2 border-t border-white/[0.04]">
+          <div className="grid grid-cols-2 gap-2 text-left pt-3 border-t border-white/[0.06]">
             {finalPieData.map((entry, index) => (
               <div key={entry.name} className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                 <div className="flex flex-col min-w-0">
                   <span className="text-[8.5px] font-bold text-slate-400 uppercase truncate leading-none">{entry.name}</span>
-                  <span className="text-[10px] font-mono font-black text-slate-200 mt-0.5">Bs.{entry.value.toLocaleString('es-BO', { maximumFractionDigits: 0 })}</span>
+                  <span className="text-[10px] font-mono font-black text-slate-200 mt-0.5 tabular-nums">Bs.{entry.value.toLocaleString('es-BO', { maximumFractionDigits: 0 })}</span>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
       </div>
 
       {/* Bottom Area chart: Expenses trend */}
-      <div className="bg-slate-900/80 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 shadow-xl">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.26, ease: [0.16, 1, 0.3, 1] }}
+        className="perf-contain bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-white/[0.14] rounded-3xl p-5 sm:p-6 shadow-[0_12px_36px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-colors duration-300 relative overflow-hidden"
+      >
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
         <div>
           <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-100">
             Tendencia de Costos de Ruta (Historial de Desembolsos)
@@ -453,34 +522,34 @@ export default function SaulDashboardOverview({
             <AreaChart data={finalTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorGastos" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.25}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#38bdf8" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#ffffff0a" vertical={false} />
               <XAxis 
                 dataKey="fecha" 
-                stroke="#64748b" 
+                stroke="#94a3b8" 
                 fontSize={10} 
                 fontWeight="bold" 
                 tickLine={false} 
               />
               <YAxis 
-                stroke="#64748b" 
+                stroke="#94a3b8" 
                 fontSize={10} 
                 fontWeight="bold" 
                 tickLine={false} 
                 axisLine={false}
               />
               <Tooltip 
-                contentStyle={{ backgroundColor: '#020617', borderColor: '#334155', borderRadius: '12px' }}
-                labelStyle={{ color: '#fff', fontWeight: 'bold', fontSize: '11px' }}
-                itemStyle={{ fontSize: '11px', color: '#60a5fa' }}
+                contentStyle={{ backgroundColor: 'rgba(2, 6, 23, 0.92)', backdropFilter: 'blur(12px)', borderColor: 'rgba(255, 255, 255, 0.12)', borderRadius: '14px', boxShadow: '0 16px 36px rgba(0, 0, 0, 0.6)' }}
+                labelStyle={{ color: '#f8fafc', fontWeight: 'bold', fontSize: '11px', marginBottom: '4px' }}
+                itemStyle={{ fontSize: '11px', color: '#38bdf8', fontFamily: 'JetBrains Mono, monospace' }}
               />
               <Area 
                 type="monotone" 
                 dataKey="Monto Gastado" 
-                stroke="#3b82f6" 
+                stroke="#38bdf8" 
                 strokeWidth={2.5}
                 fillOpacity={1} 
                 fill="url(#colorGastos)" 
@@ -489,31 +558,37 @@ export default function SaulDashboardOverview({
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </motion.div>
 
       {/* 📋 AUDITORÍA DE RENDIMIENTO POR VIAJE (Ingresos vs. Gastos) */}
-      <div className="bg-slate-900/80 backdrop-blur-md border border-white/[0.08] rounded-2xl p-5 shadow-xl space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-white/[0.04] pb-4">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className="perf-contain bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] rounded-3xl p-5 sm:p-6 shadow-[0_12px_36px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] space-y-4 relative overflow-hidden"
+      >
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-white/[0.06] pb-4">
           <div>
-            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-100 flex items-center gap-2">
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-100 flex items-center gap-2 flex-wrap">
               <span>📋 Auditoría de Rendimiento por Viaje</span>
-              <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-extrabold px-2 py-0.5 rounded uppercase font-mono tracking-widest animate-pulse">Datos Reales</span>
+              <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 font-extrabold px-2.5 py-0.5 rounded-lg uppercase font-mono tracking-widest whitespace-nowrap shrink-0">Datos Reales</span>
             </h3>
             <p className="text-[10px] text-slate-400 mt-1">
               Desglose uno a uno de ingresos por flete (tarifa base + toneladas extras) y gastos reales reportados por conductores en ruta.
             </p>
           </div>
-          <div className="flex items-center gap-4 text-[10px] font-mono">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-[10px] font-mono shrink-0">
             <div className="flex items-center gap-1.5 text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               <span>Ingresos (Flete)</span>
             </div>
             <div className="flex items-center gap-1.5 text-rose-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
               <span>Gastos (Ruta)</span>
             </div>
             <div className="flex items-center gap-1.5 text-sky-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
               <span>Margen Neto</span>
             </div>
           </div>
@@ -570,22 +645,22 @@ export default function SaulDashboardOverview({
                 return (
                   <div 
                     key={`${v.id_viaje}-${idx}`}
-                    className="bg-slate-950/50 hover:bg-slate-950/80 border border-slate-800/80 hover:border-slate-700 rounded-2xl transition duration-200 overflow-hidden"
+                    className="perf-contain bg-slate-950/55 hover:bg-slate-950/85 border border-white/[0.06] hover:border-white/[0.15] rounded-2xl transition-colors duration-200 ease-natural overflow-hidden"
                   >
                     {/* Collapsible Header */}
                     <div 
                       onClick={() => setExpandedTripId(isExpanded ? null : v.id_viaje)}
-                      className="p-4 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 select-none"
+                      className="p-4 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 select-none active:scale-[0.995] transition-transform duration-150"
                     >
                       {/* Left: Route Name, ID & Driver */}
                       <div className="flex items-start gap-3">
-                        <div className="p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-sky-400 font-mono text-[10px] font-bold leading-none flex items-center justify-center shrink-0">
+                        <div className="p-2.5 bg-slate-900/90 border border-white/[0.08] rounded-xl text-sky-400 font-mono text-[10px] font-bold leading-none flex items-center justify-center shrink-0 tabular-nums">
                           ID: {v.id_viaje.substring(0, 6)}
                         </div>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 text-xs font-black text-slate-100 uppercase tracking-tight">
+                          <div className="flex items-center gap-1.5 text-xs font-black text-slate-100 uppercase tracking-tight flex-wrap">
                             <span>{route?.origen || 'Origen'}</span>
-                            <ArrowRight className="w-3 h-3 text-sky-500 shrink-0" />
+                            <ArrowRight className="w-3 h-3 text-sky-400 shrink-0" />
                             <span>{route?.destino || 'Destino'}</span>
                             <span className={`text-[8px] font-extrabold px-1.5 py-0.5 rounded font-mono shrink-0 ${
                               v.estado_viaje === 'Finalizado' 
@@ -602,7 +677,7 @@ export default function SaulDashboardOverview({
                       </div>
 
                       {/* Right: Income, Expenses, Profit Summary */}
-                      <div className="flex flex-wrap items-center gap-6 text-xs font-mono">
+                      <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs font-mono tabular-nums">
                         <div className="text-left">
                           <span className="text-[8px] text-slate-400 block uppercase font-sans font-bold">Ingreso Flete</span>
                           <span className="text-emerald-400 font-black">Bs. {totalIncome.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
@@ -616,20 +691,24 @@ export default function SaulDashboardOverview({
                           <span className={`font-black ${textColor}`}>Bs. {netProfit.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 ml-auto sm:ml-0">
                           <div className="flex flex-col items-end">
                             <span className="text-[8px] text-slate-400 block uppercase font-sans font-bold">Margen Neto</span>
                             <span className={`text-[10px] font-black ${textColor}`}>{marginPct.toFixed(1)}%</span>
                           </div>
                           <div className="w-12 bg-slate-800 h-1.5 rounded-full overflow-hidden shrink-0">
-                            <div className={`h-full ${progressColor}`} style={{ width: `${Math.max(0, Math.min(100, marginPct))}%` }} />
+                            <div className={`h-full transition-all duration-500 ${progressColor}`} style={{ width: `${Math.max(0, Math.min(100, marginPct))}%` }} />
                           </div>
                         </div>
 
-                        {/* Chevron Icon */}
-                        <div className="text-slate-500">
-                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                        </div>
+                        {/* Animated Chevron Icon */}
+                        <motion.div
+                          animate={{ rotate: isExpanded ? 180 : 0 }}
+                          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                          className="text-slate-400"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </motion.div>
                       </div>
                     </div>
 
@@ -640,10 +719,10 @@ export default function SaulDashboardOverview({
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.25, ease: 'easeInOut' }}
+                          transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
                           className="overflow-hidden"
                         >
-                          <div className="p-4 space-y-4 border-t border-slate-800/80 bg-slate-950/30">
+                          <div className="p-4 space-y-4 border-t border-white/[0.06] bg-slate-950/35">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               
                               {/* Left: How Saul manages Income (Flete Formula) */}
@@ -680,7 +759,7 @@ export default function SaulDashboardOverview({
                                   <span className="text-[10px] text-rose-400 font-extrabold uppercase tracking-wider block">
                                     ⛽ Comprobantes y Gastos en Ruta
                                   </span>
-                                  <span className="text-[9px] text-slate-450 font-mono font-bold">Total: {tripExpensesList.length} registros</span>
+                                  <span className="text-[9px] text-slate-400 font-mono font-bold">Total: {tripExpensesList.length} registros</span>
                                 </div>
                                 
                                 {tripExpensesList.length === 0 ? (
@@ -699,13 +778,13 @@ export default function SaulDashboardOverview({
                                             <span className="text-[8px] bg-slate-800 text-slate-300 font-black font-mono px-1.5 py-0.5 rounded uppercase">
                                               {g.tipo_gasto.replace(/⛽|🍲|🔧|🜔|🛢️|🎫/g, '').trim()}
                                             </span>
-                                            <span className="text-[9px] text-slate-500 font-mono">
+                                            <span className="text-[9px] text-slate-400 font-mono">
                                               {g.timestamp_registro ? new Date(g.timestamp_registro).toLocaleDateString('es-BO') : ''}
                                             </span>
                                           </div>
                                           <p className="text-[10px] text-slate-300 mt-1 leading-normal truncate">{g.descripcion || 'Sin descripción'}</p>
                                         </div>
-                                        <span className="text-xs font-black text-rose-400 font-mono shrink-0">
+                                        <span className="text-xs font-black text-rose-400 font-mono shrink-0 tabular-nums">
                                           -Bs. {safeParse(g.monto).toLocaleString('es-BO', { minimumFractionDigits: 2 })}
                                         </span>
                                       </div>
@@ -721,7 +800,7 @@ export default function SaulDashboardOverview({
                               <p className="text-slate-200 leading-normal">
                                 ℹ️ <strong>Margen de Utilidad del Viaje:</strong> En esta ruta, Don Saúl retiene el <strong>{marginPct.toFixed(1)}%</strong> del flete cobrado después de liquidar los gastos operativos autodeclarados del chofer.
                               </p>
-                              <span className={`font-black uppercase shrink-0 ${textColor}`}>
+                              <span className={`font-black uppercase shrink-0 tabular-nums ${textColor}`}>
                                 Retorno Neto: Bs. {netProfit.toLocaleString('es-BO', { minimumFractionDigits: 2 })}
                               </span>
                             </div>
@@ -734,7 +813,7 @@ export default function SaulDashboardOverview({
               })
           )}
         </div>
-      </div>
+      </motion.div>
 
     </div>
   );

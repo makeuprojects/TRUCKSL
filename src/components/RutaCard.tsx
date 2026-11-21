@@ -20,12 +20,12 @@ export default function RutaCard({ id, ruta, onStartTrip, isLoading, disabled }:
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
       whileHover={{ 
-        scale: 1.04, 
-        y: -4,
+        scale: 1.02, 
+        y: -3,
         boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3)",
         transition: { duration: 0.2, ease: "easeOut" } 
       }}
-      className="bg-slate-900/85 backdrop-blur-md border border-slate-800 rounded-3xl p-6 hover:border-slate-700/80 transition-colors space-y-4 flex flex-col justify-between"
+      className="perf-contain bg-slate-900/85 backdrop-blur-md border border-white/[0.08] rounded-3xl p-6 hover:border-white/[0.16] transition-colors space-y-4 flex flex-col justify-between"
       id={id}
     >
       <div className="flex items-start justify-between gap-4">
@@ -60,7 +60,7 @@ export default function RutaCard({ id, ruta, onStartTrip, isLoading, disabled }:
         whileTap={{ scale: 0.95 }}
         disabled={disabled || isLoading}
         onClick={() => onStartTrip(ruta)}
-        className="w-full bg-orange-500 hover:bg-orange-400 active:bg-orange-600 disabled:bg-slate-950 disabled:border-slate-850 disabled:text-slate-500 disabled:cursor-not-allowed text-slate-950 font-black tracking-wide text-xs sm:text-sm py-3.5 rounded-2xl leading-none transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-orange-500/25"
+        className="w-full bg-orange-500 hover:bg-orange-400 active:bg-orange-600 disabled:bg-slate-950 disabled:border disabled:border-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed text-slate-950 font-black tracking-wide text-xs sm:text-sm py-3.5 rounded-2xl leading-none transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-orange-500/25"
       >
         {isLoading ? (
           <>

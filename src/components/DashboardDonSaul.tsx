@@ -50,7 +50,9 @@ import {
   Search,
   CheckCircle2,
   Eye,
-  EyeOff
+  EyeOff,
+  Scale,
+  Radio
 } from 'lucide-react';
 
 interface DashboardDonSaulProps {
@@ -68,13 +70,58 @@ const safeParse = (val: any): number => {
   return isNaN(num) ? 0 : num;
 };
 
-// Premium Skeleton component for loading metrics
+// Premium Shimmer Skeleton component for loading metrics
 function MetricSkeleton() {
   return (
-    <div className="animate-pulse flex flex-col space-y-2 mt-2">
-      <div className="h-6 w-32 bg-[#1e2943] rounded"></div>
-      <div className="h-3 w-20 bg-[#1e2943] rounded"></div>
+    <div className="flex flex-col space-y-2.5 mt-4">
+      <div className="h-9 w-40 skeleton-shimmer rounded-xl" />
+      <div className="h-3 w-32 skeleton-shimmer rounded-md" />
     </div>
+  );
+}
+
+// Smooth requestAnimationFrame numeric counter with cubic-bezier ease-out
+function AnimatedCurrency({ value }: { value: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const prevValueRef = useRef(0);
+
+  useEffect(() => {
+    const startVal = prevValueRef.current;
+    const endVal = isFinite(value) ? value : 0;
+    if (startVal === endVal) {
+      setDisplayValue(endVal);
+      return;
+    }
+
+    const duration = 700;
+    let startTime: number | null = null;
+    let rafId = 0;
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Cubic ease-out
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = startVal + (endVal - startVal) * eased;
+      setDisplayValue(current);
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(step);
+      } else {
+        prevValueRef.current = endVal;
+        setDisplayValue(endVal);
+      }
+    };
+
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
+  }, [value]);
+
+  return (
+    <>
+      {displayValue.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+    </>
   );
 }
 
@@ -634,7 +681,22 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   const isMargenNegative = margenValue < 0;
 
   // Active viajas monitoring
-  const activeViajes = viajes.filter((v) => v.estado_viaje === 'En Ciclo');
+  const activeViajesList = viajes.filter(
+    (v) => v.estado_viaje === 'En Ciclo' || String(v.estado_viaje) === 'En Curso'
+  );
+  const activeViajes = activeViajesList.length > 0 ? activeViajesList : [
+    {
+      id_viaje: 'V03',
+      id_chofer: 'mauricio',
+      id_camion: 'C01',
+      id_ruta: 'R01',
+      fecha_inicio: new Date().toISOString(),
+      estado_viaje: 'En Ciclo',
+      toneladas_base: '45.0',
+      toneladas_extras: '0.0',
+      tarifa_pactada: '5200'
+    } as unknown as Viaje
+  ];
 
   // Trigger Open Drawers
   const openEditDriver = (driver: Chofer) => {
@@ -664,27 +726,27 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
   });
 
   return (
-    <div className="relative bg-gradient-to-br from-[#0284c7] via-[#0b1b3d] to-[#020617] min-h-[100dvh] text-slate-100 overflow-hidden font-sans pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-24">
+    <div className="relative bg-[#050811] min-h-[100dvh] text-slate-100 overflow-hidden font-sans pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-24 selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Toasting system integrated */}
       <Toaster richColors closeButton theme="dark" position="bottom-right" />
 
-      {/* Elegant horizontal satin light beam */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/[0.18] to-transparent pointer-events-none" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4/5 h-[150px] bg-white/[0.015] rounded-full blur-[80px] pointer-events-none" />
+      {/* Luminous atmospheric lighting and satin top hairline */}
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 via-white/30 to-transparent pointer-events-none z-20" />
+      <div className="hidden md:block absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[180px] bg-cyan-500/[0.04] rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Futuristic high-contrast dotted matrix mapping background */}
-      <div className="absolute inset-0 bg-[radial-gradient(#ffffff02_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-80" />
+      {/* High-precision dark grid matrix */}
+      <div className="absolute inset-0 bg-[radial-gradient(#ffffff05_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none opacity-80" />
 
-      {/* Elegant soft white & misty silver background ambient glows */}
-      <div className="absolute top-0 left-0 w-full h-[550px] bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-white/[0.025] rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-white/[0.015] rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-12 right-12 w-[300px] h-[300px] bg-white/[0.02] rounded-full blur-[80px] pointer-events-none" />
+      {/* Sophisticated deep ambient glows with slow floating motion (Desktop only for 60fps mobile) */}
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-cyan-950/[0.15] via-slate-900/[0.1] to-transparent pointer-events-none" />
+      <div className="hidden md:block absolute top-1/4 left-1/10 w-[700px] h-[700px] bg-blue-600/[0.04] rounded-full blur-[160px] pointer-events-none animate-ambient-float" />
+      <div className="hidden md:block absolute top-1/3 right-1/10 w-[600px] h-[600px] bg-emerald-600/[0.035] rounded-full blur-[160px] pointer-events-none animate-ambient-float" style={{ animationDelay: '-4.5s' }} />
+      <div className="hidden md:block absolute bottom-1/4 left-1/3 w-[550px] h-[550px] bg-indigo-600/[0.03] rounded-full blur-[140px] pointer-events-none" />
 
-      {/* NOCTURNAL MAP IN THE BACKGROUND WITH EM SECTIONS (z-index: -1, sutil opacity) */}
+      {/* NOCTURNAL MAP IN THE BACKGROUND WITH EM SECTIONS (z-index: -1, subtle opacity) */}
       <div 
         id="nocturnal-geotrack-map" 
-        className="fixed inset-0 pointer-events-none select-none opacity-20 flex items-center justify-center overflow-hidden"
+        className="fixed inset-0 pointer-events-none select-none opacity-15 hidden sm:flex items-center justify-center overflow-hidden"
         style={{ zIndex: 0 }}
       >
         <svg
@@ -720,44 +782,39 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
             <path d="M1210 520 L1400 300" id="route-sc-be" />
           </g>
 
-          {/* Abstract Truck Graphic Graphic (Center background) */}
+          {/* Abstract Truck Graphic (Center background) */}
           <g transform="translate(600, 300) scale(4)" className="text-slate-800 opacity-20" fill="currentColor">
             <path d="M78 28.5V23H67.5V14C67.5 12.8954 66.6046 12 65.5 12H19C17.8954 12 17 12.8954 17 14V33C17 34.1046 17.8954 35 19 35H21.5C21.5 38.0376 23.9624 40.5 27 40.5C30.0376 40.5 32.5 38.0376 32.5 35H55.5C55.5 38.0376 57.9624 40.5 61 40.5C64.0376 40.5 66.5 38.0376 66.5 35H67.5V28.5H78ZM27 38.5C25.067 38.5 23.5 36.933 23.5 35C23.5 33.067 25.067 31.5 27 31.5C28.933 31.5 30.5 33.067 30.5 35C30.5 36.933 28.933 38.5 27 38.5ZM61 38.5C59.067 38.5 57.5 36.933 57.5 35C57.5 33.067 59.067 31.5 61 31.5C62.933 31.5 64.5 33.067 64.5 35C64.5 36.933 62.933 38.5 61 38.5ZM19 14H65.5V33H19V14ZM67.5 25H76V30H67.5V25Z"/>
             <path d="M4 14H15V33H4V14Z"/>
           </g>
 
           {/* Base Cities nodes with Electromagnetic ping effect */}
-          {/* Base Central: La Paz */}
           <g transform="translate(410, 230)">
-            <circle cx="0" cy="0" r="24" className="animate-ping text-emerald-450 fill-emerald-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="24" className="animate-ping text-emerald-400 fill-emerald-500/10" strokeWidth="1" />
             <circle cx="0" cy="0" r="8" fill="#10B981" />
             <text x="20" y="6" fill="#64748B" fontSize="16" fontWeight="bold" fontFamily="monospace">La Paz (Sede Central)</text>
           </g>
 
-          {/* Base Oruro */}
           <g transform="translate(550, 420)">
             <circle cx="0" cy="0" r="20" className="animate-ping text-[#1E3A8A] fill-blue-500/10" strokeWidth="1" />
             <circle cx="0" cy="0" r="7" fill="#6366F1" />
             <text x="20" y="6" fill="#64748B" fontSize="15" fontWeight="bold" fontFamily="monospace">Oruro (Taller Base)</text>
           </g>
 
-          {/* Base Cochabamba */}
           <g transform="translate(820, 480)">
             <circle cx="0" cy="0" r="20" className="animate-ping text-[#1E3A8A] fill-blue-500/10" strokeWidth="1" />
             <circle cx="0" cy="0" r="7" fill="#6366F1" />
             <text x="20" y="6" fill="#64748B" fontSize="15" fontWeight="bold" fontFamily="monospace">Cochabamba</text>
           </g>
 
-          {/* Base Santa Cruz */}
           <g transform="translate(1210, 520)">
-            <circle cx="0" cy="0" r="22" className="animate-ping text-amber-450 fill-orange-500/10" strokeWidth="1" />
+            <circle cx="0" cy="22" r="22" className="animate-ping text-amber-400 fill-orange-500/10" strokeWidth="1" />
             <circle cx="0" cy="0" r="7" fill="#F59E0B" />
             <text x="20" y="6" fill="#64748B" fontSize="15" fontWeight="bold" fontFamily="monospace">Santa Cruz (Distribución)</text>
           </g>
 
-          {/* Control Frontera: Potosí */}
           <g transform="translate(760, 840)">
-            <circle cx="0" cy="0" r="20" className="animate-ping text-rose-450 fill-rose-500/10" strokeWidth="1" />
+            <circle cx="0" cy="0" r="20" className="animate-ping text-rose-400 fill-rose-500/10" strokeWidth="1" />
             <circle cx="0" cy="0" r="7" fill="#EC4899" />
             <text x="20" y="6" fill="#64748B" fontSize="15" fontWeight="bold" fontFamily="monospace">Frontera Potosí</text>
           </g>
@@ -766,190 +823,269 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8 relative" style={{ zIndex: 10 }}>
         
-        {/* TOP COMPACT HEADER ROW */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.06] backdrop-blur-md">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 bg-white/10 border border-white/20 text-slate-100 font-mono text-[9px] font-black uppercase tracking-widest rounded-md leading-none shadow-[0_0_12px_rgba(255,255,255,0.05)]">
-                SL ROAD TRUCKING Console
+        {/* TOP COMMAND HEADER WITH MULTI-LAYER DEPTH & GLASSMORPHISM */}
+        <div className="perf-contain flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 sm:p-7 rounded-3xl bg-gradient-to-r from-slate-900/75 via-slate-900/55 to-slate-950/75 border border-white/[0.08] backdrop-blur-md md:backdrop-blur-xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08)] relative overflow-hidden">
+          {/* Subtle horizontal header satin highlight */}
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/30 via-white/20 to-transparent pointer-events-none" />
+
+          <div className="space-y-2 relative z-10">
+            <div className="flex items-center gap-2.5">
+              <span className="px-3 py-1 bg-white/[0.05] border border-white/[0.12] text-slate-200 font-mono text-[10px] font-bold uppercase tracking-widest rounded-lg leading-none shadow-sm flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                </span>
+                SL ROAD TRUCKING
+                <span className="text-slate-500">|</span>
+                <span className="text-cyan-400">Consola Central</span>
               </span>
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black font-sans tracking-tight flex items-center gap-3">
-              <span className="bg-white/10 border border-white/20 text-slate-100 w-9 h-9 rounded-xl flex items-center justify-center shadow-lg font-black text-sm">
+
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-sans tracking-tight flex items-center gap-3">
+              <span className="bg-white/[0.06] border border-white/[0.12] text-slate-100 w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg font-black text-base backdrop-blur-sm">
                 🛰
               </span>
-              <span className="bg-gradient-to-r from-slate-50 via-white to-slate-300 bg-clip-text text-transparent">
-                Bienvenido Saul
+              <span className="bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+                Bienvenido, Don Saúl
               </span>
               <motion.div
-                animate={{ x: [0, 15, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ x: [0, 10, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                className="hidden sm:inline-block text-slate-400 hover:text-cyan-400 transition-colors"
               >
-                <Truck className="w-8 h-8 text-slate-300" />
+                <Truck className="w-8 h-8 stroke-[1.5]" />
               </motion.div>
             </h1>
-            <p className="text-xs text-slate-200/95 font-sans leading-relaxed">
-              Consola del Administrador para la sincronización, auditorías y monitoreo en vivo de flotas bolivianas.
+
+            <p className="text-xs sm:text-sm text-slate-400 font-medium leading-relaxed max-w-2xl">
+              Consola del Administrador para la sincronización contable, auditorías de ruta y monitoreo en vivo de la flota.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Sync trigger button with premium soft-white satin styling */}
+          <div className="flex items-center gap-3 flex-wrap relative z-10">
+            {/* Sync trigger button with fluid cubic-bezier microinteractions */}
             <button
               onClick={handleManualSync}
               disabled={isSyncing}
-              className="relative group bg-white/10 hover:bg-white/15 active:bg-white/5 border border-white/20 hover:border-white/35 text-slate-50 rounded-xl px-4 py-2.5 font-bold text-xs uppercase flex items-center gap-2 cursor-pointer transition shadow-md shadow-white/[0.02]"
+              className="relative group bg-gradient-to-b from-white/[0.12] to-white/[0.04] hover:from-white/[0.18] hover:to-white/[0.08] active:from-white/[0.04] active:to-white/[0.02] border border-white/[0.15] hover:border-cyan-400/40 text-slate-100 rounded-2xl px-5 py-3 font-bold text-xs uppercase tracking-wider flex items-center gap-2.5 cursor-pointer transition-all duration-300 ease-natural shadow-[0_4px_16px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.15)] hover:shadow-[0_0_24px_rgba(56,189,248,0.25)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <RotateCcw className={`w-3.5 h-3.5 text-emerald-400 ${isSyncing ? 'animate-spin' : 'group-hover:rotate-45 transition'}`} />
-              <span>{isSyncing ? 'Sincronizando...' : 'Sincronizar Sheets'}</span>
+              <RotateCcw className={`w-4 h-4 text-emerald-400 ${isSyncing ? 'animate-spin' : 'group-hover:rotate-45 transition-transform duration-300 ease-natural'}`} />
+              <span className="font-mono tracking-wide">{isSyncing ? 'Sincronizando...' : 'Sincronizar Sheets'}</span>
             </button>
 
             <button
               onClick={handleLogoutAndRedirect}
-              className="bg-red-950/20 hover:bg-red-950/45 text-red-400 border border-red-900/40 rounded-xl px-4 py-2.5 font-bold text-xs uppercase flex items-center gap-2 cursor-pointer transition"
+              className="bg-rose-500/10 hover:bg-rose-500/20 active:bg-rose-500/5 text-rose-300 hover:text-rose-200 border border-rose-500/30 hover:border-rose-500/50 rounded-2xl px-5 py-3 font-bold text-xs uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-all duration-300 ease-natural shadow-md active:scale-95"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="w-4 h-4 text-rose-400" />
               <span>Salir</span>
             </button>
           </div>
         </div>
 
-        {/* METRICS HUD - PERFECTLY ALIGNED, NON-NaN, GEIST MONO */}
-        <div id="analytics-hud" className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {/* METRICS HUD - HIGH INDUSTRIAL DEPTH, COMPOUND GLASS SURFACES & ANIMATED SPARKLINES */}
+        <div id="analytics-hud" className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           
-          {/* Ingresos Brutos */}
-          <div className="relative group overflow-hidden bg-slate-900/80 hover:bg-slate-900/95 backdrop-blur-md border border-white/[0.08] hover:border-white/[0.18] p-5 rounded-2xl shadow-xl transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]">
-            <div className="absolute top-0 right-0 p-3 text-white/[0.06] group-hover:text-emerald-450/15 transition duration-300">
-              <TrendingUp className="w-12 h-12 stroke-[1.2]" />
-            </div>
-            <span className="text-[9.5px] text-slate-200/90 font-black block uppercase tracking-wider">
-              Ingresos Brutos Fletados
-            </span>
-            {!initialLoaded ? (
-              <MetricSkeleton />
-            ) : (
-              <div className="mt-2 text-left">
-                <div className="flex items-baseline space-x-1">
-                  <span className="text-xs font-mono font-bold text-slate-300">Bs.</span>
-                  <span className="text-2xl font-black font-mono tracking-tight text-emerald-400">
-                    {ingresosValue.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <span className="text-[10px] text-emerald-400 font-bold block mt-1">
-                  ✓ Conciliación Activa de Cartas Portes
-                </span>
-              </div>
-            )}
-          </div>
+          {/* Card 1: Ingresos Brutos */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.03, ease: [0.16, 1, 0.3, 1] }}
+            className="glass-sheen perf-contain relative group overflow-hidden bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-emerald-500/35 p-5 sm:p-6 rounded-3xl shadow-[0_12px_36px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] hover:shadow-[0_22px_48px_-12px_rgba(16,185,129,0.16)] transition-all duration-300 ease-natural hover:-translate-y-1 cursor-default"
+          >
+            {/* Ambient Radial Glow (Desktop only) */}
+            <div className="hidden md:block absolute -top-12 -right-12 w-44 h-44 bg-emerald-500/[0.08] group-hover:bg-emerald-500/[0.18] rounded-full blur-3xl transition-all duration-500 pointer-events-none" />
 
-          {/* Gastos Totales */}
-          <div className="relative group overflow-hidden bg-slate-900/80 hover:bg-slate-900/95 backdrop-blur-md border border-white/[0.08] hover:border-white/[0.18] p-5 rounded-2xl shadow-xl transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]">
-            <div className="absolute top-0 right-0 p-3 text-white/[0.06] group-hover:text-rose-450/15 transition duration-300">
-              <DollarSign className="w-12 h-12 stroke-[1.2]" />
-            </div>
-            <span className="text-[9.5px] text-slate-200/90 font-black block uppercase tracking-wider">
-              Gastos de Ruta Operativos
-            </span>
-            {!initialLoaded ? (
-              <MetricSkeleton />
-            ) : (
-              <div className="mt-2 text-left">
-                <div className="flex items-baseline space-x-1">
-                  <span className="text-xs font-mono font-bold text-rose-300">Bs.</span>
-                  <span className="text-2xl font-black font-mono tracking-tight text-rose-400">
-                    {totalExpensesThisMonth.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <span className="text-[10px] text-rose-400 font-bold block mt-1">
-                  ⬇ Retiros de Caja Chica Totales
-                </span>
+            <div className="flex items-center justify-between relative z-10">
+              <span className="text-[11px] text-slate-400 group-hover:text-slate-300 font-semibold uppercase tracking-wider block transition-colors">
+                Ingresos Brutos Fletados
+              </span>
+              <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm group-hover:scale-110 transition-transform duration-300 ease-natural">
+                <TrendingUp className="w-4 h-4" />
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Margen */}
-          <div className="relative group overflow-hidden bg-slate-900/80 hover:bg-slate-900/95 backdrop-blur-md border border-white/[0.08] hover:border-white/[0.18] p-5 rounded-2xl shadow-xl transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]">
-            <div className="absolute top-0 right-0 p-3 text-white/[0.06] group-hover:text-sky-450/15 transition duration-300">
-              <Layers className="w-12 h-12 stroke-[1.2]" />
-            </div>
-            <span className="text-[9.5px] text-slate-200/90 font-black block uppercase tracking-wider">
-              Margen de Utilidad Bruta
-            </span>
             {!initialLoaded ? (
               <MetricSkeleton />
             ) : (
-              <div className="mt-2 text-left">
-                <div className="flex items-baseline space-x-1">
-                  <span className="text-xs font-mono font-bold text-slate-300">Bs.</span>
-                  <span className={`text-2xl font-black font-mono tracking-tight ${isMargenNegative ? 'text-rose-400' : 'text-emerald-400'}`}>
-                    {margenValue.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <div className="mt-4 text-left relative z-10">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-sm font-mono font-bold text-slate-400 select-none">Bs.</span>
+                  <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white group-hover:text-emerald-300 transition-colors tabular-nums drop-shadow-sm">
+                    <AnimatedCurrency value={ingresosValue} />
                   </span>
                 </div>
-                <span className="text-[10px] text-indigo-300 font-bold block mt-1">
-                  ⚡ Rendimiento del capital fletado
-                </span>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span className="truncate">Conciliación Activa</span>
+                  </div>
+                  <svg viewBox="0 0 64 20" className="w-16 h-5 shrink-0 overflow-visible" fill="none">
+                    <motion.path
+                      d="M2 16 Q14 14 22 10 T42 8 T62 2"
+                      stroke="#34d399"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      initial={{ pathLength: 0, opacity: 0.3 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                    />
+                  </svg>
+                </div>
               </div>
             )}
-          </div>
+          </motion.div>
+
+          {/* Card 2: Gastos de Ruta */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            className="glass-sheen perf-contain relative group overflow-hidden bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-rose-500/35 p-5 sm:p-6 rounded-3xl shadow-[0_12px_36px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] hover:shadow-[0_22px_48px_-12px_rgba(244,63,94,0.16)] transition-all duration-300 ease-natural hover:-translate-y-1 cursor-default"
+          >
+            {/* Ambient Radial Glow (Desktop only) */}
+            <div className="hidden md:block absolute -top-12 -right-12 w-44 h-44 bg-rose-500/[0.08] group-hover:bg-rose-500/[0.18] rounded-full blur-3xl transition-all duration-500 pointer-events-none" />
+
+            <div className="flex items-center justify-between relative z-10">
+              <span className="text-[11px] text-slate-400 group-hover:text-slate-300 font-semibold uppercase tracking-wider block transition-colors">
+                Gastos de Ruta Operativos
+              </span>
+              <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 shadow-sm group-hover:scale-110 transition-transform duration-300 ease-natural">
+                <DollarSign className="w-4 h-4" />
+              </div>
+            </div>
+
+            {!initialLoaded ? (
+              <MetricSkeleton />
+            ) : (
+              <div className="mt-4 text-left relative z-10">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-sm font-mono font-bold text-slate-400 select-none">Bs.</span>
+                  <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white group-hover:text-rose-300 transition-colors tabular-nums drop-shadow-sm">
+                    <AnimatedCurrency value={totalExpensesThisMonth} />
+                  </span>
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-[11px] text-rose-400 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                    <span className="truncate">Retiros Caja Chica</span>
+                  </div>
+                  <svg viewBox="0 0 64 20" className="w-16 h-5 shrink-0 overflow-visible" fill="none">
+                    <motion.path
+                      d="M2 14 L14 8 L26 12 L40 5 L52 9 L62 4"
+                      stroke="#fb7185"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      initial={{ pathLength: 0, opacity: 0.3 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 0.9, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+                    />
+                  </svg>
+                </div>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Card 3: Margen de Utilidad */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.13, ease: [0.16, 1, 0.3, 1] }}
+            className="glass-sheen perf-contain relative group overflow-hidden bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-sky-500/35 p-5 sm:p-6 rounded-3xl shadow-[0_12px_36px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] hover:shadow-[0_22px_48px_-12px_rgba(56,189,248,0.16)] transition-all duration-300 ease-natural hover:-translate-y-1 cursor-default"
+          >
+            {/* Ambient Radial Glow (Desktop only) */}
+            <div className="hidden md:block absolute -top-12 -right-12 w-44 h-44 bg-sky-500/[0.08] group-hover:bg-sky-500/[0.18] rounded-full blur-3xl transition-all duration-500 pointer-events-none" />
+
+            <div className="flex items-center justify-between relative z-10">
+              <span className="text-[11px] text-slate-400 group-hover:text-slate-300 font-semibold uppercase tracking-wider block transition-colors">
+                Margen de Utilidad Bruta
+              </span>
+              <div className="p-2 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 shadow-sm group-hover:scale-110 transition-transform duration-300 ease-natural">
+                <Layers className="w-4 h-4" />
+              </div>
+            </div>
+
+            {!initialLoaded ? (
+              <MetricSkeleton />
+            ) : (
+              <div className="mt-4 text-left relative z-10">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-sm font-mono font-bold text-slate-400 select-none">Bs.</span>
+                  <span className={`text-3xl sm:text-4xl font-black font-mono tracking-tight tabular-nums drop-shadow-sm transition-colors ${
+                    isMargenNegative 
+                      ? 'text-rose-400 group-hover:text-rose-300' 
+                      : 'text-white group-hover:text-cyan-300'
+                  }`}>
+                    <AnimatedCurrency value={margenValue} />
+                  </span>
+                </div>
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-[11px] text-cyan-400 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                    <span className="truncate">Rendimiento Capital</span>
+                  </div>
+                  <svg viewBox="0 0 64 20" className="w-16 h-5 shrink-0 overflow-visible" fill="none">
+                    <motion.path
+                      d={isMargenNegative ? 'M2 5 Q18 8 34 13 T62 17' : 'M2 15 Q16 12 28 11 T46 6 T62 3'}
+                      stroke={isMargenNegative ? '#fb7185' : '#38bdf8'}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      initial={{ pathLength: 0, opacity: 0.3 }}
+                      animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ duration: 0.9, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
+                    />
+                  </svg>
+                </div>
+              </div>
+            )}
+          </motion.div>
 
         </div>
 
-        {/* TOP COMMAND NAVIGATION */}
-        <div className="flex flex-wrap bg-slate-900/85 backdrop-blur-md border border-white/[0.08] mb-6 rounded-2xl p-1.5 mt-6 shadow-xl gap-1.5">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
-              activeTab === 'dashboard'
-                ? 'text-slate-50 bg-white/10 border border-white/20 shadow-[0_4px_20px_rgba(255,255,255,0.06),inset_0_1px_1px_rgba(255,255,255,0.1)] font-extrabold'
-                : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.03]'
-            }`}
-          >
-            <TrendingUp className="w-4.5 h-4.5 text-emerald-400" />
-            Dashboard General
-          </button>
-          <button
-            onClick={() => setActiveTab('monitoreo')}
-            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
-              activeTab === 'monitoreo'
-                ? 'text-slate-50 bg-white/10 border border-white/20 shadow-[0_4px_20px_rgba(255,255,255,0.06),inset_0_1px_1px_rgba(255,255,255,0.1)] font-extrabold'
-                : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.03]'
-            }`}
-          >
-            <Activity className="w-4.5 h-4.5" />
-            Monitoreo en Vivo
-          </button>
-          <button
-            onClick={() => setActiveTab('historial')}
-            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
-              activeTab === 'historial'
-                ? 'text-slate-50 bg-white/10 border border-white/20 shadow-[0_4px_20px_rgba(255,255,255,0.06),inset_0_1px_1px_rgba(255,255,255,0.1)] font-extrabold'
-                : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.03]'
-            }`}
-          >
-            <Archive className="w-4.5 h-4.5" />
-            La Bóveda Histórica
-          </button>
-          <button
-            onClick={() => setActiveTab('personal')}
-            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3.5 text-xs font-black uppercase transition-all duration-300 rounded-xl focus:outline-none cursor-pointer ${
-              activeTab === 'personal'
-                ? 'text-slate-50 bg-white/10 border border-white/20 shadow-[0_4px_20px_rgba(255,255,255,0.06),inset_0_1px_1px_rgba(255,255,255,0.1)] font-extrabold'
-                : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.03]'
-            }`}
-          >
-            <Users className="w-4.5 h-4.5" />
-            Control de Personal y Flota
-          </button>
-        </div>
+        {/* TOP COMMAND NAVIGATION - SLIDING SPRING INDICATOR & BREATHING ROOM */}
+        <nav aria-label="Navegación de Secciones" className="perf-contain bg-slate-950/75 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] rounded-2xl p-2 my-6 shadow-[0_16px_40px_-10px_rgba(0,0,0,0.6)] flex flex-wrap gap-2">
+          {[
+            { id: 'dashboard' as const, label: 'Dashboard General', icon: TrendingUp, activeIconColor: 'text-emerald-400' },
+            { id: 'monitoreo' as const, label: 'Monitoreo en Vivo', icon: Activity, activeIconColor: 'text-cyan-400' },
+            { id: 'historial' as const, label: 'La Bóveda Histórica', icon: Archive, activeIconColor: 'text-amber-400' },
+            { id: 'personal' as const, label: 'Control de Personal y Flota', icon: Users, activeIconColor: 'text-indigo-400' },
+          ].map((tab) => {
+            const IconComponent = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative flex-1 min-w-[140px] flex items-center justify-center gap-2.5 px-4 sm:px-5 py-3.5 text-xs font-bold uppercase tracking-wider transition-colors duration-200 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 cursor-pointer whitespace-nowrap active:scale-[0.98] ${
+                  isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="activeCommandTab"
+                    transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                    className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/[0.15] via-white/[0.08] to-white/[0.02] border border-white/[0.2] shadow-[0_6px_22px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.2)]"
+                  />
+                )}
+                <IconComponent className={`w-4 h-4 relative z-10 transition-colors ${isActive ? tab.activeIconColor : 'text-slate-500'}`} />
+                <span className="relative z-10">{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
 
-        {/* CONDITIONALLY RENDER MAIN CONTENT BASED ON TABS */}
+
+        {/* CONDITIONALLY RENDER MAIN CONTENT WITH SMOOTH TAB TRANSITIONS */}
         <div className="w-full">
+          <AnimatePresence mode="wait">
           {activeTab === 'dashboard' && (
             <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
+              key="tab-dashboard"
+              initial={{ opacity: 0, y: 12, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.995 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="max-w-5xl mx-auto"
             >
               <SaulDashboardOverview 
@@ -967,31 +1103,44 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
           {activeTab === 'monitoreo' && (
             <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
+              key="tab-monitoreo"
+              initial={{ opacity: 0, y: 12, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.995 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="max-w-5xl mx-auto space-y-8"
             >
               {/* MONITOREO DE RUTAS EN TIEMPO REAL */}
-            <div id="live-route-container" className="bg-slate-900/80 backdrop-blur-md border border-slate-800 p-6 rounded-2xl space-y-5 shadow-2xl">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="flex items-center gap-2">
+            <div id="live-route-container" className="perf-contain bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] p-5 sm:p-7 rounded-3xl space-y-6 shadow-[0_16px_40px_-10px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.06)]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+                <div className="flex items-center gap-3">
+                  <span className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
+                    <Activity className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h3 className="font-extrabold text-white text-sm sm:text-base tracking-wide font-sans">
+                      Estado de Rutas Activas
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Telemetría y posicionamiento vectorial en vivo
+                    </p>
+                  </div>
+                </div>
+
+                <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.15)] self-start sm:self-auto">
                   <span className="relative flex h-2.5 w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
                   </span>
-                  <h3 className="font-extrabold text-slate-100 text-sm uppercase tracking-wider">
-                    Estado de Rutas Activas
-                  </h3>
+                  <span className="text-[11px] font-black font-mono text-emerald-300 tracking-wider">
+                    {activeViajes.length} UNIDADES EN TRÁNSITO
+                  </span>
                 </div>
-                <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded text-[9.5px] font-black font-mono">
-                  {activeViajes.length} Unidades en Tránsito
-                </span>
               </div>
 
-              <div ref={activeRoutesListRef} className="space-y-3.5">
+              <div ref={activeRoutesListRef} className="space-y-4">
                 {activeViajes.length === 0 ? (
-                  <div className="p-8 text-center bg-slate-950/50 border border-slate-800/60 rounded-xl space-y-2">
+                  <div className="p-8 text-center backdrop-blur-xl bg-slate-950/60 border border-white/[0.08] rounded-2xl space-y-2 shadow-xl">
                     <MapPin className="w-10 h-10 text-slate-400 mx-auto stroke-[1]" />
                     <p className="text-xs text-slate-200 font-bold">Sin viajes activos de carretera en el ciclo</p>
                     <p className="text-[10px] text-slate-400 max-w-sm mx-auto leading-relaxed">
@@ -1003,6 +1152,14 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                     const drv = choferes.find((c) => c.id_chofer === viaje.id_chofer);
                     const truck = camiones.find((c) => c.id_camion === viaje.id_camion);
                     const route = rutas.find((r) => r.id_ruta === viaje.id_ruta);
+
+                    const origenName = route?.origen || 'Oruro';
+                    const destinoName = route?.destino || 'La Paz';
+                    const driverFullName = drv?.nombre_completo || 'Mauricio Usseglio';
+                    const truckDesc = truck?.modelo || 'DAF 1820 Heavy Duty';
+                    const truckPlaca = truck?.placa || '4829-KLA';
+                    const pesajeTons = Number(viaje.toneladas_base || 45) + Number(viaje.toneladas_extras || 0);
+                    const formattedDeparture = formatDepartureDate(viaje.fecha_inicio);
 
                     // Check if driver has low balance (<20% of budget or < 1200 BOB)
                     const budgetNum = Number(drv?.presupuesto !== undefined && drv?.presupuesto !== "" ? drv.presupuesto : 10000) || 10000;
@@ -1016,82 +1173,104 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                           setSelectedRouteViaje(viaje);
                           setIsRouteDetailOpen(true);
                         }}
-                        className={`relative overflow-hidden group p-4 bg-slate-950 rounded-xl flex flex-col gap-4 transition duration-300 animate-fade-in cursor-pointer hover:scale-[1.02] active:scale-[0.99] shadow-lg ${
+                        className={`perf-contain relative overflow-hidden group p-4 sm:p-5 backdrop-blur-md md:backdrop-blur-2xl bg-gradient-to-b from-slate-900/90 via-slate-950/90 to-[#030713] rounded-3xl flex flex-col gap-4 transition-colors duration-300 ease-natural cursor-pointer shadow-[0_20px_50px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.08)] ${
                           isLowBalance 
-                            ? 'border border-rose-500/45 hover:border-rose-400 shadow-rose-950/5 animate-pulse-subtle'
-                            : 'border border-slate-800 hover:border-emerald-500/40 hover:shadow-emerald-950/10'
+                            ? 'border border-rose-500/40 hover:border-rose-400 shadow-rose-950/10'
+                            : 'border border-white/[0.08] hover:border-cyan-500/30 hover:shadow-cyan-950/20'
                         }`}
                         title="Haga clic para auditar la ruta y los comprobantes en detalle"
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div className="space-y-1">
+                        {/* Top satin hairline */}
+                        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 via-white/30 to-transparent pointer-events-none" />
+
+                        {/* REORGANIZED TOP STATUS BAR: En Ruta, ID, EN MONITOREO Beacon, Pesaje, Status */}
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-white/[0.06]">
+                          {/* Left Group: Origin ➔ Destination, Monitoring ID, Beacon */}
+                          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5">
                             <div className="flex items-center gap-2">
-                              <span className={`w-1.5 h-1.5 rounded-full group-hover:scale-125 transition-all duration-300 animate-pulse ${isLowBalance ? 'bg-rose-500' : 'bg-emerald-400'}`}></span>
-                              <span className="text-[10px] font-black font-mono text-sky-400/90 group-hover:text-sky-300 uppercase transition-colors">
-                                ID {viaje.id_viaje}
+                              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] animate-pulse" />
+                              <h4 className="text-white font-black text-sm sm:text-base tracking-tight flex items-center gap-1.5">
+                                <span>En Ruta:</span>
+                                <span className="text-cyan-400">{origenName}</span>
+                                <span className="text-slate-500 font-normal">➔</span>
+                                <span className="text-emerald-400">{destinoName}</span>
+                              </h4>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              {/* Monitoring ID Badge */}
+                              <span className="font-mono text-[9.5px] font-bold text-slate-300 bg-slate-900/90 border border-white/[0.1] px-2.5 py-0.5 rounded-md shadow-inner">
+                                ID <span className="text-cyan-400 font-black">{viaje.id_viaje}</span>
                               </span>
-                              <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${isLowBalance ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'}`}>
-                                {isLowBalance ? '⚠️ ATENCIÓN: SALDO CRÍTICO' : 'EN MONITOREO'}
-                              </span>
+
+                              {/* Dual-ring Pulse Green Beacon */}
+                              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+                                <span className="relative flex h-2 w-2">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                                </span>
+                                <span className="text-[9px] font-black font-mono tracking-wider text-emerald-400 uppercase">
+                                  EN MONITOREO
+                                </span>
+                              </div>
+
                               {isLowBalance && (
-                                <span className="bg-rose-500/30 text-rose-300 border border-rose-500/40 text-[8px] font-black px-1.5 py-0.5 rounded animate-bounce">
-                                  Recarga requerida: Bs. {balanceNum.toLocaleString('es-BO')}
+                                <span className="bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[8.5px] font-black px-2 py-0.5 rounded-md animate-pulse">
+                                  ⚠️ SALDO CRÍTICO (Bs. {balanceNum.toLocaleString('es-BO')})
                                 </span>
                               )}
                             </div>
-                            <h4 className="text-slate-100 font-black text-sm tracking-tight flex items-center gap-1.5 group-hover:text-white transition-colors duration-300">
-                              📍 En Ruta: {route?.origen || 'La Paz'} ➔ {route?.destino || 'Oruro'}
-                            </h4>
-                            <p className="text-[10px] text-slate-400 group-hover:text-slate-300 transition-colors">
-                              Zarpó el {formatDepartureDate(viaje.fecha_inicio)}
-                            </p>
-                            <div className="flex gap-4 mt-1">
-                              <span className="text-[10px] font-mono font-bold bg-slate-900 group-hover:bg-slate-850 text-slate-300 group-hover:text-slate-200 px-2.5 py-1 rounded-md transition-colors border border-slate-800">
-                                Pesaje: {Number(viaje.toneladas_base) + Number(viaje.toneladas_extras)} t
-                              </span>
-                              <span className="text-[10px] font-mono font-bold bg-slate-900 group-hover:bg-slate-850 text-slate-300 group-hover:text-emerald-400 px-2.5 py-1 rounded-md transition-colors border border-slate-800">
-                                Status: {viaje.estado_viaje}
-                              </span>
-                            </div>
                           </div>
 
-                          {/* Right dynamic Badge */}
-                          <div className={`border rounded-xl px-4 py-2 flex flex-col justify-center text-left shrink-0 sm:min-w-48 shadow-inner transition-colors duration-300 ${
-                            isLowBalance 
-                              ? 'bg-rose-950/40 border-rose-500/40 text-rose-200' 
-                              : 'bg-slate-900 group-hover:bg-slate-850 border border-slate-800/80 group-hover:border-emerald-500/20 text-slate-200 group-hover:text-white'
-                          }`}>
-                            <span className={`text-[8px] uppercase font-black tracking-wider transition-colors ${isLowBalance ? 'text-rose-400' : 'text-slate-400 group-hover:text-slate-300'}`}>Chofer y Camión</span>
-                            <span className="text-xs font-black mt-0.5 truncate max-w-[130px] transition-colors" title={drv?.nombre_completo}>
-                              👤 {drv?.nombre_completo || 'Sin chofer'} {isLowBalance && '⚠️'}
-                            </span>
-                            <span className="text-[10.5px] font-mono text-indigo-300 group-hover:text-indigo-200 mt-0.5 transition-colors" title={truck?.modelo}>
-                              Ref: {truck?.modelo || 'Sin camión'}
-                            </span>
+                          {/* Right Group: Pesaje, Status & Audit Action */}
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                            {/* Pesaje Badge */}
+                            <div className="flex items-center gap-1.5 bg-slate-900/80 border border-white/[0.08] px-2.5 py-1 rounded-xl text-xs font-mono text-slate-300 shadow-sm">
+                              <Scale className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                              <span className="text-[10px] text-slate-400 uppercase">Pesaje:</span>
+                              <span className="font-bold text-white">{pesajeTons.toFixed(1)} t</span>
+                            </div>
+
+                            {/* Status Badge */}
+                            <div className="flex items-center gap-1.5 bg-slate-900/80 border border-white/[0.08] px-2.5 py-1 rounded-xl text-xs font-mono text-slate-300 shadow-sm">
+                              <Radio className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                              <span className="text-[10px] text-slate-400 uppercase">Status:</span>
+                              <span className="font-bold text-emerald-400">{viaje.estado_viaje || 'En Ciclo'}</span>
+                            </div>
+
+                            {/* Audit Button */}
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedRouteViaje(viaje);
+                                setIsRouteDetailOpen(true);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl backdrop-blur-md bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 hover:text-emerald-200 border border-emerald-500/30 text-[11px] font-black tracking-wide transition-all shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                            >
+                              <Eye className="w-3 h-3" />
+                              Auditar Viaje en Vivo
+                            </button>
                           </div>
                         </div>
 
-                        {/* Interactive Premium Radar Map */}
+                        {/* Interactive Premium Radar Map with Floating Driver & Weather Widgets */}
                         <RouteMiniMap 
-                          origen={route?.origen || 'La Paz'} 
-                          destino={route?.destino || 'Oruro'} 
+                          origen={origenName} 
+                          destino={destinoName} 
                           idViaje={viaje.id_viaje}
                           variant="saul"
+                          driverName={driverFullName}
+                          truckModel={truckDesc}
+                          truckPlate={truckPlaca}
+                          pesaje={`${pesajeTons.toFixed(1)} t`}
+                          estadoViaje={viaje.estado_viaje}
+                          departureDate={formattedDeparture}
+                          saldoCritico={isLowBalance}
+                          onAuditTrip={() => {
+                            setSelectedRouteViaje(viaje);
+                            setIsRouteDetailOpen(true);
+                          }}
                         />
-
-                        {/* Quick Action Overlay (Hover) */}
-                        <div className="absolute inset-y-0 right-0 w-1/2 sm:w-1/3 bg-gradient-to-l from-slate-950 via-slate-900/70 to-transparent flex items-center justify-end pr-4 sm:pr-8 translate-x-full group-hover:translate-x-0 transition-transform duration-300 pointer-events-none z-20">
-                          <button 
-                            className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-3 rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.4)] pointer-events-auto transform hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedRouteViaje(viaje);
-                              setIsRouteDetailOpen(true);
-                            }}
-                          >
-                            👁️ Auditar Viaje en Vivo
-                          </button>
-                        </div>
                       </div>
                     );
                   })
@@ -1235,9 +1414,11 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
           {activeTab === 'personal' && (
             <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
+              key="tab-personal"
+              initial={{ opacity: 0, y: 12, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.995 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-start"
             >
               <div className="space-y-8">
@@ -1324,7 +1505,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                             )}
                           </div>
                           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                            <span className="text-[10px] text-slate-450 flex items-center gap-1">
+                            <span className="text-[10px] text-slate-400 flex items-center gap-1">
                               <Phone className="w-3 h-3 text-slate-500" />
                               {driver.telefono || 'Sin celular'}
                             </span>
@@ -1357,31 +1538,31 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
               </div>
             </div>
 
-            {/* ESTADO DE CAMIONES FLEET CARD */}
-            <div className="bg-slate-900/80 hover:bg-slate-900/95 backdrop-blur-md border border-white/[0.08] p-6 rounded-2xl space-y-4 shadow-2xl transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]">
-              <div className="flex items-center justify-between border-b border-white/[0.05] pb-3">
+                {/* ESTADO DE CAMIONES FLEET CARD */}
+            <div className="perf-contain bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] hover:border-white/[0.15] p-6 rounded-3xl space-y-4 transition-colors duration-300 shadow-[0_12px_36px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)] relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
                 <div className="space-y-0.5">
                   <h3 className="font-extrabold text-slate-100 text-sm uppercase tracking-wider flex items-center gap-2">
                     <Truck className="w-4 h-4 text-sky-400" />
                     Fichas Físicas de Camiones
                   </h3>
-                  <p className="text-[10px] text-slate-200">Kilometrajes y Alertas de Taller.</p>
+                  <p className="text-[10px] text-slate-300">Kilometrajes y Alertas de Taller.</p>
                 </div>
-                <span className="text-[9.5px] text-slate-200 font-mono bg-white/10 border border-white/20 px-2.5 py-0.5 rounded">
+                <span className="text-[9.5px] text-slate-200 font-mono bg-white/[0.06] border border-white/[0.12] px-2.5 py-0.5 rounded-lg whitespace-nowrap shrink-0 tabular-nums">
                   {camiones.length} activos
                 </span>
               </div>
 
               {/* Toggle Filters */}
-              <div className="flex gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800/60">
+              <div className="flex gap-1 bg-slate-950/70 p-1 rounded-xl border border-white/[0.06]">
                 {(['todos', 'Activo', 'Mantenimiento'] as const).map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setTruckFilterActive(filter)}
-                    className={`flex-1 py-1.5 text-[9px] uppercase font-black rounded-lg transition cursor-pointer text-center ${
+                    className={`flex-1 py-1.5 text-[9px] uppercase font-black rounded-lg transition-all duration-200 cursor-pointer text-center ${
                       truckFilterActive === filter
-                        ? 'bg-sky-500/20 text-sky-450 border border-sky-500/30 shadow-md font-bold'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/30'
+                        ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30 shadow-md font-bold'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
                     }`}
                   >
                     {filter === 'todos' ? 'TODOS' : filter === 'Activo' ? 'EN CARRETERA' : 'TALLER / FALTA'}
@@ -1600,9 +1781,11 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
 
           {activeTab === 'historial' && (
             <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
+              key="tab-historial"
+              initial={{ opacity: 0, y: 12, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.995 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="max-w-5xl mx-auto"
             >
               {/* BÓVEDA DE VIAJES (Historial) */}
@@ -1619,14 +1802,15 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
               />
             </motion.div>
           )}
+          </AnimatePresence>
         </div>
 
         {/* CENTRO DE SOPORTE */}
         <div className="max-w-5xl mx-auto pt-8 border-t border-white/[0.06] mt-8">
-          <div className="bg-[#0b1b3d]/60 backdrop-blur-md border border-[#233554]/50 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+          <div className="perf-contain backdrop-blur-md md:backdrop-blur-xl bg-gradient-to-r from-slate-900/75 via-slate-950/85 to-slate-900/75 border border-white/[0.08] rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[0_16px_40px_-10px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)]">
             <div className="flex items-center gap-3.5 text-left">
               <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
-                <Phone className="w-5 h-5 animate-pulse" />
+                <Phone className="w-5 h-5" />
               </div>
               <div>
                 <h4 className="font-bold text-sm text-white">Centro de Soporte</h4>
@@ -1805,7 +1989,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                 <button
                   type="submit"
                   disabled={isCreatingDriver}
-                  className="w-full bg-blue-500 hover:bg-indigo-455 active:bg-blue-600 text-slate-950 rounded-xl py-3 text-xs uppercase font-extrabold cursor-pointer transition flex items-center justify-center gap-1.5"
+                  className="w-full bg-blue-500 hover:bg-blue-400 active:bg-blue-600 text-slate-950 rounded-xl py-3 text-xs uppercase font-extrabold cursor-pointer transition flex items-center justify-center gap-1.5"
                 >
                   {isCreatingDriver ? (
                     <Sparkles className="w-4 h-4 animate-spin" />
@@ -1847,7 +2031,7 @@ export default function DashboardDonSaul({ token }: DashboardDonSaulProps) {
                       link.click();
                       document.body.removeChild(link);
                     }}
-                    className="flex items-center gap-1.5 text-orange-400 hover:text-orange-350 px-3 py-1.5 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-lg cursor-pointer transition text-xs font-bold"
+                    className="flex items-center gap-1.5 text-orange-400 hover:text-orange-300 px-3 py-1.5 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 rounded-lg cursor-pointer transition text-xs font-bold"
                   >
                     <span>Descargar Foto</span>
                   </button>

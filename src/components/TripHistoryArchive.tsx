@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { Search, Eye, FileDown, Navigation, Calendar, User, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
@@ -379,20 +380,21 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
   };
 
   return (
-    <div className="bg-slate-900/80 hover:bg-slate-900/95 backdrop-blur-md border border-white/[0.08] rounded-2xl p-6 mt-6 shadow-xl animate-fade-in transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] hover:shadow-[0_0_30px_rgba(255,255,255,0.04)]">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pt-2">
+    <div className="perf-contain bg-gradient-to-b from-slate-900/80 to-slate-950/90 backdrop-blur-md md:backdrop-blur-xl border border-white/[0.08] rounded-3xl p-5 sm:p-6 mt-2 shadow-[0_16px_40px_-10px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-colors duration-300 relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none" />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pt-1">
         <div className="space-y-1">
-          <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+          <h2 className="text-lg sm:text-xl font-black text-slate-100 flex items-center gap-2 tracking-tight">
             <Package className="w-5 h-5 text-emerald-400" />
             La Bóveda de Viajes
           </h2>
-          <p className="text-sm text-slate-200">Historial y liquidaciones de ruteo completado</p>
+          <p className="text-xs sm:text-sm text-slate-400">Historial y liquidaciones de ruteo completado</p>
         </div>
         
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
           <button
             onClick={handleExportExcel}
-            className="flex items-center justify-center gap-2 px-4 py-2 border border-emerald-500/30 hover:border-emerald-500 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 hover:text-white text-xs font-bold rounded-xl transition cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 border border-emerald-500/30 hover:border-emerald-400/60 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 hover:text-white text-xs font-bold rounded-xl transition cursor-pointer active:scale-95 whitespace-nowrap"
           >
             <FileDown className="w-4 h-4 text-emerald-400" />
             Descargar Todo en Excel
@@ -403,7 +405,7 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
             <input 
               type="text" 
               placeholder="Buscar chofer, ruta, o ID..." 
-              className="w-full bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-500 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl pl-9 pr-4 py-2 text-sm outline-none transition"
+              className="w-full bg-slate-950/90 border border-white/[0.1] text-slate-200 placeholder-slate-500 focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 rounded-xl pl-9 pr-4 py-2 text-sm outline-none transition"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -412,71 +414,76 @@ export default function TripHistoryArchive({ viajes, choferes, rutas, gastos, ca
       </div>
 
       {filteredTrips.length === 0 ? (
-        <div className="text-center py-10 text-slate-400 border border-dashed border-slate-800 rounded-xl">
+        <div className="text-center py-10 text-slate-400 border border-dashed border-white/[0.1] rounded-2xl">
           <p className="text-sm">No se encontraron viajes finalizados.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <div className="min-w-[800px] flex flex-col gap-3">
-            {filteredTrips.map((viaje, idx) => {
-              const drv = choferes.find(c => c.id_chofer === viaje.id_chofer);
-              const route = rutas.find(r => r.id_ruta === viaje.id_ruta);
-              const totalGastado = getTripTotalExpenses(viaje.id_viaje);
-              
-              return (
-                <div key={`${viaje.id_viaje}-${idx}`} className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-4 flex items-center justify-between hover:border-emerald-500/40 transition group">
-                  <div className="grid grid-cols-4 gap-4 flex-1 items-center">
-                    {/* Fecha y Estado */}
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-slate-900 rounded-lg shrink-0 group-hover:bg-emerald-950/30 transition">
-                        <Calendar className="w-4 h-4 text-slate-300 group-hover:text-emerald-400" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-medium text-slate-200">{viaje.fecha_fin || 'Sin Fecha'}</span>
-                        <span className="text-[10px] text-emerald-400 font-mono">ID: {viaje.id_viaje}</span>
-                      </div>
+        <div className="flex flex-col gap-3">
+          {filteredTrips.map((viaje, idx) => {
+            const drv = choferes.find(c => c.id_chofer === viaje.id_chofer);
+            const route = rutas.find(r => r.id_ruta === viaje.id_ruta);
+            const totalGastado = getTripTotalExpenses(viaje.id_viaje);
+            const animateRow = idx < 8;
+            
+            return (
+              <motion.div
+                key={`${viaje.id_viaje}-${idx}`}
+                initial={animateRow ? { opacity: 0, y: 10 } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, delay: animateRow ? idx * 0.035 : 0, ease: [0.16, 1, 0.3, 1] }}
+                className="perf-contain bg-slate-950/75 hover:bg-slate-950/95 border border-white/[0.07] hover:border-emerald-500/35 rounded-2xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-colors duration-200 group"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 flex-1 items-center">
+                  {/* Fecha y Estado */}
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-slate-900 border border-white/[0.08] rounded-xl shrink-0 group-hover:bg-emerald-950/40 group-hover:border-emerald-500/25 transition">
+                      <Calendar className="w-4 h-4 text-slate-300 group-hover:text-emerald-400" />
                     </div>
-                    
-                    {/* Chofer */}
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-slate-400" />
-                      <span className="text-xs font-semibold text-slate-300">{drv?.nombre_completo || 'Sin Chofer'}</span>
-                    </div>
-
-                    {/* Ruta */}
-                    <div className="flex items-center gap-2">
-                      <Navigation className="w-4 h-4 text-indigo-400" />
-                      <span className="text-xs text-indigo-200">{route?.origen || '?'} ➔ {route?.destino || '?'}</span>
-                    </div>
-
-                    {/* Gastos Totales */}
-                    <div className="flex flex-col items-end pr-8">
-                      <span className="text-[10px] text-slate-400 uppercase tracking-wider">Total Gastado</span>
-                      <span className="font-mono text-sm text-emerald-400 font-bold tracking-tight">Bs. {totalGastado.toFixed(2)}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-slate-200 truncate">{viaje.fecha_fin || 'Sin Fecha'}</span>
+                      <span className="text-[10px] text-emerald-400 font-mono">ID: {viaje.id_viaje}</span>
                     </div>
                   </div>
+                  
+                  {/* Chofer */}
+                  <div className="flex items-center gap-2 min-w-0">
+                    <User className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span className="text-xs font-semibold text-slate-200 truncate">{drv?.nombre_completo || 'Sin Chofer'}</span>
+                  </div>
 
-                  {/* Acciones */}
-                  <div className="flex items-center gap-2 border-l border-slate-800 pl-4 shrink-0">
-                    <button 
-                      onClick={() => onOpenDetails(viaje)}
-                      className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition"
-                      title="Ver Detalles del Viaje"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={() => handleExportPDF(viaje, drv, route)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-800 hover:bg-slate-800 hover:border-slate-600 text-slate-300 hover:text-white text-xs font-medium rounded-lg transition"
-                    >
-                      <FileDown className="w-3.5 h-3.5" />
-                      Exportar PDF
-                    </button>
+                  {/* Ruta */}
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Navigation className="w-4 h-4 text-sky-400 shrink-0" />
+                    <span className="text-xs font-medium text-sky-200 truncate">{route?.origen || '?'} ➔ {route?.destino || '?'}</span>
+                  </div>
+
+                  {/* Gastos Totales */}
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between lg:pr-4 tabular-nums">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider">Total Gastado</span>
+                    <span className="font-mono text-sm text-emerald-400 font-black tracking-tight">Bs. {totalGastado.toFixed(2)}</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Acciones */}
+                <div className="flex items-center justify-end gap-2 border-t lg:border-t-0 lg:border-l border-white/[0.08] pt-3 lg:pt-0 lg:pl-4 shrink-0">
+                  <button 
+                    onClick={() => onOpenDetails(viaje)}
+                    className="p-2 text-slate-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.08] rounded-xl transition cursor-pointer active:scale-95"
+                    title="Ver Detalles del Viaje"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleExportPDF(viaje, drv, route)}
+                    className="flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 border border-white/[0.1] bg-white/[0.04] hover:bg-white/[0.1] hover:border-emerald-500/35 text-slate-200 hover:text-white text-xs font-bold rounded-xl transition cursor-pointer active:scale-95 whitespace-nowrap"
+                  >
+                    <FileDown className="w-3.5 h-3.5 text-emerald-400" />
+                    Exportar PDF
+                  </button>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>

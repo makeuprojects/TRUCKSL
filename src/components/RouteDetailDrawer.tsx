@@ -64,6 +64,7 @@ export default function RouteDetailDrawer({
 }: RouteDetailDrawerProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [zoomScale, setZoomScale] = useState(1);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   // States for parameters editing
   const [isEditingParams, setIsEditingParams] = useState(false);
@@ -101,7 +102,14 @@ export default function RouteDetailDrawer({
       window.URL.revokeObjectURL(blobUrl);
     } catch (e) {
       console.error(e);
-      window.open(url, '_blank');
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `comprobante_${Date.now()}.jpg`;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 
@@ -153,52 +161,81 @@ export default function RouteDetailDrawer({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={onClose}
-              className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 cursor-pointer"
+              transition={{ duration: 0.18 }}
+              onClick={() => {
+                setConfirmingDelete(false);
+                onClose();
+              }}
+              className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm sm:backdrop-blur-md z-50 cursor-pointer"
             />
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-full max-w-[480px] bg-slate-900 border-l border-slate-800 shadow-2xl z-55 flex flex-col overflow-hidden"
+              transition={{ type: 'spring', damping: 28, stiffness: 260 }}
+              className="perf-contain fixed top-0 right-0 h-full w-full max-w-[480px] bg-gradient-to-b from-slate-900/95 via-slate-950/95 to-[#030713] backdrop-blur-md sm:backdrop-blur-2xl border-l border-white/[0.1] shadow-[0_24px_60px_rgba(0,0,0,0.85)] z-55 flex flex-col overflow-hidden"
             >
-              <div className="p-6 border-b border-slate-800 bg-slate-900 backdrop-blur-md flex items-center justify-between">
-                <div className="space-y-1">
-                  <span className="text-emerald-400 font-mono text-[9px] font-black uppercase tracking-wider rounded-md">
+              {/* Top satin hairline */}
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 via-white/25 to-transparent pointer-events-none" />
+
+              <div className="p-5 sm:p-6 border-b border-white/[0.08] bg-slate-950/60 flex items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
+                  <span className="text-emerald-400 font-mono text-[9px] font-black uppercase tracking-wider rounded-md block">
                     Auditoría en Ruta
                   </span>
-                  <h2 className="text-lg font-black text-slate-100 tracking-tight">
+                  <h2 className="text-lg font-black text-slate-100 tracking-tight truncate">
                     Viaje: <span className="font-mono text-sky-400">{viaje.id_viaje}</span>
                   </h2>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   {onDeleteViaje && (
-                    <button
-                      onClick={() => {
-                        if (window.confirm('¿Está seguro de que desea cancelar (eliminar) este viaje? La ruta asociada se liberará nuevamente. Esta acción no se puede deshacer.')) {
-                          onDeleteViaje(viaje.id_viaje);
-                        }
-                      }}
-                      className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition border border-rose-500/20 text-[10px] font-bold uppercase"
-                    >
-                      Cancelar Viaje
-                    </button>
+                    !confirmingDelete ? (
+                      <button
+                        onClick={() => setConfirmingDelete(true)}
+                        className="px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition border border-rose-500/25 text-[10px] font-bold uppercase cursor-pointer active:scale-95"
+                      >
+                        Cancelar Viaje
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-1.5 bg-rose-950/60 border border-rose-500/40 rounded-lg p-1">
+                        <button
+                          onClick={() => {
+                            setConfirmingDelete(false);
+                            onDeleteViaje(viaje.id_viaje);
+                          }}
+                          className="px-2 py-1 rounded bg-rose-500 hover:bg-rose-400 text-slate-950 text-[10px] font-black uppercase cursor-pointer active:scale-95 transition"
+                        >
+                          ¿Confirmar?
+                        </button>
+                        <button
+                          onClick={() => setConfirmingDelete(false)}
+                          className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold uppercase cursor-pointer transition"
+                        >
+                          No
+                        </button>
+                      </div>
+                    )
                   )}
-                  <button onClick={onClose} className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                  <button
+                    onClick={() => {
+                      setConfirmingDelete(false);
+                      onClose();
+                    }}
+                    className="p-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] text-slate-300 hover:text-white transition cursor-pointer active:scale-95"
+                  >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                <div className="grid grid-cols-2 gap-4 bg-slate-900/50 border border-slate-800/60 p-4 rounded-xl">
-                  <div className="space-y-0.5"><span className="text-[9px] text-slate-400 uppercase font-bold">Chofer</span><span className="text-xs font-black text-slate-200 flex items-center gap-1.5"><User className="w-3.5 h-3.5 text-sky-400" />{currentDriver?.nombre_completo || 'N/A'}</span></div>
-                  <div className="space-y-0.5"><span className="text-[9px] text-slate-400 uppercase font-bold">Camión</span><span className="text-xs font-black text-slate-200 flex items-center gap-1.5"><Truck className="w-3.5 h-3.5 text-sky-400" />{currentTruck?.modelo || 'N/A'}</span></div>
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
+                <div className="grid grid-cols-2 gap-3.5 bg-slate-900/55 border border-white/[0.08] p-4 rounded-2xl">
+                  <div className="space-y-0.5 min-w-0"><span className="text-[9px] text-slate-400 uppercase font-bold block">Chofer</span><span className="text-xs font-black text-slate-100 flex items-center gap-1.5 truncate"><User className="w-3.5 h-3.5 text-sky-400 shrink-0" />{currentDriver?.nombre_completo || 'N/A'}</span></div>
+                  <div className="space-y-0.5 min-w-0"><span className="text-[9px] text-slate-400 uppercase font-bold block">Camión</span><span className="text-xs font-black text-slate-100 flex items-center gap-1.5 truncate"><Truck className="w-3.5 h-3.5 text-sky-400 shrink-0" />{currentTruck?.modelo || 'N/A'}</span></div>
                 </div>
 
                 {/* FINANCIAL PARAMETERS & FREIGHT SETTLEMENT */}
-                <div className="bg-slate-900/40 border border-slate-800/60 p-4 rounded-xl space-y-4">
+                <div className="bg-slate-900/50 border border-white/[0.08] p-4 rounded-2xl space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-emerald-400 font-extrabold uppercase tracking-wide flex items-center gap-1.5">
                       ⚖️ Configuración de Flete y Carga
@@ -210,7 +247,7 @@ export default function RouteDetailDrawer({
                           setTarifaInput(viaje.tarifa_pactada || currentRoute?.tarifa_base || '5000');
                           setIsEditingParams(true);
                         }}
-                        className="text-[10px] font-bold text-sky-400 hover:text-sky-300 transition uppercase underline"
+                        className="text-[10px] font-bold text-sky-400 hover:text-sky-300 transition uppercase underline cursor-pointer"
                       >
                         Ajustar
                       </button>
@@ -221,28 +258,28 @@ export default function RouteDetailDrawer({
                     <div className="grid grid-cols-2 gap-4 text-xs">
                       <div className="space-y-1">
                         <span className="text-[9px] text-slate-400 uppercase font-bold block">Toneladas Pactadas (Base)</span>
-                        <span className="font-mono font-bold text-slate-200">{viaje.toneladas_base || '45'} t</span>
+                        <span className="font-mono font-bold text-slate-200 tabular-nums">{viaje.toneladas_base || '45'} t</span>
                       </div>
                       <div className="space-y-1">
                         <span className="text-[9px] text-slate-400 uppercase font-bold block">Tarifa Base Pactada</span>
-                        <span className="font-mono font-bold text-slate-200">Bs. {basePrice.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                        <span className="font-mono font-bold text-slate-200 tabular-nums">Bs. {basePrice.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
                       </div>
                       <div className="space-y-1">
                         <span className="text-[9px] text-slate-400 uppercase font-bold block">Toneladas Extras</span>
-                        <span className="font-mono font-bold text-orange-400">{extraTons} t</span>
+                        <span className="font-mono font-bold text-orange-400 tabular-nums">{extraTons} t</span>
                       </div>
                       <div className="space-y-1">
                         <span className="text-[9px] text-slate-400 uppercase font-bold block">Valor Excedente (Calculado)</span>
-                        <span className="font-mono font-bold text-orange-400">Bs. {extraRateValue.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                        <span className="font-mono font-bold text-orange-400 tabular-nums">Bs. {extraRateValue.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
                       </div>
-                      <div className="col-span-2 pt-2 border-t border-slate-800/60 flex flex-col space-y-1.5">
+                      <div className="col-span-2 pt-2 border-t border-white/[0.06] flex flex-col space-y-1.5">
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] text-slate-400 font-bold uppercase">Bono Chofer (Arriba de 45t):</span>
-                          <span className="font-mono text-xs font-bold text-blue-400">+Bs. {driverBonusValue.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                          <span className="font-mono text-xs font-bold text-blue-400 tabular-nums">+Bs. {driverBonusValue.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="flex items-center justify-between pt-1 border-t border-slate-800/60">
+                        <div className="flex items-center justify-between pt-1 border-t border-white/[0.06]">
                           <span className="text-[10px] text-slate-300 font-black uppercase">Ingreso Total por Viaje:</span>
-                          <span className="font-mono text-sm font-black text-emerald-400">Bs. {totalTripEarnings.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
+                          <span className="font-mono text-sm font-black text-emerald-400 tabular-nums">Bs. {totalTripEarnings.toLocaleString('es-BO', { minimumFractionDigits: 2 })}</span>
                         </div>
                       </div>
                     </div>
@@ -256,7 +293,7 @@ export default function RouteDetailDrawer({
                             step="any"
                             value={toneladasInput}
                             onChange={(e) => setToneladasInput(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono focus:border-sky-500 focus:outline-none"
+                            className="w-full bg-slate-950 border border-white/[0.1] rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono focus:border-sky-500 focus:outline-none"
                             placeholder="45"
                             required
                           />
@@ -268,7 +305,7 @@ export default function RouteDetailDrawer({
                             step="any"
                             value={tarifaInput}
                             onChange={(e) => setTarifaInput(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono focus:border-sky-500 focus:outline-none"
+                            className="w-full bg-slate-950 border border-white/[0.1] rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono focus:border-sky-500 focus:outline-none"
                             placeholder="5000"
                             required
                           />
@@ -278,14 +315,14 @@ export default function RouteDetailDrawer({
                         <button
                           type="button"
                           onClick={() => setIsEditingParams(false)}
-                          className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold uppercase transition"
+                          className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold uppercase transition cursor-pointer"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
                           disabled={isSavingParams}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-[#10B981] text-slate-950 text-[10px] font-black uppercase transition flex items-center gap-1 disabled:opacity-50"
+                          className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-[#10B981] text-slate-950 text-[10px] font-black uppercase transition flex items-center gap-1 disabled:opacity-50 cursor-pointer active:scale-95"
                         >
                           {isSavingParams ? 'Guardando...' : 'Guardar Ajustes'}
                         </button>
@@ -296,7 +333,7 @@ export default function RouteDetailDrawer({
 
                 {/* Weigh Scale Ticket & Load Photos Section */}
                 {viaje.foto_pesaje_url && viaje.foto_pesaje_url.trim().length > 6 && (
-                  <div className="space-y-2 bg-slate-900/40 border border-slate-800/60 p-4 rounded-xl">
+                  <div className="space-y-2 bg-slate-900/50 border border-white/[0.08] p-4 rounded-2xl">
                     <span className="text-[10px] text-indigo-300 font-extrabold uppercase tracking-wide flex items-center gap-1.5">
                       🎫 Certificación de Pesaje y Carga
                     </span>
@@ -305,13 +342,14 @@ export default function RouteDetailDrawer({
                     </p>
                     <div className="flex flex-wrap gap-2 pt-1">
                       {viaje.foto_pesaje_url.split(',').map((u) => u.trim()).filter(Boolean).map((imgUrl, i) => (
-                        <div 
-                           key={i} 
+                        <motion.div 
+                          whileTap={{ scale: 0.94 }}
+                          key={i} 
                           onClick={() => {
                             setSelectedPhoto(imgUrl);
                             setZoomScale(1);
                           }}
-                          className="relative w-16 h-16 rounded-xl overflow-hidden border border-slate-800/60 bg-slate-950 cursor-pointer group shrink-0"
+                          className="relative w-16 h-16 rounded-xl overflow-hidden border border-white/[0.1] bg-slate-950 cursor-pointer group shrink-0"
                           title="Click para ver certificación de carga"
                         >
                           <img 
@@ -319,11 +357,12 @@ export default function RouteDetailDrawer({
                             alt="Ticket pesaje" 
                             className="w-full h-full object-cover transition duration-300 transform group-hover:scale-110" 
                             referrerPolicy="no-referrer"
+                            loading="lazy"
                           />
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
                             <ZoomIn className="w-4 h-4 text-white" />
                           </div>
-                        </div>
+                        </motion.div>
                       ))}
                     </div>
                   </div>
@@ -331,36 +370,43 @@ export default function RouteDetailDrawer({
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-350 font-black uppercase tracking-wider">Resumen Gastos</span>
-                    <span className="text-slate-100 text-xs font-black font-mono">Bs. {totalRouteSpent.toFixed(2)}</span>
+                    <span className="text-[10px] text-slate-300 font-black uppercase tracking-wider">Resumen Gastos</span>
+                    <span className="text-slate-100 text-xs font-black font-mono tabular-nums">Bs. {totalRouteSpent.toFixed(2)}</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800/80 text-center"><span className="text-[9px] text-slate-400 uppercase block">Diésel</span><span className="text-xs font-bold font-mono text-emerald-400 block">{totalFuelExp.toFixed(2)}</span></div>
-                    <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800/80 text-center"><span className="text-[9px] text-slate-400 uppercase block">Peaje</span><span className="text-xs font-bold font-mono text-orange-400 block">{totalTollsExp.toFixed(2)}</span></div>
-                    <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800/80 text-center"><span className="text-[9px] text-slate-400 uppercase block">Otros</span><span className="text-xs font-bold font-mono text-sky-400 block">{totalOtherExp.toFixed(2)}</span></div>
+                  <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                    <div className="bg-slate-900/60 p-3 rounded-xl border border-white/[0.08] text-center"><span className="text-[9px] text-slate-400 uppercase block">Diésel</span><span className="text-xs font-bold font-mono text-emerald-400 block tabular-nums">{totalFuelExp.toFixed(2)}</span></div>
+                    <div className="bg-slate-900/60 p-3 rounded-xl border border-white/[0.08] text-center"><span className="text-[9px] text-slate-400 uppercase block">Peaje</span><span className="text-xs font-bold font-mono text-orange-400 block tabular-nums">{totalTollsExp.toFixed(2)}</span></div>
+                    <div className="bg-slate-900/60 p-3 rounded-xl border border-white/[0.08] text-center"><span className="text-[9px] text-slate-400 uppercase block">Otros</span><span className="text-xs font-bold font-mono text-sky-400 block tabular-nums">{totalOtherExp.toFixed(2)}</span></div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <span className="text-[10px] text-slate-355 font-black uppercase tracking-wider">Historial de Declaraciones</span>
+                  <span className="text-[10px] text-slate-300 font-black uppercase tracking-wider">Historial de Declaraciones</span>
                   {routeExpenses.length === 0 ? (
-                    <div className="p-8 text-center bg-slate-900/30 border border-slate-800/60 rounded-xl text-xs text-slate-400 italic">
+                    <div className="p-8 text-center bg-slate-900/35 border border-white/[0.06] rounded-2xl text-xs text-slate-400 italic">
                       Esperando registros del conductor en tiempo real...
                     </div>
                   ) : (
-                    <div className="relative border-l border-slate-800 pl-4 ml-2.5 space-y-6">
+                    <div className="relative border-l border-white/[0.1] pl-4 ml-2.5 space-y-5">
                       {routeExpenses.map((gasto, index) => {
                         const rawPhotos = gasto.foto_url ? gasto.foto_url.split(',').map((u) => u.trim()).filter(Boolean) : [];
+                        const animateTimeline = index < 8;
                         return (
-                          <div key={`${gasto.id_gasto}-${index}`} className="relative group/timeline-item">
-                            <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 bg-[#090D16] border-2 border-sky-400 rounded-full" />
-                            <div className="space-y-1.5">
-                              <div className="flex items-center justify-between">
-                                <span className="flex items-center gap-1.5 bg-slate-900/80 border border-slate-800 text-slate-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
+                          <motion.div
+                            key={`${gasto.id_gasto}-${index}`}
+                            initial={animateTimeline ? { opacity: 0, x: 10 } : false}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.24, delay: animateTimeline ? index * 0.04 : 0, ease: [0.16, 1, 0.3, 1] }}
+                            className="relative group/timeline-item"
+                          >
+                            <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 bg-[#090D16] border-2 border-sky-400 rounded-full shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
+                            <div className="space-y-1.5 bg-slate-900/40 border border-white/[0.06] rounded-xl p-3">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="flex items-center gap-1.5 bg-slate-950/80 border border-white/[0.08] text-slate-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
                                   {getCategoryIcon(gasto.normalizedCat)}
                                   {gasto.normalizedCat}
                                 </span>
-                                <span className="font-mono text-sm font-black text-rose-450">Bs. {safeParseNum(gasto.monto).toFixed(2)}</span>
+                                <span className="font-mono text-sm font-black text-rose-400 tabular-nums">Bs. {safeParseNum(gasto.monto).toFixed(2)}</span>
                               </div>
                               <p className="text-[11px] text-slate-200 leading-relaxed">{gasto.descripcion || 'Sin descripción'}</p>
                               
@@ -369,30 +415,32 @@ export default function RouteDetailDrawer({
                                   <span className="text-[9px] text-slate-400 uppercase font-black tracking-wider block">Estampas de Comprobante:</span>
                                   <div className="flex flex-wrap gap-2">
                                     {rawPhotos.map((imgUrl, i) => (
-                                      <div 
+                                      <motion.div 
+                                        whileTap={{ scale: 0.94 }}
                                         key={i} 
                                         onClick={() => {
                                           setSelectedPhoto(imgUrl);
                                           setZoomScale(1);
                                         }}
-                                        className="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-800 bg-slate-950 cursor-pointer group/item scale-100 hover:scale-105 transition duration-150"
+                                        className="relative w-12 h-12 rounded-lg overflow-hidden border border-white/[0.1] bg-slate-950 cursor-pointer group/item scale-100 hover:scale-105 transition duration-150"
                                       >
                                         <img 
                                           src={imgUrl} 
                                           alt="Comprobante Gasto" 
                                           className="w-full h-full object-cover" 
                                           referrerPolicy="no-referrer"
+                                          loading="lazy"
                                         />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/item:opacity-100 flex items-center justify-center transition">
                                           <ZoomIn className="w-3.5 h-3.5 text-white" />
                                         </div>
-                                      </div>
+                                      </motion.div>
                                     ))}
                                   </div>
                                 </div>
                               )}
                             </div>
-                          </div>
+                          </motion.div>
                         );
                       })}
                     </div>
@@ -410,14 +458,15 @@ export default function RouteDetailDrawer({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-60 bg-slate-950/95 backdrop-blur-xl flex flex-col justify-center items-center p-8"
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-60 bg-slate-950/95 backdrop-blur-md flex flex-col justify-center items-center p-4 sm:p-8"
           >
-            <button onClick={() => setSelectedPhoto(null)} className="absolute top-5 right-5 p-2 bg-slate-800 border border-slate-700 rounded-lg text-white hover:text-red-400 transition cursor-pointer"><X /></button>
-            <img src={selectedPhoto} alt="Comprobante" style={{ transform: `scale(${zoomScale})` }} className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl" />
+            <button onClick={() => setSelectedPhoto(null)} className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 bg-slate-900 border border-white/[0.15] rounded-xl text-white hover:text-rose-400 transition cursor-pointer active:scale-95"><X /></button>
+            <img src={selectedPhoto} alt="Comprobante" style={{ transform: `scale(${zoomScale})` }} className="max-h-[75vh] sm:max-h-[85vh] max-w-[92vw] object-contain rounded-xl transition-transform duration-200 ease-out" />
             <div className="mt-4 flex gap-2 items-center flex-wrap justify-center">
-              <button onClick={() => setZoomScale(Math.max(0.5, zoomScale - 0.25))} className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded cursor-pointer transition" title="Reducir Zoom"><ZoomOut /></button>
-              <button onClick={() => setZoomScale(Math.min(3.0, zoomScale + 0.25))} className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded cursor-pointer transition" title="Aumentar Zoom"><ZoomIn /></button>
-              <button onClick={() => handleDownload(selectedPhoto)} className="flex items-center gap-1.5 px-4 py-2 bg-orange-550/10 hover:bg-orange-550/20 border border-orange-550/30 text-orange-400 font-bold rounded cursor-pointer transition text-xs">
+              <button onClick={() => setZoomScale(Math.max(0.5, zoomScale - 0.25))} className="p-2 bg-slate-900 hover:bg-slate-800 border border-white/[0.12] text-white rounded-xl cursor-pointer transition active:scale-95" title="Reducir Zoom"><ZoomOut className="w-4 h-4" /></button>
+              <button onClick={() => setZoomScale(Math.min(3.0, zoomScale + 0.25))} className="p-2 bg-slate-900 hover:bg-slate-800 border border-white/[0.12] text-white rounded-xl cursor-pointer transition active:scale-95" title="Aumentar Zoom"><ZoomIn className="w-4 h-4" /></button>
+              <button onClick={() => handleDownload(selectedPhoto)} className="flex items-center gap-1.5 px-4 py-2 bg-orange-500/15 hover:bg-orange-500/25 border border-orange-500/35 text-orange-400 font-bold rounded-xl cursor-pointer transition text-xs active:scale-95">
                 <Download className="w-4 h-4" />
                 <span>Descargar Comprobante</span>
               </button>

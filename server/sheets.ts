@@ -8,9 +8,9 @@ export const memoryStore: Record<string, any[]> = {
   Camiones: [
     {
       id_camion: 'C01',
-      modelo: 'Volvo FH16 750 Heavy Duty',
-      anio: '2021',
-      kilometraje_actual: '125400',
+      modelo: 'DAF 1820 Heavy Duty',
+      anio: '2022',
+      kilometraje_actual: '94300',
       saldo_presupuesto: '15000',
       estado: 'Activo',
       placa: '4829-KLA',
@@ -40,8 +40,8 @@ export const memoryStore: Record<string, any[]> = {
   Choferes: [
     {
       id_chofer: 'mauricio',
-      nombre_completo: 'Mauricio Siles',
-      telefono: '71234567',
+      nombre_completo: 'Mauricio Usseglio',
+      telefono: '76543210',
       pin_acceso: '1234',
       estado: 'Activo',
       presupuesto: '10000',
@@ -82,9 +82,9 @@ export const memoryStore: Record<string, any[]> = {
   Rutas: [
     {
       id_ruta: 'R01',
-      origen: 'La Paz',
-      destino: 'Oruro',
-      tarifa_base: '4500',
+      origen: 'Oruro',
+      destino: 'La Paz',
+      tarifa_base: '5400',
       estado: 'Activa'
     },
     {
@@ -105,9 +105,9 @@ export const memoryStore: Record<string, any[]> = {
   Viajes: [
     {
       id_viaje: 'V01',
-      id_camion: 'C01',
-      id_chofer: 'mauricio',
-      id_ruta: 'R01',
+      id_camion: 'C02',
+      id_chofer: 'juan_carlos',
+      id_ruta: 'R02',
       fecha_inicio: '2026-07-01',
       fecha_fin: '2026-07-03',
       estado_viaje: 'Finalizado',
@@ -117,12 +117,12 @@ export const memoryStore: Record<string, any[]> = {
     },
     {
       id_viaje: 'V02',
-      id_camion: 'C02',
+      id_camion: 'C03',
       id_chofer: 'juan_carlos',
-      id_ruta: 'R02',
+      id_ruta: 'R03',
       fecha_inicio: '2026-07-04',
       fecha_fin: '',
-      estado_viaje: 'En Curso',
+      estado_viaje: 'En Ciclo',
       toneladas_base: '45',
       toneladas_extras: '0',
       foto_pesaje_url: ''
@@ -131,12 +131,12 @@ export const memoryStore: Record<string, any[]> = {
       id_viaje: 'V03',
       id_camion: 'C01',
       id_chofer: 'mauricio',
-      id_ruta: 'R03',
-      fecha_inicio: '2026-07-05',
+      id_ruta: 'R01',
+      fecha_inicio: '2026-10-26',
       fecha_fin: '',
-      estado_viaje: 'En Curso',
+      estado_viaje: 'En Ciclo',
       toneladas_base: '45',
-      toneladas_extras: '5.2',
+      toneladas_extras: '3.5',
       foto_pesaje_url: ''
     }
   ],
